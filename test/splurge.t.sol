@@ -16,9 +16,12 @@ contract splurgeTest is Test {
         token = new mockToken();
     }
 
-    function testExecuteTrade() public {
-        token.approve(address(this), 10000e18);
+    function testTransfer() public {
+        token.approve(address(this), 1e18);
+        token.transferFrom(address(this), address(0x5cbDB794b3B36dF58A7Ce6C1a552F117F061103b), 1e18);
+        require(token.balanceOf(0x5cbDB794b3B36dF58A7Ce6C1a552F117F061103b) == 1e18);
     }
+
 
 
 }
