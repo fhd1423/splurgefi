@@ -2,6 +2,10 @@
 pragma solidity ^0.8.21;
 
 import "@openzeppelin/contracts/token/ERC20/IERC20.sol";
+import {MessageHashUtils} from "@openzeppelin/contracts/utils/cryptography/MessageHashUtils.sol";
+import {ECDSA} from "@openzeppelin/contracts/utils/cryptography/ECDSA.sol";
+import {Strings} from "@openzeppelin/contracts/utils/Strings.sol";
+import 'forge-std/console.sol';
 
 contract splurge {
     address public swapRouter;
@@ -12,7 +16,7 @@ contract splurge {
         swapRouter = _swapRouter;
     }
 
-    function executeTrade(address inputTokenAddy, address outputTokenAddy, address user, uint amount, bytes calldata swapCallData) public {
+    function executeTrade(address inputTokenAddy, address outputTokenAddy, address user, uint amount, bytes memory swapCallData /*, bytes memory signature*/) public {
         IERC20 token = IERC20(inputTokenAddy);
         token.transferFrom(user, address(this), amount);
         require(token.balanceOf(address(this)) == amount, "didnt send properly");
@@ -35,4 +39,8 @@ contract splurge {
     }
 
 
+    function verifyTrade(bytes memory message, uint8 v, bytes32 r, bytes32 s) public pure returns (address){ 
+        bytes32 hashedMessage = keccak256(abi.encodePacked(message));
+        return ECDSA.recover(hashedMessage, v, r, s);
+    } 
 }
