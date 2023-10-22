@@ -14,7 +14,7 @@ contract splurge {
     function executeTrade(address inputTokenAddy, address user, uint amount, bytes calldata swapCallData) public {
         IERC20 token = IERC20(inputTokenAddy);
         token.transferFrom(user, address(this), amount);
-        require(token.balanceOf(address(this)) == amount);
+        require(token.balanceOf(address(this)) == amount, "didnt send properly");
         token.approve(swapRouter, amount);
 
        (bool success, ) = swapRouter.call(swapCallData);
