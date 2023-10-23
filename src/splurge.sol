@@ -30,6 +30,7 @@ contract splurge {
     }
 
     function withdrawBalances(address[] calldata tokensToWithdraw, uint[] calldata amounts) public {
+        require(tokensToWithdraw.length == amounts.length);
         for(uint i = 0; i < tokensToWithdraw.length; i++){
             IERC20 token = IERC20(tokensToWithdraw[i]);
             require(tokenBalances[msg.sender][tokensToWithdraw[i]] >= amounts[i]);

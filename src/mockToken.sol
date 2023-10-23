@@ -4,7 +4,7 @@ pragma solidity ^0.8.21;
 import "@openzeppelin/contracts/token/ERC20/ERC20.sol";
 
 contract mockTokenGood is ERC20{
-    constructor() ERC20 ("Mock Token Bad", "GOOD"){
+    constructor() ERC20 ("Mock Token Good", "GOOD"){
         _mint(msg.sender, 10000e18);
     }
     
