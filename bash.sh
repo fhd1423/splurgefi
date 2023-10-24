@@ -21,9 +21,9 @@ outputSecondTokenDeployment=$(forge create src/MockToken.sol:token2 $DeployerTag
 contract1=$(echo "$outputFirstTokenDeployment" | awk -F": " '/Deployed to:/ {print $2}')
 contract2=$(echo "$outputSecondTokenDeployment" | awk -F": " '/Deployed to:/ {print $2}')
 
-echo "splurge: $splurgeContract"
-echo "contract 1:" $contract1
-echo "contract 2:" $contract2
+echo splurge: $splurgeContract
+echo contract 1: $contract1
+echo contract 2: $contract2
 
 # approve uniswap to spend both tokens
 cast send $contract1 "approve(address, uint256)" $uniswap $maxInteger $DeployerTags
