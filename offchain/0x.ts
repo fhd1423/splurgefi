@@ -1,5 +1,3 @@
-import { todo } from "node:test";
-
 // Import dependencies
 const dotenv = require("dotenv");
 const axios = require("axios");
@@ -8,8 +6,8 @@ const axios = require("axios");
 dotenv.config();
 
 // Define your tokens
-const inputToken = "0x6adeE270c1486c2304EEC0242f1091757E659b99";
-const outputToken = "0xFbC49fE5DfA0f9c3eB672aBB4aCC80b0FDFBb9a3";
+const inputToken = "0xbcdCB26fFec1bE5991FA4b5aF5B2BbC878965Db1";
+const outputToken = "0xFA75399b5ce8C0299B0434E0D1bcFDFd8fF8a755";
 
 // Get the API key from the environment variables
 const apiKey = "0631b1fa-5205-42d3-89ef-c4e8ea3538fe";

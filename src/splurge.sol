@@ -22,12 +22,15 @@ contract splurge {
         require(token.balanceOf(address(this)) == amount, "didnt send properly");
         token.approve(swapRouter, amount);
 
-       (bool success, bytes memory returnData) = swapRouter.call(swapCallData);
+        (bool success,) = swapRouter.call(swapCallData);
         require(success, "swap call failed");
 
-        uint outputAmount = abi.decode(returnData, (uint256));
-        tokenBalances[user][outputTokenAddy] += outputAmount;
+       //(bool success, bytes memory returnData) = swapRouter.call(swapCallData);
+
+        //uint outputAmount = abi.decode(returnData, (uint256));
+        //tokenBalances[user][outputTokenAddy] += outputAmount;
     }
+    /*
 
     function withdrawBalances(address[] calldata tokensToWithdraw, uint[] calldata amounts) public {
         for(uint i = 0; i < tokensToWithdraw.length; i++){
@@ -36,7 +39,9 @@ contract splurge {
             token.transferFrom(address(this), msg.sender, amounts[i]);
             tokenBalances[msg.sender][tokensToWithdraw[i]] -= amounts[i];
         }
+        
     }
+    */
 
 
     function verifyTrade(bytes memory message, uint8 v, bytes32 r, bytes32 s) public pure returns (address){ 
