@@ -11,8 +11,8 @@ addresses=(
 )
 
 # deploy two tokens
-outputFirstTokenDeployment=$(forge create src/MockToken.sol:token1 --private-key $PRIVATE_KEY --rpc-url $RPC_URL)
-outputSecondTokenDeployment=$(forge create src/MockToken.sol:token2 --private-key $PRIVATE_KEY --rpc-url $RPC_URL)
+outputFirstTokenDeployment=$(forge create src/MockToken.sol:token1 $tags)
+outputSecondTokenDeployment=$(forge create src/MockToken.sol:token2 $tags)
 contract1=$(echo "$outputFirstTokenDeployment" | awk -F": " '/Deployed to:/ {print $2}')
 contract2=$(echo "$outputSecondTokenDeployment" | awk -F": " '/Deployed to:/ {print $2}')
 echo "contract 1:" $contract1
