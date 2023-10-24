@@ -10,7 +10,7 @@ contract token1 is ERC20{
     
 }
 
-contract uvablockchain2 is ERC20{
+contract token2 is ERC20{
     constructor() ERC20 ("token2", "2"){
         _mint(msg.sender, 1e6*1e18);
     }
