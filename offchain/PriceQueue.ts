@@ -6,8 +6,7 @@ export default class PriceQueue {
   private count = 0;
 
   addPrice(price: number): void {
-    if (this.queue.length === QUEUE_SIZE) {
-      console.log("works");
+    if (this.count === QUEUE_SIZE) {
       const oldPrice = this.queue.shift()!;
       this.total -= oldPrice;
       this.count -= 1;
@@ -18,7 +17,7 @@ export default class PriceQueue {
   }
 
   mean(): number | null {
-    if (this.count === 0) return null;
+    if (this.count < QUEUE_SIZE) return null;
     return this.total / this.count;
   }
 }

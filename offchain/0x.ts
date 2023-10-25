@@ -1,5 +1,6 @@
 const axios = require("axios");
 import PriceQueue from "./PriceQueue";
+import chunk from "./utils";
 
 const priceQueues: Map<string, PriceQueue> = new Map();
 
@@ -25,8 +26,8 @@ const pairs = [
     output: "0x58c330A4f6e783779a6d1A904555E9E5375d0255",
   },
   {
-    output: "0x58c330A4f6e783779a6d1A904555E9E5375d0255",
-    input: "0x193842E186561260DC49Bd1f5981bfDED1BD672D",
+    input: "0x58c330A4f6e783779a6d1A904555E9E5375d0255",
+    output: "0x193842E186561260DC49Bd1f5981bfDED1BD672D",
   },
 ];
 
@@ -35,7 +36,7 @@ for (const pair of pairs) {
   priceQueues.set(key, new PriceQueue());
 }
 
-const apiKey = "0631b1fa-5205-42d3-89ef-c4e8ea3538fe"; // Replace with your actual API key
+const apiKey = "0631b1fa-5205-42d3-89ef-c4e8ea3538fe";
 
 async function fetchPrice(pair: {
   input: string;
@@ -58,8 +59,6 @@ async function fetchPrice(pair: {
       const meanPrice = priceQueue.mean();
       if (meanPrice !== null) {
         console.log(`Mean for ${key}: ${meanPrice}`);
-      } else {
-        console.log(`No prices yet for ${key}`);
       }
     } else {
       console.error(`No PriceQueue found for ${key}`);
@@ -69,23 +68,18 @@ async function fetchPrice(pair: {
   }
 }
 
-function chunk<T>(array: T[], size: number): T[][] {
-  const chunks = [];
-  for (let i = 0; i < array.length; i += size) {
-    chunks.push(array.slice(i, i + size));
-  }
-  return chunks;
+async function staggeredQuery(pairs: { input: string; output: string }[]) {
+  const chunkedPairs = chunk(pairs, 3); // Chunk pairs into groups of 3
+  chunkedPairs.forEach((chunk, index) => {
+    setTimeout(() => {
+      // Stagger the intervals by 1 second
+      setInterval(() => {
+        for (const pair of chunk) {
+          fetchPrice(pair);
+        }
+      }, 10000);
+    }, index * 1000);
+  });
 }
 
-const chunkedPairs = chunk(pairs, 3); // Chunk pairs into groups of 3
-
-chunkedPairs.forEach((chunk, index) => {
-  setTimeout(() => {
-    // Stagger the intervals by 1 second
-    setInterval(() => {
-      for (const pair of chunk) {
-        fetchPrice(pair);
-      }
-    }, 10000); // Fetch every 10 seconds
-  }, index * 1000);
-});
+staggeredQuery(pairs);
