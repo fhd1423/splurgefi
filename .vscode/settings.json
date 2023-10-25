@@ -1,4 +1,5 @@
 {
   "solidity.compileUsingRemoteVersion": "v0.8.21+commit.d9974bed",
-  "solidity.defaultCompiler": "localFile"
+  "solidity.defaultCompiler": "localFile",
+  "editor.formatOnSave": true
 }
