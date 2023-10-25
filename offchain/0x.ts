@@ -72,13 +72,11 @@ async function staggeredQuery(pairs: { input: string; output: string }[]) {
   const chunkedPairs = chunk(pairs, 3); // Chunk pairs into groups of 3
   chunkedPairs.forEach((chunk, index) => {
     setTimeout(() => {
-      // Stagger the intervals by 1 second
-      setInterval(() => {
-        for (const pair of chunk) {
-          fetchPrice(pair);
-        }
-      }, 10000);
-    }, index * 1000);
+      setInterval(async () => {
+        const fetchPromises = chunk.map((pair) => fetchPrice(pair));
+        await Promise.all(fetchPromises);
+      }, 10000); // Fetch every 10 seconds
+    }, index * 1000); // stagger by 1 second
   });
 }
 
