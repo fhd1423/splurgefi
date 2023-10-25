@@ -1,38 +1,91 @@
-// Import dependencies
-const dotenv = require("dotenv");
 const axios = require("axios");
+import PriceQueue from "./PriceQueue";
 
-// Load environment variables
-dotenv.config();
+const priceQueues: Map<string, PriceQueue> = new Map();
 
-// Define your tokens
-const inputToken = "0xbcdCB26fFec1bE5991FA4b5aF5B2BbC878965Db1";
-const outputToken = "0xFA75399b5ce8C0299B0434E0D1bcFDFd8fF8a755";
+const pairs = [
+  {
+    input: "0xbcdCB26fFec1bE5991FA4b5aF5B2BbC878965Db1",
+    output: "0xFA75399b5ce8C0299B0434E0D1bcFDFd8fF8a755",
+  },
+  {
+    input: "0xFA75399b5ce8C0299B0434E0D1bcFDFd8fF8a755",
+    output: "0xbcdCB26fFec1bE5991FA4b5aF5B2BbC878965Db1",
+  },
+  {
+    input: "0x50dbE194eC396E22A0796919C048323D6086E79D",
+    output: "0xF83Efca7dd4a646C288aC30A8F761383DCFF5306",
+  },
+  {
+    input: "0xF83Efca7dd4a646C288aC30A8F761383DCFF5306",
+    output: "0x50dbE194eC396E22A0796919C048323D6086E79D",
+  },
+  {
+    input: "0x193842E186561260DC49Bd1f5981bfDED1BD672D",
+    output: "0x58c330A4f6e783779a6d1A904555E9E5375d0255",
+  },
+  {
+    output: "0x58c330A4f6e783779a6d1A904555E9E5375d0255",
+    input: "0x193842E186561260DC49Bd1f5981bfDED1BD672D",
+  },
+];
 
-// Get the API key from the environment variables
-const apiKey = "0631b1fa-5205-42d3-89ef-c4e8ea3538fe";
+for (const pair of pairs) {
+  const key = `${pair.input}:${pair.output}`;
+  priceQueues.set(key, new PriceQueue());
+}
 
-// Define the URL and headers
-const url = `https://mumbai.api.0x.org/swap/v1/quote?buyToken=${outputToken}&sellToken=${inputToken}&sellAmount=100000`;
-const headers = {
-  "0x-api-key": apiKey,
-};
+const apiKey = "0631b1fa-5205-42d3-89ef-c4e8ea3538fe"; // Replace with your actual API key
 
-// @todo
-const median = 1;
+async function fetchPrice(pair: {
+  input: string;
+  output: string;
+}): Promise<void> {
+  const url = `https://mumbai.api.0x.org/swap/v1/quote?buyToken=${pair.output}&sellToken=${pair.input}&sellAmount=100000`;
+  const headers = { "0x-api-key": apiKey };
 
-// Define a function to fetch the price
-async function fetchPrice() {
   try {
     const response = await axios.get(url, { headers });
-    console.log(`Price: ${response.data.price}`, Date());
-    if (response.data.price / median < 0.95) {
-      console.log("5% deviation detected");
+    console.log(
+      `Price for ${pair.input}:${pair.output} is ${response.data.price}`,
+      Date()
+    );
+
+    const key = `${pair.input}:${pair.output}`;
+    const priceQueue = priceQueues.get(key);
+    if (priceQueue) {
+      priceQueue.addPrice(response.data.price);
+      const meanPrice = priceQueue.mean();
+      if (meanPrice !== null) {
+        console.log(`Mean for ${key}: ${meanPrice}`);
+      } else {
+        console.log(`No prices yet for ${key}`);
+      }
+    } else {
+      console.error(`No PriceQueue found for ${key}`);
     }
   } catch (error) {
-    console.error(`Fetch failed: ${error.message}`);
+    console.error(`Fetch failed for ${pair.input}:${pair.output}`);
   }
 }
 
-// Call fetchPrice every second
-setInterval(fetchPrice, 1000);
+function chunk<T>(array: T[], size: number): T[][] {
+  const chunks = [];
+  for (let i = 0; i < array.length; i += size) {
+    chunks.push(array.slice(i, i + size));
+  }
+  return chunks;
+}
+
+const chunkedPairs = chunk(pairs, 3); // Chunk pairs into groups of 3
+
+chunkedPairs.forEach((chunk, index) => {
+  setTimeout(() => {
+    // Stagger the intervals by 1 second
+    setInterval(() => {
+      for (const pair of chunk) {
+        fetchPrice(pair);
+      }
+    }, 10000); // Fetch every 10 seconds
+  }, index * 1000);
+});
