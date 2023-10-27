@@ -112,6 +112,7 @@ contract splurgeTest is Test {
         );
 
         bytes memory signature = joinSignature(v, r, s);
+        splurgeContract.prepareVerifyTrade(order, signature, "hi");
     }
 
     function joinSignature(
