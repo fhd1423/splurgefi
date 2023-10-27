@@ -20,6 +20,8 @@ contract splurgeTest is Test {
             0xDef1C0ded9bec7F1a1670819833240f027b25EfF
         );
         token = new mockToken();
+        ownerPrivateKey = 0xA11CE;
+        owner = vm.addr(ownerPrivateKey);
     }
 
     function testTransfer() public {
@@ -34,40 +36,95 @@ contract splurgeTest is Test {
         );
     }
 
-    function testVerify() public {
-        ownerPrivateKey = 0xA11CE;
-        owner = vm.addr(ownerPrivateKey);
+    function testVerify() public view {
         (uint8 v, bytes32 r, bytes32 s) = vm.sign(
             ownerPrivateKey,
             keccak256(abi.encodePacked("hi"))
         );
 
-        require(splurgeContract.verifyTrade("hi", v, r, s) == owner);
+        bytes memory signature = joinSignature(v, r, s);
+
+        require(splurgeContract.verifyTrade("hi", signature) == owner);
     }
 
-    function testVerifyTradeInfo() public {
-        ownerPrivateKey = 0xA11CE;
-        owner = vm.addr(ownerPrivateKey);
+    function testVerifyTradeDetails() public view {
+        address inputTokenAddy = vm.addr(0x11);
+        address outputTokenAddy = vm.addr(0x22);
+        address recipient = vm.addr(0x33);
+        uint amount = 100000;
+        uint deadline = 1730016559; // date in 2024
+        orderStruct memory order = orderStruct(
+            inputTokenAddy,
+            outputTokenAddy,
+            recipient,
+            amount,
+            deadline
+        );
 
-        address input = 0x5cbDB794b3B36dF58A7Ce6C1a552F117F061103b;
-        address output = 0x5cBDB794B3B36EF58A7cE6c1a552f117F061103b;
-
-        // Convert the addresses to bytes
-        bytes memory inputBytes = abi.encodePacked(input);
-        bytes memory outputBytes = abi.encodePacked(output);
-        // Concatenate the bytes
-        bytes memory concatenatedBytes = abi.encodePacked(
-            inputBytes,
-            outputBytes
+        bytes memory concatenatedOrderBytesBeforeHash = abi.encode(
+            order.inputTokenAddy,
+            order.outputTokenAddy,
+            order.recipient,
+            order.amount,
+            order.deadline
         );
 
         (uint8 v, bytes32 r, bytes32 s) = vm.sign(
             ownerPrivateKey,
-            keccak256(abi.encodePacked(concatenatedBytes))
+            keccak256(abi.encodePacked(concatenatedOrderBytesBeforeHash))
         );
 
+        bytes memory signature = joinSignature(v, r, s);
+
         require(
-            splurgeContract.verifyTrade(concatenatedBytes, v, r, s) == owner
+            splurgeContract.verifyTrade(
+                concatenatedOrderBytesBeforeHash,
+                signature
+            ) == owner
         );
+    }
+
+    function testPrepareVerifyTrade() public {
+        address inputTokenAddy = vm.addr(0x11);
+        address outputTokenAddy = vm.addr(0x22);
+        address recipient = owner;
+        uint amount = 100000;
+        uint deadline = 1730016559; // date in 2024
+        orderStruct memory order = orderStruct(
+            inputTokenAddy,
+            outputTokenAddy,
+            recipient,
+            amount,
+            deadline
+        );
+
+        bytes memory concatenatedOrderBytesBeforeHash = abi.encode(
+            order.inputTokenAddy,
+            order.outputTokenAddy,
+            order.recipient,
+            order.amount,
+            order.deadline
+        );
+
+        (uint8 v, bytes32 r, bytes32 s) = vm.sign(
+            ownerPrivateKey,
+            keccak256(abi.encodePacked(concatenatedOrderBytesBeforeHash))
+        );
+
+        bytes memory signature = joinSignature(v, r, s);
+    }
+
+    function joinSignature(
+        uint8 v,
+        bytes32 r,
+        bytes32 s
+    ) public pure returns (bytes memory) {
+        bytes memory sig = new bytes(65);
+        assembly {
+            mstore(add(sig, 32), r)
+            mstore(add(sig, 64), s)
+        }
+        sig[64] = bytes1(v);
+        return sig;
     }
 }
