@@ -1,91 +1,72 @@
-// SPDX-License-Identifier: MIT
-pragma solidity ^0.8.21;
+import { Web3Function, Web3FunctionContext } from "@gelatonetwork/web3-functions-sdk";
+import { Contract } from "@ethersproject/contracts";
+import axios from "axios"; 
 
-import "@openzeppelin/contracts/token/ERC20/IERC20.sol";
-import {MessageHashUtils} from "@openzeppelin/contracts/utils/cryptography/MessageHashUtils.sol";
-import {ECDSA} from "@openzeppelin/contracts/utils/cryptography/ECDSA.sol";
-import {Strings} from "@openzeppelin/contracts/utils/Strings.sol";
-import "forge-std/console.sol";
+const ORACLE_ABI = [
+  "function prepareVerifyTrade(orderStruct memory order, bytes memory signature, bytes memory swapCallData) public"
+];
 
-struct orderStruct {
-    address inputTokenAddy;
-    address outputTokenAddy;
-    address recipient; // the user we are executing the trade for
-    uint amount;
-    uint deadline; // when the order expires
+const apiKey = "0631b1fa-5205-42d3-89ef-c4e8ea3538fe";
+
+const targetPrice = 3000; 
+const tokenPair = {
+  input: "0xbcdCB26fFec1bE5991FA4b5aF5B2BbC878965Db1",
+  output: "0xFA75399b5ce8C0299B0434E0D1bcFDFd8fF8a755",
+};
+
+// Sample order data and signatures (these will need actual values)
+const order = {
+    inputTokenAddy: "0xInputTokenAddress",
+    outputTokenAddy: "0xOutputTokenAddress",
+    recipient: "0xRecipientAddress",
+    amount: 1000, // Placeholder
+    deadline: Date.now() + 24*60*60*1000 // Placeholder: 24 hours from now
+};
+const signature = "0x..."; // Placeholder
+const swapCallData = "0x..."; // Placeholder
+
+async function fetchPrice(pair: { input: string; output: string }): Promise<number> {
+  const url = `https://mumbai.api.0x.org/swap/v1/quote?buyToken=${pair.output}&sellToken=${pair.input}&sellAmount=100000`;
+  const headers = { "0x-api-key": apiKey };
+  const response = await axios.get(url, { headers });
+  return parseFloat(response.data.price);
 }
 
-contract splurge {
-    address public swapRouter;
-    mapping(address => mapping(address => uint)) tokenBalances;
+Web3Function.onRun(async (context: Web3FunctionContext) => {
+  try {
+    const { multiChainProvider } = context;
+    const provider = multiChainProvider.default();
+    const oracleAddress = "0x71B9B0F6C999CBbB0FeF9c92B80D54e4973214da";
+    const oracle = new Contract(oracleAddress, ORACLE_ABI, provider);
 
-    constructor(address _swapRouter) {
-        // 0x router address
-        swapRouter = _swapRouter;
+    const currentPrice = await fetchPrice(tokenPair);
+    console.log(`Current price: ${currentPrice}`);
+
+    if (currentPrice >= targetPrice) {
+      console.log(`Target price reached! Calling prepareVerifyTrade...`);
+      const encodedFunctionData = oracle.interface.encodeFunctionData(
+          'prepareVerifyTrade', 
+          [order, signature, swapCallData]
+      );
+
+      return {
+        canExec: true,
+        callData: [
+          {
+            to: oracleAddress,
+            data: encodedFunctionData
+          }
+        ]
+      };
+    } else {
+      return { canExec: false, message: `Target price not reached` };
     }
-
-    function prepareVerifyTrade(
-        orderStruct memory order,
-        bytes memory signature,
-        bytes memory swapCallData
-    ) public {
-        bytes memory concatenatedOrderBytesBeforeHash = abi.encode(
-            order.inputTokenAddy,
-            order.outputTokenAddy,
-            order.recipient,
-            order.amount,
-            order.deadline
-        );
-
-        require(
-            verifyTrade(concatenatedOrderBytesBeforeHash, signature) ==
-                order.recipient
-        );
-        // executeTrade(order, swapCallData);
+  } catch (error) {
+    console.error("Error:", error);
+    if (error instanceof Error) {
+        return { canExec: false, message: `Error encountered: ${error.message}` };
+    } else {
+        return { canExec: false, message: `An unknown error occurred` };
     }
-
-    function executeTrade(
-        orderStruct memory order,
-        bytes memory swapCallData
-    ) public returns (bool) {
-        IERC20 input = IERC20(order.inputTokenAddy);
-        IERC20 output = IERC20(order.outputTokenAddy);
-
-        // user approves our contract
-        input.transferFrom(order.recipient, address(this), order.amount);
-        input.approve(swapRouter, order.amount);
-
-        uint initialBalance = output.balanceOf(address(this));
-
-        (bool success, ) = swapRouter.call(swapCallData);
-        uint afterBalance = output.balanceOf(address(this));
-        uint amountChange = afterBalance - initialBalance;
-
-        require(success && amountChange > 0, "swap call failed");
-
-        tokenBalances[order.recipient][order.outputTokenAddy] += amountChange;
-        return true;
-    }
-
-    function withdrawBalances(
-        address[] calldata tokensToWithdraw,
-        uint[] calldata amounts
-    ) public {
-        for (uint i = 0; i < tokensToWithdraw.length; i++) {
-            IERC20 token = IERC20(tokensToWithdraw[i]);
-            require(
-                tokenBalances[msg.sender][tokensToWithdraw[i]] >= amounts[i]
-            );
-            token.transfer(msg.sender, amounts[i]);
-            tokenBalances[msg.sender][tokensToWithdraw[i]] -= amounts[i];
-        }
-    }
-
-    function verifyTrade(
-        bytes memory message,
-        bytes memory signature
-    ) public pure returns (address) {
-        bytes32 hashedMessage = keccak256(abi.encodePacked(message));
-        return ECDSA.recover(hashedMessage, signature);
-    }
-}
+  }
+});
