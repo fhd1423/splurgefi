@@ -17,7 +17,7 @@ const tokenPair = {
 // Sample order data and signatures (these will need actual values)
 const order = {
     inputTokenAddy: tokenPair[0],
-    outputTokenAddy: tokenPaire[1],
+    outputTokenAddy: tokenPair[1],
     recipient: "0xRecipientAddress",
     amount: 1000, // Placeholder
     deadline: Date.now() + 24*60*60*1000 // Placeholder: 24 hours from now

@@ -1,0 +1,9 @@
+{
+    "web3FunctionVersion": "2.0.0",
+    "runtime": "js-1.0",
+    "memory": 128,
+    "timeout": 30,
+    "userArgs": {
+      "args": "{\"currency\":\"ethereum\",\"oracle\":\"0x71B9B0F6C999CBbB0FeF9c92B80D54e4973214da\"}"
+    }
+}
