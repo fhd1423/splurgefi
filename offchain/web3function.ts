@@ -1,7 +1,7 @@
 import { Web3Function, Web3FunctionContext } from "@gelatonetwork/web3-functions-sdk";
 import { Contract } from "@ethersproject/contracts";
-import ky from "ky"; 
-import axios from "axios"; 
+import ky from "ky";
+import axios from "axios";
 
 const ORACLE_ABI = [
   "function lastUpdated() external view returns(uint256)",
@@ -11,7 +11,7 @@ const ORACLE_ABI = [
 const apiKey = "0631b1fa-5205-42d3-89ef-c4e8ea3538fe";
 
 // Sample target price and tokenPair (need to upload pairs to firebase and check through that here)
-const targetPrice = 3000; 
+const targetPrice = 3000;
 const tokenPair = {
   input: "0xbcdCB26fFec1bE5991FA4b5aF5B2BbC878965Db1",
   output: "0xFA75399b5ce8C0299B0434E0D1bcFDFd8fF8a755",
@@ -27,12 +27,12 @@ async function fetchPrice(pair: { input: string; output: string }): Promise<numb
 Web3Function.onRun(async (context: Web3FunctionContext) => {
   try {
 
-    const { multiChainProvider } = context;
+    const { userArgs, multiChainProvider } = context;
     const provider = multiChainProvider.default();
 
     // Note - need to update oracle address once we launch smart contract
-    const oracleAddress = "0x71B9B0F6C999CBbB0FeF9c92B80D54e4973214da";
-    const oracle = new Contract(oracleAddress, ORACLE_ABI, provider);
+    // const oracleAddress = "0x71B9B0F6C999CBbB0FeF9c92B80D54e4973214da";
+    const oracle = new Contract(userArgs.oracle, ORACLE_ABI, provider);
 
     const currentPrice = await fetchPrice(tokenPair);
     console.log(`Current price: ${currentPrice}`);
@@ -46,7 +46,7 @@ Web3Function.onRun(async (context: Web3FunctionContext) => {
         canExec: true,
         callData: [
           {
-            to: oracleAddress,
+            to: userArgs.oracle,
             data: oracle.interface.encodeFunctionData("updatePrice", [Math.floor(currentPrice * 100)]), // Convert to cents or your desired format
           },
         ],
@@ -57,9 +57,9 @@ Web3Function.onRun(async (context: Web3FunctionContext) => {
   } catch (error) {
     console.error("Error:", error);
     if (error instanceof Error) {
-        return { canExec: false, message: `Error encountered: ${error.message}` };
+      return { canExec: false, message: `Error encountered: ${error.message}` };
     } else {
-        return { canExec: false, message: `An unknown error occurred` };
+      return { canExec: false, message: `An unknown error occurred` };
     }
-    }
+  }
 });
