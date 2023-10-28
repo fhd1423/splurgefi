@@ -26,8 +26,11 @@ async function fetchPrice(pair: { input: string; output: string }): Promise<numb
 
 Web3Function.onRun(async (context: Web3FunctionContext) => {
   try {
+
     const { multiChainProvider } = context;
     const provider = multiChainProvider.default();
+
+    // Note - need to update oracle address once we launch smart contract
     const oracleAddress = "0x71B9B0F6C999CBbB0FeF9c92B80D54e4973214da";
     const oracle = new Contract(oracleAddress, ORACLE_ABI, provider);
 
@@ -37,6 +40,8 @@ Web3Function.onRun(async (context: Web3FunctionContext) => {
     if (currentPrice >= targetPrice) {
       // If the current price hits the target, update the oracle
       console.log(`Target price reached! Updating oracle...`);
+
+      // Need to update based on our contract payload function
       return {
         canExec: true,
         callData: [
