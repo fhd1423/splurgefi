@@ -133,19 +133,23 @@ contract splurgeTest is Test {
     }
 
     // using the test below to generate the data for performing a real tx
-    /*
+
     function testPrepareVerifyTradeStuff() public {
         address inputTokenAddy = 0x9c3C9283D3e44854697Cd22D3Faa240Cfb032889; // wmatic
         address outputTokenAddy = 0xa0a6c157871A9F38253234BBfD2B8D79F9e9FCDC; // token1
         address recipient = 0x8839278A75dc8249BC0C713A710aaEBD0FEE6750;
-        uint amount = 20000000000000000;
+        uint amount = 200000000000000000;
         uint deadline = 1730016559; // date in 2024
-        orderStruct memory order = orderStruct(
+        uint8 salt = 1;
+        uint8 tranches = 6;
+        OrderStruct memory order = OrderStruct(
             inputTokenAddy,
             outputTokenAddy,
             recipient,
             amount,
-            deadline
+            tranches,
+            deadline,
+            salt
         );
 
         bytes memory concatenatedOrderBytesBeforeHash = abi.encode(
@@ -153,7 +157,9 @@ contract splurgeTest is Test {
             order.outputTokenAddy,
             order.recipient,
             order.amount,
-            order.deadline
+            order.tranches,
+            order.deadline,
+            order.salt
         );
 
         (uint8 v, bytes32 r, bytes32 s) = vm.sign(
@@ -167,7 +173,7 @@ contract splurgeTest is Test {
         vm.expectRevert();
         splurgeContract.prepareVerifyTrade(order, signature, "test");
     }
-*/
+
     function joinSignature(
         uint8 v,
         bytes32 r,

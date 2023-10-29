@@ -64,7 +64,7 @@ contract Splurge is ReentrancyGuard {
     ) public nonReentrant returns (bool) {
         IERC20 input = IERC20(order.inputTokenAddy);
         IERC20 output = IERC20(order.outputTokenAddy);
-        require(order.deadline < block.timestamp, "trade expired");
+        require(order.deadline > block.timestamp, "trade expired");
         require(
             order.inputTokenAddy == wethAddress ||
                 order.outputTokenAddy == wethAddress,
