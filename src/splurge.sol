@@ -2,17 +2,16 @@
 pragma solidity ^0.8.21;
 
 import "@openzeppelin/contracts/token/ERC20/IERC20.sol";
-import {MessageHashUtils} from "@openzeppelin/contracts/utils/cryptography/MessageHashUtils.sol";
 import {ECDSA} from "@openzeppelin/contracts/utils/cryptography/ECDSA.sol";
-import {Strings} from "@openzeppelin/contracts/utils/Strings.sol";
-import "forge-std/console.sol";
 
 struct orderStruct {
     address inputTokenAddy;
     address outputTokenAddy;
     address recipient; // the user we are executing the trade for
     uint amount;
+    uint tranches;
     uint deadline; // when the order expires
+    uint salt; // random number
 }
 
 interface IWETH is IERC20 {
@@ -22,14 +21,16 @@ interface IWETH is IERC20 {
 contract splurge {
     address public swapRouter;
     IWETH public WETH;
-    address wethAddress = 0x9c3C9283D3e44854697Cd22D3Faa240Cfb032889;
+    address wethAddress;
     mapping(address => mapping(address => uint)) tokenBalances;
+    mapping(bytes => uint) tranchesCompleted;
 
-    constructor(address _swapRouter) {
+    constructor(address _swapRouter, address _wethAddress) {
         // 0x router address
         swapRouter = _swapRouter;
         // wmatic for testing purposes
-        WETH = IWETH(wethAddress);
+        wethAddress = _wethAddress;
+        WETH = IWETH(_wethAddress);
     }
 
     function prepareVerifyTrade(
@@ -42,18 +43,21 @@ contract splurge {
             order.outputTokenAddy,
             order.recipient,
             order.amount,
-            order.deadline
+            order.tranches,
+            order.deadline,
+            order.salt
         );
 
         require(
             verifyTrade(concatenatedOrderBytesBeforeHash, signature) ==
                 order.recipient
         );
-        executeTrade(order, swapCallData);
+        executeTrade(order, signature, swapCallData);
     }
 
     function executeTrade(
         orderStruct memory order,
+        bytes memory signature,
         bytes memory swapCallData
     ) public returns (bool) {
         IERC20 input = IERC20(order.inputTokenAddy);
@@ -63,14 +67,20 @@ contract splurge {
                 order.outputTokenAddy == wethAddress
         );
 
-        // @todo figure out how the amount vs tranches works
-        input.transferFrom(order.recipient, address(this), order.amount);
+        require(tranchesCompleted[signature] < order.tranches);
+
+        uint tranche = order.amount / order.tranches;
+        input.transferFrom(order.recipient, address(this), tranche);
         if (order.inputTokenAddy == wethAddress) unwrapAndPay();
-        input.approve(swapRouter, order.amount);
+
+        // @todo optimize this, maybe only need to approve once
+        input.approve(swapRouter, tranche);
 
         uint initialBalance = output.balanceOf(address(this));
 
         (bool success, ) = swapRouter.call(swapCallData);
+        // refund on fail
+        if (!success) input.transfer(order.recipient, tranche);
         uint afterBalance = output.balanceOf(address(this));
         uint amountChange = afterBalance - initialBalance;
 
@@ -83,6 +93,7 @@ contract splurge {
         require(success && amountChange > 0, "swap call failed");
 
         tokenBalances[order.recipient][order.outputTokenAddy] += amountChange;
+        tranchesCompleted[signature] += 1;
         return true;
     }
 

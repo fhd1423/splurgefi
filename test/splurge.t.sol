@@ -18,7 +18,8 @@ contract splurgeTest is Test {
 
     function setUp() public {
         splurgeContract = new splurge(
-            0xDef1C0ded9bec7F1a1670819833240f027b25EfF
+            0xDef1C0ded9bec7F1a1670819833240f027b25EfF,
+            0x9c3C9283D3e44854697Cd22D3Faa240Cfb032889
         );
         token = new mockToken();
         ownerPrivateKey = 0xA11CE;
@@ -55,12 +56,16 @@ contract splurgeTest is Test {
         address recipient = vm.addr(0x33);
         uint amount = 100000;
         uint deadline = 1730016559; // date in 2024
+        uint salt = 1;
+        uint tranches = 6;
         orderStruct memory order = orderStruct(
             inputTokenAddy,
             outputTokenAddy,
             recipient,
             amount,
-            deadline
+            tranches,
+            deadline,
+            salt
         );
 
         bytes memory concatenatedOrderBytesBeforeHash = abi.encode(
@@ -68,7 +73,9 @@ contract splurgeTest is Test {
             order.outputTokenAddy,
             order.recipient,
             order.amount,
-            order.deadline
+            order.tranches,
+            order.deadline,
+            order.salt
         );
 
         (uint8 v, bytes32 r, bytes32 s) = vm.sign(
@@ -92,12 +99,16 @@ contract splurgeTest is Test {
         address recipient = owner;
         uint amount = 100000;
         uint deadline = 1730016559; // date in 2024
+        uint salt = 1;
+        uint tranches = 6;
         orderStruct memory order = orderStruct(
             inputTokenAddy,
             outputTokenAddy,
             recipient,
             amount,
-            deadline
+            tranches,
+            deadline,
+            salt
         );
 
         bytes memory concatenatedOrderBytesBeforeHash = abi.encode(
@@ -105,7 +116,9 @@ contract splurgeTest is Test {
             order.outputTokenAddy,
             order.recipient,
             order.amount,
-            order.deadline
+            order.tranches,
+            order.deadline,
+            order.salt
         );
 
         (uint8 v, bytes32 r, bytes32 s) = vm.sign(
