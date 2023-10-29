@@ -15,13 +15,21 @@ struct orderStruct {
     uint deadline; // when the order expires
 }
 
+interface IWETH is IERC20 {
+    function withdraw(uint wad) external;
+}
+
 contract splurge {
     address public swapRouter;
+    IWETH public WETH;
+    address wethAddress = 0x9c3C9283D3e44854697Cd22D3Faa240Cfb032889;
     mapping(address => mapping(address => uint)) tokenBalances;
 
     constructor(address _swapRouter) {
         // 0x router address
         swapRouter = _swapRouter;
+        // wmatic for testing purposes
+        WETH = IWETH(wethAddress);
     }
 
     function prepareVerifyTrade(
@@ -41,7 +49,7 @@ contract splurge {
             verifyTrade(concatenatedOrderBytesBeforeHash, signature) ==
                 order.recipient
         );
-        // executeTrade(order, swapCallData);
+        executeTrade(order, swapCallData);
     }
 
     function executeTrade(
@@ -50,9 +58,14 @@ contract splurge {
     ) public returns (bool) {
         IERC20 input = IERC20(order.inputTokenAddy);
         IERC20 output = IERC20(order.outputTokenAddy);
+        require(
+            order.inputTokenAddy == wethAddress ||
+                order.outputTokenAddy == wethAddress
+        );
 
-        // user approves our contract
+        // @todo figure out how the amount vs tranches works
         input.transferFrom(order.recipient, address(this), order.amount);
+        if (order.inputTokenAddy == wethAddress) unwrapAndPay();
         input.approve(swapRouter, order.amount);
 
         uint initialBalance = output.balanceOf(address(this));
@@ -60,6 +73,12 @@ contract splurge {
         (bool success, ) = swapRouter.call(swapCallData);
         uint afterBalance = output.balanceOf(address(this));
         uint amountChange = afterBalance - initialBalance;
+
+        if (order.outputTokenAddy == wethAddress) {
+            require(amountChange > 1e16);
+            amountChange -= 1e16;
+            unwrapAndPay();
+        }
 
         require(success && amountChange > 0, "swap call failed");
 
@@ -88,4 +107,14 @@ contract splurge {
         bytes32 hashedMessage = keccak256(abi.encodePacked(message));
         return ECDSA.recover(hashedMessage, signature);
     }
+
+    function unwrapAndPay() private {
+        require(WETH.balanceOf(address(this)) > 1e16); // 0.01 eth
+        WETH.withdraw(1e16);
+        payable(msg.sender).transfer(1e16);
+    }
+
+    receive() external payable {}
+
+    fallback() external payable {}
 }
