@@ -9,7 +9,7 @@ import "forge-std/console.sol";
 import {Strings} from "@openzeppelin/contracts/utils/Strings.sol";
 
 contract splurgeTest is Test {
-    splurge public splurgeContract;
+    Splurge public splurgeContract;
     mockToken public token;
     address internal owner;
     uint256 internal ownerPrivateKey;
@@ -17,7 +17,7 @@ contract splurgeTest is Test {
     uint256 internal realPrivateKey;
 
     function setUp() public {
-        splurgeContract = new splurge(
+        splurgeContract = new Splurge(
             0xDef1C0ded9bec7F1a1670819833240f027b25EfF,
             0x9c3C9283D3e44854697Cd22D3Faa240Cfb032889
         );
@@ -56,9 +56,9 @@ contract splurgeTest is Test {
         address recipient = vm.addr(0x33);
         uint amount = 100000;
         uint deadline = 1730016559; // date in 2024
-        uint salt = 1;
-        uint tranches = 6;
-        orderStruct memory order = orderStruct(
+        uint8 salt = 1;
+        uint8 tranches = 6;
+        OrderStruct memory order = OrderStruct(
             inputTokenAddy,
             outputTokenAddy,
             recipient,
@@ -99,9 +99,9 @@ contract splurgeTest is Test {
         address recipient = owner;
         uint amount = 100000;
         uint deadline = 1730016559; // date in 2024
-        uint salt = 1;
-        uint tranches = 6;
-        orderStruct memory order = orderStruct(
+        uint8 salt = 1;
+        uint8 tranches = 6;
+        OrderStruct memory order = OrderStruct(
             inputTokenAddy,
             outputTokenAddy,
             recipient,
