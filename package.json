@@ -4,8 +4,14 @@
     "solhint": "^4.0.0"
   },
   "dependencies": {
+    "@gelatonetwork/web3-functions-sdk": "^2.1.7",
+    "@openzeppelin/contracts": "^5.0.0",
     "axios": "^1.5.1",
     "dotenv": "^16.3.1",
-    "npm": "^10.2.1"
+    "fetch": "^1.1.0",
+    "install": "^0.13.0",
+    "node-fetch": "^3.3.2",
+    "npm": "^10.2.1",
+    "solc": "^0.8.22"
   }
 }
