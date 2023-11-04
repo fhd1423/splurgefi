@@ -28,7 +28,7 @@ function WaitlistSection() {
         Join our waitlist.
       </h1>
       <p className="text-2xl mb-8 text-gray-400 tracking-wide">
-        Connect you wallet & twitter username to join.
+        Connect you wallet & twitter alias to join.
       </p>
 
       {/* Conditionally render the button or the success message */}
