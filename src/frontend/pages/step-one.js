@@ -10,6 +10,7 @@ export default function StepOne() {
       <h1 className="text-4xl text-white mb-6">
         What tokens do you want to trade?
       </h1>
+      <h3 className="text-lg text-custom-green font-bold">Step 1</h3>
     </div>
   );
 }
