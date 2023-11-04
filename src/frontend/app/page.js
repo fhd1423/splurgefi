@@ -2,9 +2,9 @@
 import LandingPage from "../components/LandingPage";
 import FeaturesSection from "../components/FeaturesSection";
 import WaitlistSection from "../components/WaitlistSection";
+import { DynamicContextProvider } from "@dynamic-labs/sdk-react-core";
 import Graph from "../components/Graph";
 import { EthereumWalletConnectors } from "@dynamic-labs/ethereum";
-import { DynamicContextProvider } from "@dynamic-labs/sdk-react-core";
 
 export default function Home() {
   return (
