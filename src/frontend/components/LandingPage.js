@@ -11,16 +11,6 @@ const handleButtonClick = () => {
 
 const LandingPage = () => (
   <div className="flex flex-col h-screen justify-center items-center bg-black font-sans">
-    <Head>
-      <title>SplurgeFi</title>
-      <meta name="description" content="Welcome to SplurgeFi" />
-      <link rel="icon" href="/favicon.ico" />
-      <link
-        href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap"
-        rel="stylesheet"
-      />
-    </Head>
-
     <div className="text-center">
       <h1 className="text-6xl mb-4 text-white font-bold tracking-wide leading-tight">
         Automate your trades
