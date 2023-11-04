@@ -6,6 +6,7 @@ import { EthereumWalletConnectors } from "@dynamic-labs/ethereum";
 import { DynamicContextProvider } from "@dynamic-labs/sdk-react-core";
 
 export default function Home() {
+
   return (
     <div className="flex flex-col bg-black font-sans w-full">
       <DynamicContextProvider
