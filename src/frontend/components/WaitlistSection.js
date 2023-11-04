@@ -1,36 +1,49 @@
 "use client";
 
+import { useEffect, useState } from "react";
 import { useDynamicContext } from "@dynamic-labs/sdk-react-core";
-import { DynamicWidget } from "@dynamic-labs/sdk-react-core";
 
 function WaitlistSection() {
-  // Function to handle click event
-  const handleButtonClick = () => {
-    // Redirect to the target URL
-    window.location.href = "https://760abapqqfl.typeform.com/to/umui6CKW";
+  // Local state to track if the wallet is connected
+  const [isWalletConnected, setIsWalletConnected] = useState(false);
+
+  // Destructure setShowAuthFlow and primaryWallet from useDynamicContext
+  const { setShowAuthFlow, primaryWallet } = useDynamicContext();
+
+  // Function to handle the authentication flow
+  const handleAuthFlow = () => {
+    setShowAuthFlow(true);
   };
 
-  const { setShowAuthFlow } = useDynamicContext();
+  // Use useEffect to listen for changes in primaryWallet
+  useEffect(() => {
+    if (primaryWallet?.address) {
+      setIsWalletConnected(true);
+    }
+  }, [primaryWallet?.address]);
 
   return (
     <div className="text-center mt-48 mb-48">
       <h1 className="text-5xl mb-5 text-white font-bold tracking-wide leading-tight">
         Join our waitlist.
       </h1>
-      {/* <h1 className="flex justify-center">
-        <DynamicWidget />
-      </h1> */}
-
       <p className="text-2xl mb-8 text-gray-400 tracking-wide">
-        Connect you wallet & twitter account to join.
+        Connect your wallet & Twitter account to join.
       </p>
 
-      <button
-        className="bg-green-500 text-white text-xl font-bold py-2 px-8 rounded-full shadow-lg hover:bg-green-600"
-        onClick={() => setShowAuthFlow(true)}
-      >
-        Connect Wallet
-      </button>
+      {/* Conditionally render the button or the success message */}
+      {isWalletConnected ? (
+        <p className="text-2xl text-green-500 font-bold">
+          You joined our waitlist! 🎉
+        </p>
+      ) : (
+        <button
+          className="bg-green-500 text-white text-xl font-bold py-2 px-8 rounded-full shadow-lg hover:bg-green-600"
+          onClick={handleAuthFlow}
+        >
+          Connect Wallet
+        </button>
+      )}
     </div>
   );
 }

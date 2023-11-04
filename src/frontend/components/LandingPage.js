@@ -3,6 +3,8 @@
 import Head from "next/head";
 import Link from "next/link";
 import Button from "@mui/material/Button";
+import { useEffect, useState } from "react";
+import { useDynamicContext } from "@dynamic-labs/sdk-react-core";
 
 const handleButtonClick = () => {
   // Redirect to the target URL
