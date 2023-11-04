@@ -1,9 +1,9 @@
 "use client";
 
 import Head from "next/head";
-import Button from "@mui/material/Button";
 import { useEffect, useState } from "react";
 import { useDynamicContext } from "@dynamic-labs/sdk-react-core";
+import GradientText from "./GradientText";
 
 const LandingPage = () => {
   // Local state to track if the wallet is connected
@@ -25,7 +25,7 @@ const LandingPage = () => {
   }, [primaryWallet?.address]);
 
   return (
-    <div className="flex flex-col h-screen justify-center items-center bg-black font-sans">
+    <div className="flex flex-col h-screen justify-center items-center bg-black font-sans px-4 sm:px-6 lg:px-8">
       <Head>
         <title>SplurgeFi</title>
         <meta name="description" content="Welcome to SplurgeFi" />
@@ -36,27 +36,27 @@ const LandingPage = () => {
         />
       </Head>
 
-      <div className="text-center">
-        <h1 className="text-6xl mb-4 text-white font-bold tracking-wide leading-tight">
-          Automate your trades
+      <div className="text-center w-full max-w-2xl">
+        <h1 className="text-4xl sm:text-5xl md:text-6xl mb-4 text-white font-bold tracking-wide leading-tight">
+          <GradientText>Automate your trades on DEXs seamlessly</GradientText>
         </h1>
 
-        <h1 className="text-6xl mb-8 text-white font-bold tracking-wide leading-tight">
+        {/* <h2 className="text-4xl sm:text-5xl md:text-6xl mb-8 text-white font-bold tracking-wide leading-tight">
           on DEXs seamlessly
-        </h1>
-        <p className="text-2xl mb-10 text-gray-400 tracking-wide">
-          Connect you wallet & twitter alias to join.
+        </h2> */}
+        <p className="text-xl sm:text-2xl mb-10 text-gray-400 tracking-wide">
+          Connect your wallet & Twitter alias to join.
         </p>
 
         {/* Conditionally render the button or the success message */}
         {isWalletConnected ? (
-          <p className="text-2xl text-green-500 font-bold">
+          <p className="text-xl sm:text-2xl text-green-500 font-bold">
             You joined our waitlist! 🎉
           </p>
         ) : (
           <button
             onClick={handleAuthFlow}
-            className="bg-green-500 text-white text-xl font-bold py-2 px-8 rounded-full shadow-lg hover:bg-green-600"
+            className="bg-green-500 text-white text-lg sm:text-xl font-bold py-2 px-6 sm:px-8 rounded-full shadow-lg hover:bg-green-600 transition-colors duration-300"
           >
             Connect Wallet
           </button>
