@@ -22,7 +22,7 @@ function WaitlistSection() {
       </h1> */}
 
       <p className="text-2xl mb-8 text-gray-400 tracking-wide">
-        Connect you wallet & twitter account to join.
+        Connect you wallet & twitter username to join.
       </p>
 
       <button
