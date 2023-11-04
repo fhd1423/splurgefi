@@ -1,3 +1,4 @@
+"use client";
 import LandingPage from "../components/LandingPage";
 import FeaturesSection from "../components/FeaturesSection";
 import WaitlistSection from "../components/WaitlistSection";
