@@ -45,7 +45,7 @@ const LandingPage = () => {
           on DEXs seamlessly
         </h2> */}
         <p className="text-xl sm:text-2xl mb-10 text-gray-400 tracking-wide">
-          Connect your wallet & Twitter alias to join.
+          Connect your wallet & twitter to join.
         </p>
 
         {/* Conditionally render the button or the success message */}
