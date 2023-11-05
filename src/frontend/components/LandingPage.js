@@ -2,7 +2,7 @@
 
 import Head from "next/head";
 import { useEffect, useState } from "react";
-import { useDynamicContext } from "@dynamic-labs/sdk-react-core";
+import { useDynamicContext, DynamicWidget } from "@dynamic-labs/sdk-react-core";
 import GradientText from "./GradientText";
 
 const LandingPage = () => {
@@ -49,18 +49,19 @@ const LandingPage = () => {
         </p>
 
         {/* Conditionally render the button or the success message */}
-        {isWalletConnected ? (
-          <p className="text-xl sm:text-2xl text-green-500 font-bold">
-            You joined our waitlist! 🎉
-          </p>
-        ) : (
-          <button
-            onClick={handleAuthFlow}
-            className="bg-green-500 text-white text-lg sm:text-xl font-bold py-2 px-6 sm:px-8 rounded-full shadow-lg hover:bg-green-600 transition-colors duration-300"
-          >
-            Connect Wallet
-          </button>
-        )}
+        <>
+          {isWalletConnected && (
+            <p className="text-md sm:text-lg md:text-xl text-green-500 font-bold">
+              You joined our waitlist! 🎉
+              <div className="text-gray-400 text-xl sm:text-2xl">
+                click on the three dots to connect with twitter
+              </div>
+            </p>
+          )}
+          <h1 className="flex justify-center">
+            <DynamicWidget />
+          </h1>
+        </>
       </div>
     </div>
   );
