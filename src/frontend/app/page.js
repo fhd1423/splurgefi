@@ -34,8 +34,8 @@ export default function Home() {
               </a>
             </div>
 
-            <div class="mt-3">
-              <p class="text-gray-500">
+            <div className="mt-3">
+              <p className="text-gray-500">
                 © SplurgeFi. 2023. All rights reserved.
               </p>
             </div>
