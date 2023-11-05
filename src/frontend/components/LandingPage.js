@@ -53,9 +53,6 @@ const LandingPage = () => {
           {isWalletConnected && (
             <p className="text-md sm:text-lg md:text-xl text-green-500 font-bold">
               You joined our waitlist! 🎉
-              <div className="text-gray-400 text-xl sm:text-2xl">
-                click on the three dots to connect with twitter
-              </div>
             </p>
           )}
           <h1 className="flex justify-center">
