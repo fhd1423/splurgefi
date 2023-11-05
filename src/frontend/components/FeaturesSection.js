@@ -12,8 +12,8 @@ function FeaturesSection() {
       </div>
       <div className="w-full sm:w-1/2 lg:w-1/3 mb-6 lg:mb-0">
         <Feature
-          title="Optimized for Speed"
-          description="Easy, secure, and fast trading experience."
+          title="Gasless"
+          description="Don't worry about gas after the approval."
         />
       </div>
       <div className="w-full sm:w-1/2 lg:w-1/3">

@@ -38,7 +38,7 @@ function WaitlistSection() {
             You joined our waitlist! 🎉
           </p>
         )}
-        <h1 className="flex justify-center">
+        <h1 className="flex justify-center p-2">
           <DynamicWidget />
         </h1>
       </>
