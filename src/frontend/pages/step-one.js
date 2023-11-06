@@ -6,9 +6,7 @@ import CustomInputToken from "../components/CustomInputToken";
 import Link from "next/link";
 
 export default function StepOne() {
-  // Initialize the state to control the value of the NumberInput
-  const [value, setValue] = useState(""); // Start with an empty string or any initial value
-
+  const [value, setValue] = useState("");
   const tokenOptions = [
     { label: "Token A", value: "A" },
     { label: "Token B", value: "B" },

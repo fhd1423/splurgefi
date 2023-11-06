@@ -7,23 +7,23 @@ import Typography from "@mui/material/Typography";
 const CustomInputContainer = styled("div")({
   display: "flex",
   alignItems: "center",
-  justifyContent: "center", // Center the child horizontally and vertically
+  justifyContent: "center",
   backgroundColor: "#1B1B1B",
   borderRadius: "10px",
-  width: "160px", // Fixed width as requested
-  height: "90px", // Fixed height as requested
-  padding: "0", // No padding, as the input will dictate the content size
+  width: "160px",
+  height: "90px",
+  padding: "0",
 });
 
 // Custom styles for the input component
 const CustomInput = styled(InputBase)({
   color: "white",
-  fontSize: "2rem", // Large font size for better visibility
+  fontSize: "2rem",
   "& .MuiInputBase-input": {
-    textAlign: "center", // Center the text inside the input
-    padding: "0", // Remove padding to prevent misalignment
-    width: "100%", // Input should fill the container width
-    height: "100%", // Input should fill the container height
+    textAlign: "center",
+    padding: "0",
+    width: "100%",
+    height: "100%",
   },
 });
 

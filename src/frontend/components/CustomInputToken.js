@@ -16,7 +16,7 @@ const CustomInputContainer = styled("div")({
   alignItems: "center",
   backgroundColor: "#1B1B1B",
   borderRadius: "10px",
-  padding: "0 10px", // Add padding here
+  padding: "0 10px",
   width: "400px",
   height: "90px",
   justifyContent: "space-between",
@@ -27,7 +27,7 @@ const CustomInput = styled(InputBase)(({ theme }) => ({
   color: "white",
   fontSize: "2rem",
   "& .MuiInputBase-input": {
-    padding: "20px 12px", // Adjust padding to vertically center the text
+    padding: "20px 12px",
     flex: 1,
   },
 }));
@@ -37,7 +37,7 @@ const CustomSelect = styled(Select)(({ theme }) => ({
   color: "white",
   backgroundColor: "#27ae60",
   borderRadius: "20px",
-  height: "30px", // Adjust height as needed to fit within CustomInputContainer
+  height: "30px",
   width: "140px",
   "& .MuiSelect-select": {
     '&[aria-label="placeholder"]': {
@@ -56,7 +56,6 @@ const CustomSelect = styled(Select)(({ theme }) => ({
 }));
 // Custom styles for the form control (to remove the underline from the select)
 const CustomFormControl = styled(FormControl)({
-  // Removed minWidth and added flexShrink
   flexShrink: 0,
   "&&&:before": {
     borderBottom: "none",
@@ -84,7 +83,6 @@ export default function CustomInputToken({ title, options }) {
   const [selectedValue, setSelectedValue] = useState("");
 
   const handleChange = (event) => {
-    // Set the selectedValue to the value of the selected option
     setSelectedValue(event.target.value);
   };
 
