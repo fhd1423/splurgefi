@@ -1,15 +1,33 @@
-// step-three.js
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import Head from "next/head";
 import CustomInputPercent from "../components/CustomInputPercent";
-import CustomDatePicker from "../components/CustomDatePicker"; // Import the new component
+import CustomDatePicker from "../components/CustomDatePicker";
 import { AdapterDayjs } from "@mui/x-date-pickers/AdapterDayjs";
 import { LocalizationProvider } from "@mui/x-date-pickers/LocalizationProvider";
+import { useDynamicContext } from "@dynamic-labs/sdk-react-core";
 import Grid from "@mui/material/Grid";
 import dayjs from "dayjs";
 
 export default function StepThree() {
   const [selectedDate, setSelectedDate] = useState(dayjs());
+  const [isWalletConnected, setIsWalletConnected] = useState(false);
+
+  // Access setShowAuthFlow and primaryWallet from useDynamicContext
+  const { setShowAuthFlow, primaryWallet } = useDynamicContext();
+
+  const [percentValue, setPercentValue] = useState("");
+
+  // Function to handle the authentication flow
+  const handleAuthFlow = () => {
+    setShowAuthFlow(true);
+  };
+
+  // Listen for changes in primaryWallet
+  useEffect(() => {
+    if (primaryWallet?.address) {
+      setIsWalletConnected(true);
+    }
+  }, [primaryWallet?.address]);
 
   return (
     <LocalizationProvider dateAdapter={AdapterDayjs}>
@@ -29,7 +47,11 @@ export default function StepThree() {
         <div className="pt-4 pb-12">
           <Grid container spacing={10} justifyContent="center">
             <Grid item>
-              <CustomInputPercent title="Batches" />
+              <CustomInputPercent
+                title="Batches"
+                value={percentValue}
+                onValueChange={setPercentValue} // Pass the handler
+              />
             </Grid>
             <Grid item>
               <CustomDatePicker
@@ -40,9 +62,27 @@ export default function StepThree() {
           </Grid>
         </div>
 
-        <button className="bg-green-500 text-white text-xl font-bold rounded-full shadow-lg hover:bg-green-600 w-96 h-16">
-          Connect Wallet
-        </button>
+        {isWalletConnected ? (
+          <div class="flex flex-col space-y-4">
+            <p className="text-xl text-green-500 font-bold">
+              Wallet succesfully connected 🎉!
+            </p>
+
+            <button
+              onClick={handleAuthFlow}
+              className="bg-green-500 text-white text-xl font-bold py-2 px-8 rounded-full shadow-lg hover:bg-green-600"
+            >
+              Start Automation
+            </button>
+          </div>
+        ) : (
+          <button
+            onClick={handleAuthFlow}
+            className="bg-green-500 text-white text-xl font-bold py-2 px-8 rounded-full shadow-lg hover:bg-green-600"
+          >
+            Connect Wallet
+          </button>
+        )}
       </div>
     </LocalizationProvider>
   );

@@ -1,4 +1,3 @@
-// CustomDatePicker.js
 import React from "react";
 import { DatePicker } from "@mui/x-date-pickers/DatePicker";
 import {
@@ -40,7 +39,7 @@ const customDatePickerTheme = createTheme({
     MuiSvgIcon: {
       styleOverrides: {
         root: {
-          color: "#ffffff", // icon color
+          color: "#ffffff",
         },
       },
     },

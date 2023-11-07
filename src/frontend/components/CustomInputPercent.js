@@ -27,7 +27,7 @@ const CustomInput = styled(InputBase)({
   },
 });
 
-export default function CustomInputPercent({ title }) {
+export default function CustomInputPercent({ title, value, onValueChange }) {
   return (
     <div>
       <Typography
@@ -40,7 +40,11 @@ export default function CustomInputPercent({ title }) {
         {title}
       </Typography>
       <CustomInputContainer>
-        <CustomInput placeholder="0%" />
+        <CustomInput
+          placeholder="0%"
+          value={value} // Ensure you use the value from props
+          onChange={handleInputChange}
+        />
       </CustomInputContainer>
     </div>
   );

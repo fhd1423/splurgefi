@@ -6,12 +6,29 @@ import CustomInputPercent from "../components/CustomInputPercent";
 import CustomInputToken from "../components/CustomInputToken";
 import Grid from "@mui/material/Grid";
 import Link from "next/link";
+import { useState } from "react";
 
 export default function StepTwo() {
   const tokenOptions = [
-    { label: "Token A", value: "A" },
-    { label: "Token B", value: "B" },
+    { label: "WETH", value: "WETH" },
+    { label: "JOE", value: "JOE" },
   ];
+
+  // State for percent change
+  const [percentChange, setPercentChange] = useState("");
+
+  // State for the selected token
+  const [selectedToken, setSelectedToken] = useState("");
+
+  // Handler to update percent change
+  const handlePercentChange = (value) => {
+    setPercentChange(value);
+  };
+
+  // Handler to update selected token
+  const handleTokenChange = (value) => {
+    setSelectedToken(value);
+  };
 
   return (
     <div className="h-screen bg-black flex flex-col justify-center items-center">
@@ -30,10 +47,19 @@ export default function StepTwo() {
       <div className="pt-4 pb-12">
         <Grid container spacing={10} justifyContent="center">
           <Grid item>
-            <CustomInputPercent title="Percent Change" />
+            <CustomInputPercent
+              title="Percent Change"
+              value={percentChange} // Pass the state value
+              onValueChange={handlePercentChange} // Pass the handler
+            />
           </Grid>
           <Grid item>
-            <CustomInputToken title="Token" options={tokenOptions} />
+            <CustomInputToken
+              title="Token"
+              options={tokenOptions}
+              onValueChange={handleTokenChange}
+              onSelectChange={handleTokenChange}
+            />
           </Grid>
         </Grid>
       </div>
