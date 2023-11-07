@@ -6,11 +6,36 @@ import CustomInputToken from "../components/CustomInputToken";
 import Link from "next/link";
 
 export default function StepOne() {
-  const [value, setValue] = useState("");
+  // Sample options for testing
   const tokenOptions = [
-    { label: "Token A", value: "A" },
-    { label: "Token B", value: "B" },
+    { label: "WETH", value: "WETH" },
+    { label: "JOE", value: "JOE" },
   ];
+
+  // State to hold input values
+  const [inputTokenValue, setInputTokenValue] = useState("");
+  const [outputTokenValue, setOutputTokenValue] = useState("");
+
+  // State to hold selected tokens
+  const [inputToken, setInputToken] = useState("");
+  const [outputToken, setOutputToken] = useState("");
+
+  // Handlers to update the state
+  const handleInputTokenChange = (value) => {
+    setInputTokenValue(value);
+  };
+
+  const handleOutputTokenChange = (value) => {
+    setOutputTokenValue(value);
+  };
+
+  const handleInputTokenSelect = (token) => {
+    setInputToken(token);
+  };
+
+  const handleOutputTokenSelect = (token) => {
+    setOutputToken(token);
+  };
 
   return (
     <div className="h-screen bg-black flex flex-col justify-center items-center">
@@ -24,8 +49,18 @@ export default function StepOne() {
       <h3 className="text-lg text-custom-green font-bold">Step 1</h3>
 
       <div className="space-y-8 pt-6 pb-12">
-        <CustomInputToken title="Input Token" options={tokenOptions} />
-        <CustomInputToken title="Output Token" options={tokenOptions} />
+        <CustomInputToken
+          title="Input Token"
+          options={tokenOptions}
+          onValueChange={handleInputTokenChange}
+          onSelectChange={handleInputTokenSelect}
+        />
+        <CustomInputToken
+          title="Output Token"
+          options={tokenOptions}
+          onValueChange={handleOutputTokenChange}
+          onSelectChange={handleOutputTokenSelect}
+        />
       </div>
 
       <Link href="/step-two" passHref>

@@ -79,11 +79,30 @@ const CustomMenuItem = styled(MenuItem)({
   },
 });
 
-export default function CustomInputToken({ title, options }) {
+export default function CustomInputToken({
+  title,
+  options,
+  onValueChange,
+  onSelectChange,
+}) {
+  // Local state for the input's value
+  const [value, setValue] = useState("");
+
+  // ADD THIS LINE: Local state for the selected token's value
   const [selectedValue, setSelectedValue] = useState("");
 
-  const handleChange = (event) => {
-    setSelectedValue(event.target.value);
+  // Update local state and lift up the value when it changes
+  const handleInputChange = (event) => {
+    const newValue = event.target.value;
+    setValue(newValue);
+    onValueChange(newValue); // Lift up the new value
+  };
+
+  // Lift up the selected token when it changes
+  const handleSelectChange = (event) => {
+    const newToken = event.target.value;
+    setSelectedValue(newToken);
+    onSelectChange(newToken); // Lift up the selected token
   };
 
   return (
@@ -98,11 +117,15 @@ export default function CustomInputToken({ title, options }) {
         {title}
       </Typography>
       <CustomInputContainer>
-        <CustomInput placeholder="0" />
+        <CustomInput
+          placeholder="0"
+          value={value}
+          onChange={handleInputChange}
+        />
         <CustomFormControl variant="standard">
           <CustomSelect
             value={selectedValue}
-            onChange={handleChange}
+            onChange={handleSelectChange}
             displayEmpty
             input={<OutlinedInput />}
             renderValue={(value) => {

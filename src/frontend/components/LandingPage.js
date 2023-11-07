@@ -4,8 +4,6 @@ import Head from "next/head";
 import Link from "next/link";
 import Button from "@mui/material/Button";
 
-// Note: Removed handleButtonClick since it's not needed for internal navigation.
-
 const LandingPage = () => (
   <div className="flex flex-col h-screen justify-center items-center bg-black font-sans">
     <Head>
