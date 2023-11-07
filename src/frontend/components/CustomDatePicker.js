@@ -1,65 +1,71 @@
-import * as React from "react";
-import TextField from "@mui/material/TextField";
+// CustomDatePicker.js
+import React from "react";
 import { DatePicker } from "@mui/x-date-pickers/DatePicker";
-import { styled } from "@mui/system";
-import Typography from "@mui/material/Typography";
-import { LocalizationProvider } from "@mui/x-date-pickers/LocalizationProvider";
+import {
+  TextField,
+  createTheme,
+  ThemeProvider,
+  Typography,
+} from "@mui/material";
 
-const CustomStyledTextField = styled(TextField)({
-  "& label.Mui-focused": {
-    color: "white",
-  },
-  "& .MuiInputBase-input": {
-    color: "white",
-  },
-  "& .MuiOutlinedInput-root": {
-    "& fieldset": {
-      borderColor: "white",
-    },
-    "&:hover fieldset": {
-      borderColor: "white",
-    },
-    "&.Mui-focused fieldset": {
-      borderColor: "white",
+const customDatePickerTheme = createTheme({
+  palette: {
+    primary: {
+      main: "#50D890",
+      contrastText: "#1B1B1B",
     },
   },
-  "& .MuiSvgIcon-root": {
-    color: "white",
+  components: {
+    MuiTextField: {
+      styleOverrides: {
+        root: {
+          input: {
+            color: "#ffffff",
+            height: "70px",
+            padding: "10px 14px",
+          },
+          "& .MuiInputLabel-root": {
+            color: "#ffffff",
+          },
+          "& .MuiOutlinedInput-root": {
+            backgroundColor: "#1B1B1B",
+            borderRadius: "4px",
+            "&.Mui-focused fieldset": {
+              borderColor: "transparent",
+            },
+          },
+        },
+      },
+    },
+    MuiSvgIcon: {
+      styleOverrides: {
+        root: {
+          color: "#ffffff", // icon color
+        },
+      },
+    },
   },
 });
 
-export default function CustomDatePicker({ value, onChange, label, ...other }) {
+const CustomDatePicker = ({ selectedDate, setSelectedDate }) => {
   return (
-    <LocalizationProvider dateAdapter={AdapterDayjs}>
+    <ThemeProvider theme={customDatePickerTheme}>
+      <Typography
+        variant="subtitle1"
+        color="white"
+        fontWeight="600"
+        gutterBottom
+        style={{ marginBottom: "8px", textAlign: "left" }}
+      >
+        Automation Deadline
+      </Typography>
       <DatePicker
-        label={label}
-        value={value}
-        onChange={onChange}
-        renderInput={(params) => (
-          <CustomStyledTextField
-            {...params}
-            InputLabelProps={{
-              ...params.InputLabelProps,
-              style: { color: "white" },
-            }}
-            inputProps={{ ...params.inputProps, style: { color: "white" } }} // Ensure the input text is white
-            sx={{
-              "& .MuiOutlinedInput-root .MuiOutlinedInput-notchedOutline": {
-                borderColor: "white",
-              },
-              "&:hover .MuiOutlinedInput-root .MuiOutlinedInput-notchedOutline":
-                {
-                  borderColor: "white",
-                },
-              "& .MuiOutlinedInput-root.Mui-focused .MuiOutlinedInput-notchedOutline":
-                {
-                  borderColor: "white",
-                },
-            }}
-          />
-        )}
-        {...other}
+        value={selectedDate}
+        onChange={setSelectedDate}
+        renderInput={(params) => <TextField {...params} />}
       />
-    </LocalizationProvider>
+    </ThemeProvider>
   );
-}
+};
+
+export default CustomDatePicker;

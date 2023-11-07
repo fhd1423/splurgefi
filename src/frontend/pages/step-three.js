@@ -1,11 +1,10 @@
-"use client";
+// step-three.js
 import React, { useState } from "react";
 import Head from "next/head";
 import CustomInputPercent from "../components/CustomInputPercent";
+import CustomDatePicker from "../components/CustomDatePicker"; // Import the new component
 import { AdapterDayjs } from "@mui/x-date-pickers/AdapterDayjs";
 import { LocalizationProvider } from "@mui/x-date-pickers/LocalizationProvider";
-import { DatePicker } from "@mui/x-date-pickers/DatePicker";
-import TextField from "@mui/material/TextField";
 import Grid from "@mui/material/Grid";
 import dayjs from "dayjs";
 
@@ -33,15 +32,17 @@ export default function StepThree() {
               <CustomInputPercent title="Batches" />
             </Grid>
             <Grid item>
-              <DatePicker
-                label="Choose a date"
-                value={selectedDate}
-                onChange={(newDate) => setSelectedDate(newDate)}
-                renderInput={(params) => <TextField {...params} />}
+              <CustomDatePicker
+                selectedDate={selectedDate}
+                setSelectedDate={setSelectedDate}
               />
             </Grid>
           </Grid>
         </div>
+
+        <button className="bg-green-500 text-white text-xl font-bold rounded-full shadow-lg hover:bg-green-600 w-96 h-16">
+          Connect Wallet
+        </button>
       </div>
     </LocalizationProvider>
   );
