@@ -10,7 +10,6 @@ export default function StepOne() {
   const tokenOptions = [
     { label: "Token A", value: "A" },
     { label: "Token B", value: "B" },
-    // ... other options
   ];
 
   return (
