@@ -21,8 +21,8 @@ export default function StepTwo() {
   const [selectedToken, setSelectedToken] = useState("");
 
   // Handler to update percent change
-  const handlePercentChange = (value) => {
-    setPercentChange(value);
+  const handlePercentChange = (event) => {
+    setPercentChange(event.target.value);
   };
 
   // Handler to update selected token
@@ -50,7 +50,8 @@ export default function StepTwo() {
             <CustomInputPercent
               title="Percent Change"
               value={percentChange} // Pass the state value
-              onValueChange={handlePercentChange} // Pass the handler
+              onValueChange={handlePercentChange} // Pass the corrected handler
+              placeHolder={"0%"}
             />
           </Grid>
           <Grid item>

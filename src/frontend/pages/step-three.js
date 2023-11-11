@@ -49,8 +49,9 @@ export default function StepThree() {
             <Grid item>
               <CustomInputPercent
                 title="Batches"
+                placeHolder={"5"}
                 value={percentValue}
-                onValueChange={setPercentValue} // Pass the handler
+                onValueChange={(e) => setPercentValue(e.target.value)} // Corrected: use a handler function to set the value
               />
             </Grid>
             <Grid item>
@@ -64,8 +65,8 @@ export default function StepThree() {
 
         {isWalletConnected ? (
           <div class="flex flex-col space-y-4">
-            <p className="text-xl text-green-500 font-bold">
-              Wallet succesfully connected 🎉!
+            <p className="py-5 text-xl font-medium">
+              Wallet succesfully connected! 🎉
             </p>
 
             <button

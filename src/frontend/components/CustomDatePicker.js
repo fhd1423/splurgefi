@@ -22,13 +22,14 @@ const customDatePickerTheme = createTheme({
             color: "#ffffff",
             height: "70px",
             padding: "10px 14px",
+            fontSize: "1.25rem", // Adjust the font size as needed
           },
           "& .MuiInputLabel-root": {
             color: "#ffffff",
           },
           "& .MuiOutlinedInput-root": {
             backgroundColor: "#1B1B1B",
-            borderRadius: "4px",
+            borderRadius: "10px",
             "&.Mui-focused fieldset": {
               borderColor: "transparent",
             },
