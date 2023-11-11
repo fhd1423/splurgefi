@@ -1,20 +1,42 @@
 "use client";
 
-import React from "react";
 import Head from "next/head";
 import CustomInputPercent from "../components/CustomInputPercent";
 import TradeSelector from "../components/TradeSelector";
 import Grid from "@mui/material/Grid";
 import Link from "next/link";
-import { useState } from "react";
+import React, { useEffect, useState } from "react";
 
 export default function StepTwo() {
-  // State for percent change
-  const [percentChange, setPercentChange] = useState("");
+  // Retreive data from previous view
+  const [tradeDetails, setTradeDetails] = useState({
+    inputTokenValue: "",
+    outputTokenValue: "",
+    inputToken: "",
+    outputToken: "",
+  });
 
-  // Handler to update percent change
+  useEffect(() => {
+    // Retrieve the state from localStorage
+    const savedTradeDetails = localStorage.getItem("tradeDetails");
+    if (savedTradeDetails) {
+      setTradeDetails(JSON.parse(savedTradeDetails));
+    }
+  }, []);
+
+  // States for percent change and selected value
+  const [percentChange, setPercentChange] = useState("");
+  const [selectedSelectorValue, setSelectedSelectorValue] = useState("");
+
   const handlePercentChange = (event) => {
     setPercentChange(event.target.value);
+    // You can also do other things with the new value here
+  };
+
+  const handleSelectorChange = (event) => {
+    // Assuming you have a state to store the selected value
+    setSelectedSelectorValue(event.target.value);
+    // You can also do other things with the new value here
   };
 
   // State for the trade action
@@ -45,7 +67,9 @@ export default function StepTwo() {
               title="Percent Change"
               value={percentChange}
               onValueChange={handlePercentChange}
+              onSelectorChange={handleSelectorChange}
               placeHolder={"0%"}
+              selectorValue={selectedSelectorValue}
             />
           </Grid>
           <Grid item>
@@ -56,12 +80,24 @@ export default function StepTwo() {
           </Grid>
         </Grid>
       </div>
-      {/* {percentChange && selectedToken && (
-        <h2 className="pb-10">
-          Summary: When {selectedToken} increases by {percentChange}%, sell for
-          DAI
+      {/* <h2 className="pb-10">{tradeDetails.inputTokenValue}</h2> */}
+      {percentChange && selectedSelectorValue && selectedTradeAction && (
+        <h2 className="pb-10 text-white">
+          Summary: When{" "}
+          {selectedTradeAction === "Buy output token"
+            ? tradeDetails.outputToken
+            : tradeDetails.inputToken}{" "}
+          {selectedSelectorValue === "+" ? "increases" : "decreases"} by{" "}
+          {percentChange}%,
+          {selectedTradeAction === "Buy output token"
+            ? " buy "
+            : " sell "} for{" "}
+          {selectedTradeAction === "Buy output token"
+            ? tradeDetails.inputToken
+            : tradeDetails.outputToken}
+          {"."}
         </h2>
-      )} */}
+      )}
       <Link href="/step-three" passHref>
         <button className="bg-green-500 text-white text-xl font-bold rounded-full shadow-lg hover:bg-green-600 w-96 h-16">
           Continue

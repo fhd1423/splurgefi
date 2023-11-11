@@ -7,6 +7,7 @@ import { LocalizationProvider } from "@mui/x-date-pickers/LocalizationProvider";
 import { useDynamicContext } from "@dynamic-labs/sdk-react-core";
 import Grid from "@mui/material/Grid";
 import dayjs from "dayjs";
+import Link from "next/link";
 
 export default function StepThree() {
   const [selectedDate, setSelectedDate] = useState(dayjs());
@@ -15,7 +16,7 @@ export default function StepThree() {
   // Access setShowAuthFlow and primaryWallet from useDynamicContext
   const { setShowAuthFlow, primaryWallet } = useDynamicContext();
 
-  const [percentValue, setPercentValue] = useState("");
+  const [batchValue, setBatchValue] = useState("");
 
   // Function to handle the authentication flow
   const handleAuthFlow = () => {
@@ -101,8 +102,8 @@ export default function StepThree() {
               <CustomInputBatches
                 title="Batches"
                 placeHolder={"5"}
-                value={percentValue}
-                onValueChange={(e) => setPercentValue(e.target.value)} // Corrected: use a handler function to set the value
+                value={batchValue}
+                onValueChange={(e) => setBatchValue(e.target.value)} // Corrected: use a handler function to set the value
               />
             </Grid>
             <Grid item>
@@ -114,18 +115,35 @@ export default function StepThree() {
           </Grid>
         </div>
 
+        {batchValue && selectedDate && (
+          <h2 className="pb-10 text-white">
+            Summary: Execute the trade up to {batchValue} times or until the
+            automation deadline, whichever occurs first, once trade conditions
+            are met.
+          </h2>
+        )}
+
         {isWalletConnected ? (
-          <div class="flex flex-col space-y-4">
+          <div class="flex flex-col space-y-4 text-center">
             <p className="py-5 text-xl font-medium">
               Wallet succesfully connected! 🎉
             </p>
 
-            <button
-              onClick={uploadConditionalOrder}
+            {/* <button
+              onClick={handleAuthFlow}
               className="bg-green-500 text-white text-xl font-bold rounded-full shadow-lg hover:bg-green-600 w-96 h-16"
             >
               Start Automation
-            </button>
+            </button> */}
+
+            <Link href="/trades" passHref>
+              <button
+                onClick={handleAuthFlow}
+                className="bg-green-500 text-white text-xl font-bold rounded-full shadow-lg hover:bg-green-600 w-96 h-16"
+              >
+                Start Automation
+              </button>
+            </Link>
           </div>
         ) : (
           <button

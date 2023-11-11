@@ -41,6 +41,19 @@ export default function StepOne() {
     setOutputToken(token);
   };
 
+  // Store the values locally to pass to step-two
+  const handleContinue = () => {
+    localStorage.setItem(
+      "tradeDetails",
+      JSON.stringify({
+        inputTokenValue,
+        outputTokenValue,
+        inputToken,
+        outputToken,
+      })
+    );
+  };
+
   return (
     <div className="h-screen bg-black flex flex-col justify-center items-center">
       <Head>
@@ -68,7 +81,10 @@ export default function StepOne() {
       </div>
 
       <Link href="/step-two" passHref>
-        <button className="bg-green-500 text-white text-xl font-bold rounded-full shadow-lg hover:bg-green-600 w-96 h-16">
+        <button
+          onClick={handleContinue}
+          className="bg-green-500 text-white text-xl font-bold rounded-full shadow-lg hover:bg-green-600 w-96 h-16"
+        >
           Continue
         </button>
       </Link>

@@ -84,7 +84,7 @@ export default function TradeSelector({
             top: "50%",
             right: 10,
             transform: "translateY(-50%)",
-            color: "#27ae60", // Green color for the icon
+            color: "#FFFFFF",
             backgroundColor: "transparent",
           }}
         >
