@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from "react";
 import Head from "next/head";
-import CustomInputPercent from "../components/CustomInputPercent";
+import CustomInputBatches from "../components/CustomInputBatches";
 import CustomDatePicker from "../components/CustomDatePicker";
 import { AdapterDayjs } from "@mui/x-date-pickers/AdapterDayjs";
 import { LocalizationProvider } from "@mui/x-date-pickers/LocalizationProvider";
@@ -47,7 +47,7 @@ export default function StepThree() {
         <div className="pt-4 pb-12">
           <Grid container spacing={10} justifyContent="center">
             <Grid item>
-              <CustomInputPercent
+              <CustomInputBatches
                 title="Batches"
                 placeHolder={"5"}
                 value={percentValue}
@@ -71,7 +71,7 @@ export default function StepThree() {
 
             <button
               onClick={handleAuthFlow}
-              className="bg-green-500 text-white text-xl font-bold py-2 px-8 rounded-full shadow-lg hover:bg-green-600"
+              className="bg-green-500 text-white text-xl font-bold rounded-full shadow-lg hover:bg-green-600 w-96 h-16"
             >
               Start Automation
             </button>
@@ -79,7 +79,7 @@ export default function StepThree() {
         ) : (
           <button
             onClick={handleAuthFlow}
-            className="bg-green-500 text-white text-xl font-bold py-2 px-8 rounded-full shadow-lg hover:bg-green-600"
+            className="bg-green-500 text-white text-xl font-bold rounded-full shadow-lg hover:bg-green-600 w-96 h-16"
           >
             Connect Wallet
           </button>

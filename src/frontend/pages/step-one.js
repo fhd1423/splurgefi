@@ -22,18 +22,22 @@ export default function StepOne() {
 
   // Handlers to update the state
   const handleInputTokenChange = (value) => {
+    console.log("Input Token Value:", value); // Log the input token value
     setInputTokenValue(value);
   };
 
   const handleOutputTokenChange = (value) => {
+    console.log("Output Token Value:", value); // Log the output token value
     setOutputTokenValue(value);
   };
 
   const handleInputTokenSelect = (token) => {
+    console.log("Input Token Selected:", token); // Log the input token selection
     setInputToken(token);
   };
 
   const handleOutputTokenSelect = (token) => {
+    console.log("Output Token Selected:", token); // Log the output token selection
     setOutputToken(token);
   };
 
