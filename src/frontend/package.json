@@ -27,7 +27,8 @@
     "react": "^18.2.0",
     "react-dom": "^18.2.0",
     "request": "^2.88.2",
-    "reusify": "^1.0.4"
+    "reusify": "^1.0.4",
+    "viem": "^1.18.4"
   },
   "devDependencies": {
     "autoprefixer": "^10",

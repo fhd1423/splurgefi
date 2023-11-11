@@ -1,23 +1,47 @@
 "use client";
 
+import { useEffect, useState } from "react";
+import { useDynamicContext, DynamicWidget } from "@dynamic-labs/sdk-react-core";
+
 function WaitlistSection() {
-  // Function to handle click event
-  const handleButtonClick = () => {
-    // Redirect to the target URL
-    window.location.href = "https://760abapqqfl.typeform.com/to/umui6CKW";
+  // Local state to track if the wallet is connected
+  const [isWalletConnected, setIsWalletConnected] = useState(false);
+
+  // Destructure setShowAuthFlow and primaryWallet from useDynamicContext
+  const { setShowAuthFlow, primaryWallet } = useDynamicContext();
+
+  // Function to handle the authentication flow
+  const handleAuthFlow = () => {
+    setShowAuthFlow(true);
   };
 
+  // Use useEffect to listen for changes in primaryWallet
+  useEffect(() => {
+    if (primaryWallet?.address) {
+      setIsWalletConnected(true);
+    }
+  }, [primaryWallet?.address]);
+
   return (
-    <div className="text-center mt-48 mb-48">
-      <h1 className="text-6xl mb-10 text-white font-bold tracking-wide leading-tight">
-        Join the waitlist today.
+    <div className="text-center mt-10 md:mt-20 lg:mt-48 mb-10 md:mb-20 lg:mb-48 px-5 sm:px-10">
+      <h1 className="text-3xl sm:text-4xl md:text-5xl mb-4 sm:mb-5 md:mb-6 text-white font-bold tracking-wide leading-snug">
+        Join our waitlist.
       </h1>
-      <button
-        onClick={handleButtonClick} // Add the onClick event handler here
-        className="bg-green-500 text-white text-xl font-bold py-2 px-8 rounded-full shadow-lg hover:bg-green-600 focus:outline-none focus:ring focus:ring-green-200 focus:ring-opacity-50"
-      >
-        Join Waitlist
-      </button>
+      <p className="text-md sm:text-lg md:text-xl mb-6 sm:mb-8 text-gray-400 tracking-wide">
+        Connect your wallet & twitter to join.
+      </p>
+
+      {/* Conditionally render the button or the success message */}
+      <>
+        {isWalletConnected && (
+          <p className="text-md sm:text-lg md:text-xl text-green-500 font-bold">
+            You joined our waitlist! 🎉
+          </p>
+        )}
+        <h1 className="flex justify-center p-2">
+          <DynamicWidget />
+        </h1>
+      </>
     </div>
   );
 }
