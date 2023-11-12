@@ -2,11 +2,12 @@
 
 pragma solidity ^0.8.13;
 
-import {Test} from "forge-std/Test.sol";
-import "../src/splurge.sol";
+import { Test } from "forge-std/Test.sol";
+import "../src/contracts/splurge.sol";
 import "./mocks/mockToken.sol";
 import "forge-std/console.sol";
-import {Strings} from "@openzeppelin/contracts/utils/Strings.sol";
+import { Strings } from "@openzeppelin/contracts/utils/Strings.sol";
+import { Transformation } from "../src/contracts/Interfaces.sol";
 
 contract splurgeTest is Test {
     Splurge public splurgeContract;
@@ -58,7 +59,7 @@ contract splurgeTest is Test {
         uint deadline = 1730016559; // date in 2024
         uint8 salt = 1;
         uint8 tranches = 6;
-        OrderStruct memory order = OrderStruct(
+        SplurgeOrderStruct memory order = SplurgeOrderStruct(
             inputTokenAddy,
             outputTokenAddy,
             recipient,
@@ -101,7 +102,7 @@ contract splurgeTest is Test {
         uint deadline = 1730016559; // date in 2024
         uint8 salt = 1;
         uint8 tranches = 6;
-        OrderStruct memory order = OrderStruct(
+        SplurgeOrderStruct memory order = SplurgeOrderStruct(
             inputTokenAddy,
             outputTokenAddy,
             recipient,
@@ -129,12 +130,33 @@ contract splurgeTest is Test {
         bytes memory signature = joinSignature(v, r, s);
 
         vm.expectRevert();
-        splurgeContract.prepareVerifyTrade(order, signature, "test");
+
+        // Create a Transformation instance
+        Transformation memory transformation1 = Transformation({
+            deploymentNonce: 0, // replace 0 with your desired nonce
+            data: new bytes(0) // replace with your desired data
+        });
+
+        // Create an array of Transformations
+        Transformation[] memory transformationsArray = new Transformation[](1);
+        transformationsArray[0] = transformation1;
+
+        // Use the array in ZeroExSwapStruct
+        ZeroExSwapStruct memory zeroExSwap = ZeroExSwapStruct({
+            inputToken: vm.addr(0),
+            outputToken: vm.addr(0),
+            inputTokenAmount: 0,
+            minOutputTokenAmount: 0,
+            transformations: transformationsArray
+        });
+
+        // this will revert since its not a real contract anyways, have to mock it somehow
+        splurgeContract.verifyExecuteTrade(order, signature, zeroExSwap);
     }
 
     // using the test below to generate the data for performing a real tx
 
-    function testPrepareVerifyTradeStuff() public {
+    function generateOrderSignature() public {
         address inputTokenAddy = 0x9c3C9283D3e44854697Cd22D3Faa240Cfb032889; // wmatic
         address outputTokenAddy = 0xa0a6c157871A9F38253234BBfD2B8D79F9e9FCDC; // token1
         address recipient = 0x8839278A75dc8249BC0C713A710aaEBD0FEE6750;
@@ -142,7 +164,7 @@ contract splurgeTest is Test {
         uint deadline = 1730016559; // date in 2024
         uint8 salt = 1;
         uint8 tranches = 6;
-        OrderStruct memory order = OrderStruct(
+        SplurgeOrderStruct memory order = SplurgeOrderStruct(
             inputTokenAddy,
             outputTokenAddy,
             recipient,
@@ -171,7 +193,7 @@ contract splurgeTest is Test {
         console.logBytes(signature);
 
         vm.expectRevert();
-        splurgeContract.prepareVerifyTrade(order, signature, "test");
+        // splurgeContract.prepareVerifyTrade(order, signature, "test");
     }
 
     function joinSignature(
