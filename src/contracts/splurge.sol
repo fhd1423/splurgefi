@@ -1,30 +1,19 @@
 // SPDX-License-Identifier: MIT
 pragma solidity ^0.8.21;
 
-import {IERC20} from "@openzeppelin/contracts/token/ERC20/IERC20.sol";
-import {ECDSA} from "@openzeppelin/contracts/utils/cryptography/ECDSA.sol";
-import {ReentrancyGuard} from "@openzeppelin/contracts/utils/ReentrancyGuard.sol";
-import {IZeroExSwap, IWETH, SplurgeOrderStruct, ZeroExSwapStruct} from "./Interfaces.sol";
-
-error badSignature(SplurgeOrderStruct, bytes);
-error tradesCompleted(SplurgeOrderStruct, uint256);
-error mustIncludeWETH(address, address);
-error tradeExpired(SplurgeOrderStruct, uint256);
-error notEnoughBalanceToWithdraw(uint256, uint256);
-error feeTransferFailed(uint256, uint256);
+import { IERC20 } from "@openzeppelin/contracts/token/ERC20/IERC20.sol";
+import { ECDSA } from "@openzeppelin/contracts/utils/cryptography/ECDSA.sol";
+import { ReentrancyGuard } from "@openzeppelin/contracts/utils/ReentrancyGuard.sol";
+import { IZeroExSwap, IWETH, SplurgeOrderStruct, ZeroExSwapStruct, badSignature, tradesCompleted, mustIncludeWETH, tradeExpired, notEnoughBalanceToWithdraw, feeTransferFailed } from "./Interfaces.sol";
 
 contract Splurge is ReentrancyGuard {
     IZeroExSwap public swapRouter;
-    address public swapRouterAddy;
     IWETH internal wETH;
-    address internal wethAddress;
     mapping(address => mapping(address => uint256)) public tokenBalances;
     mapping(bytes => uint256) public tranchesCompleted;
 
     constructor(address _swapRouter, address _wethAddress) {
         swapRouter = IZeroExSwap(_swapRouter);
-        swapRouterAddy = _swapRouter;
-        wethAddress = _wethAddress;
         wETH = IWETH(_wethAddress);
     }
 
@@ -52,8 +41,8 @@ contract Splurge is ReentrancyGuard {
             revert tradesCompleted(order, tranchesCompleted[signature]);
 
         if (
-            !(order.inputTokenAddy == wethAddress ||
-                order.outputTokenAddy == wethAddress)
+            !(order.inputTokenAddy == address(wETH) ||
+                order.outputTokenAddy == address(wETH))
         ) revert mustIncludeWETH(order.inputTokenAddy, order.outputTokenAddy);
 
         if (order.deadline < block.timestamp)
@@ -66,16 +55,16 @@ contract Splurge is ReentrancyGuard {
     function executeTrade(
         SplurgeOrderStruct memory order,
         ZeroExSwapStruct memory swapCallData
-    ) public nonReentrant returns (uint256) {
+    ) private nonReentrant returns (uint256) {
         IERC20 input = IERC20(order.inputTokenAddy);
 
         uint256 tranche = order.amount / order.tranches;
         input.transferFrom(order.recipient, address(this), tranche);
-        if (order.inputTokenAddy == wethAddress) feeToSender();
+        if (order.inputTokenAddy == address(wETH)) feeToSender();
 
         // approve infinite only if needed
-        if (input.allowance(address(this), swapRouterAddy) < order.amount)
-            input.approve(swapRouterAddy, type(uint256).max);
+        if (input.allowance(address(this), address(swapRouter)) < order.amount)
+            input.approve(address(swapRouter), type(uint256).max);
 
         uint256 outputAmount = swapRouter.transformERC20(
             swapCallData.inputToken,
@@ -85,29 +74,26 @@ contract Splurge is ReentrancyGuard {
             swapCallData.transformations
         );
 
-        if (order.outputTokenAddy == wethAddress) feeToSender();
+        if (order.outputTokenAddy == address(wETH)) feeToSender();
 
         tokenBalances[order.recipient][order.outputTokenAddy] += outputAmount;
         return outputAmount;
     }
 
     function withdrawBalances(
-        address[] calldata tokensToWithdraw,
-        uint256[] calldata amounts
+        address tokenToWithdraw,
+        uint256 amount
     ) public nonReentrant {
-        for (uint8 i = 0; i < tokensToWithdraw.length; i++) {
-            IERC20 token = IERC20(tokensToWithdraw[i]);
+        if (tokenBalances[msg.sender][tokenToWithdraw] < amount)
+            revert notEnoughBalanceToWithdraw(
+                tokenBalances[msg.sender][tokenToWithdraw],
+                amount
+            );
 
-            if (tokenBalances[msg.sender][tokensToWithdraw[i]] < amounts[i])
-                revert notEnoughBalanceToWithdraw(
-                    tokenBalances[msg.sender][tokensToWithdraw[i]],
-                    amounts[i]
-                );
-
-            token.transfer(msg.sender, amounts[i]);
-            // solhint-disable-next-line reentrancy
-            tokenBalances[msg.sender][tokensToWithdraw[i]] -= amounts[i];
-        }
+        IERC20 token = IERC20(tokenToWithdraw);
+        token.transfer(msg.sender, amount);
+        // solhint-disable-next-line reentrancy
+        tokenBalances[msg.sender][tokenToWithdraw] -= amount;
     }
 
     function verifyTrade(
@@ -124,7 +110,7 @@ contract Splurge is ReentrancyGuard {
         uint256 fee = (balance * 5) / 1000;
 
         wETH.withdraw(fee);
-        (bool success, ) = payable(msg.sender).call{value: fee}("");
+        (bool success, ) = payable(msg.sender).call{ value: fee }("");
         if (!success) revert feeTransferFailed(balance, fee);
     }
 
