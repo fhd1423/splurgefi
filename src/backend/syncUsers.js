@@ -92,12 +92,14 @@ async function syncUsers() {
     }
 
     //FINALLY: write new users to SupaBase to sync
-    const { data: response, error: writeError } = await supabase
-        .from('Users')
-        .insert([needSyncing[5]])
-        .select()
+    for (let i = 0; i < needSyncing.length; i++) {
+        const { data: response, error: writeError } = await supabase
+            .from('Users')
+            .insert(needSyncing[i])
+            .select()
 
-    console.log(response);
+        console.log(response);
+    }
 }
 
 syncUsers();
