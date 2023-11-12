@@ -13,7 +13,7 @@ traderAddress=0xBb6AeaBdf61Ca96e80Aa239bA8cC7e436862E596
 
 
 #deploy splurge
-splurgeDeployment=$(forge create src/splurge.sol:Splurge --constructor-args 0xf471d32cb40837bf24529fcf17418fc1a4807626 0x9c3C9283D3e44854697Cd22D3Faa240Cfb032889 $DeployerTags --verify --etherscan-api-key 7CZYAQD27GJ9MZF6Y8NAQYWRKMV7E8N5SS)
+splurgeDeployment=$(forge create src/contracts/splurge.sol:Splurge --constructor-args 0xf471d32cb40837bf24529fcf17418fc1a4807626 0x9c3C9283D3e44854697Cd22D3Faa240Cfb032889 $DeployerTags --verify --etherscan-api-key 7CZYAQD27GJ9MZF6Y8NAQYWRKMV7E8N5SS)
 splurgeContract=$(echo "$splurgeDeployment" | awk -F": " '/Deployed to:/ {print $2}')
 
 # deploy two tokens
