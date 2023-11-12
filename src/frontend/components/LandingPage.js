@@ -3,6 +3,7 @@ import Head from "next/head";
 import { useEffect, useState } from "react";
 import { useDynamicContext, DynamicWidget } from "@dynamic-labs/sdk-react-core";
 import GradientText from "./GradientText";
+import Link from "next/link";
 
 const LandingPage = () => {
   // Local state to track if the wallet is connected
@@ -83,15 +84,23 @@ const LandingPage = () => {
           <GradientText>Automate your trades on DEXs seamlessly</GradientText>
         </h1>
 
+        <p className="text-2xl mb-10 text-gray-400 tracking-wide">
+          Best trading experience ever.
+        </p>
+        <Link href="/step-one" passHref>
+          <button className="bg-green-500 text-white text-xl font-bold py-2 px-8 rounded-full shadow-lg hover:bg-green-600">
+            Get Started
+          </button>
+        </Link>
         {/* <h2 className="text-4xl sm:text-5xl md:text-6xl mb-8 text-white font-bold tracking-wide leading-tight">
           on DEXs seamlessly
         </h2> */}
-        <p className="text-xl sm:text-2xl mb-10 text-gray-400 tracking-wide">
+        {/* <p className="text-xl sm:text-2xl mb-10 text-gray-400 tracking-wide">
           Connect your wallet & twitter to join.
-        </p>
+        </p> */}
 
         {/* Conditionally render the button or the success message */}
-        <>
+        {/* <>
           {isWalletConnected && (
             <>
               <p className="text-md sm:text-lg md:text-xl text-green-500 font-bold">
@@ -106,7 +115,7 @@ const LandingPage = () => {
           <h1 className="flex justify-center p-2">
             <DynamicWidget />
           </h1>
-        </>
+        </> */}
       </div>
     </div>
   );
