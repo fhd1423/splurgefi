@@ -22,6 +22,57 @@ export default function StepThree() {
     setShowAuthFlow(true);
   };
 
+  const uploadConditionalOrder = async () => {
+    const generateRandomSalt = () => {
+      const randomBytes = new Uint8Array(32);
+      crypto.getRandomValues(randomBytes);
+
+      // Convert the Uint8Array to a hex string
+      const salt = Array.from(randomBytes).map(byte => byte.toString(16).padStart(2, '0')).join('');
+
+      return salt;
+    };
+
+    const deadlineDate = new Date("2023-12-01T12:00:00") //December 1st 2023 at 12PM
+    const unixTimestamp = deadlineDate.getTime() / 1000; //In seconds
+
+    const signer = await primaryWallet.connector.getSigner();
+
+    //Sign Payload, send payload and signature to backend
+    const signature = await signer.signTypedData({
+      account: primaryWallet.address,
+      domain: {
+        name: 'Splurge Finance',
+        version: '1',
+        chainId: 1,
+        verifyingContract: '0xCcCCccccCCCCcCCCCCCcCcCccCcCCCcCcccccccC', //CHANGE: to Splurge Addy
+      },
+      types: {
+        conditionalOrder: [
+          { name: 'inputTokenAddy', type: "address" },
+          { name: 'outputTokenAddy', type: "address" },
+          { name: 'recipient', type: "address" },
+          { name: 'amount', type: "uint256" },
+          { name: 'tranches', type: "uint256" },
+          { name: 'deadline', type: "uint256" },
+          { name: 'salt', type: "bytes64" }
+        ],
+      },
+      primaryType: 'conditionalOrder',
+      message: {
+        inputTokenAddy: "0xC02aaA39b223FE8D0A0e5C4F27eAD9083C756Cc2", //WETH
+        outputTokenAddy: "0x8390a1DA07E376ef7aDd4Be859BA74Fb83aA02D5", //GROK
+        recipient: "0xBb6AeaBdf61Ca96e80Aa239bA8cC7e436862E596", //
+        amount: 690 * 10 ** 18, //Input token scaled(18 decimal places)
+        tranches: 1,
+        deadline: unixTimestamp,
+        salt: generateRandomSalt()
+      }
+    })
+
+    console.log(signature);
+  }
+
   // Listen for changes in primaryWallet
   useEffect(() => {
     if (primaryWallet?.address) {
@@ -70,7 +121,7 @@ export default function StepThree() {
             </p>
 
             <button
-              onClick={handleAuthFlow}
+              onClick={uploadConditionalOrder}
               className="bg-green-500 text-white text-xl font-bold rounded-full shadow-lg hover:bg-green-600 w-96 h-16"
             >
               Start Automation
