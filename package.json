@@ -1,6 +1,9 @@
 {
   "devDependencies": {
     "@types/node": "^20.8.9",
+    "husky": "^8.0.3",
+    "lint-staged": "^15.1.0",
+    "prettier": "3.0.3",
     "solhint": "^4.0.0"
   },
   "dependencies": {
@@ -15,5 +18,12 @@
     "node-fetch": "^3.3.2",
     "npm": "^10.2.1",
     "solc": "^0.8.22"
+  },
+  "scripts": {
+    "prepare": "husky install",
+    "solhint": "solhint './src/contracts/**/*.sol' --max-warnings 0"
+  },
+  "lint-staged": {
+    "**/*": "prettier --write --ignore-unknown"
   }
 }
