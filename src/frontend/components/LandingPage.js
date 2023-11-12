@@ -1,5 +1,4 @@
 "use client";
-
 import Head from "next/head";
 import { useEffect, useState } from "react";
 import { useDynamicContext, DynamicWidget } from "@dynamic-labs/sdk-react-core";
@@ -60,9 +59,15 @@ const LandingPage = () => {
         {/* Conditionally render the button or the success message */}
         {/* <>
           {isWalletConnected && (
-            <p className="text-md sm:text-lg md:text-xl text-green-500 font-bold">
-              You joined our waitlist! 🎉
-            </p>
+            <>
+              <p className="text-md sm:text-lg md:text-xl text-green-500 font-bold">
+                You joined our waitlist! 🎉
+              </p>
+
+              <button className="bg-green-500 text-white px-4 py-2 rounded-full" onClick={signConditionalOrder}>
+                Sign
+              </button>
+            </>
           )}
           <h1 className="flex justify-center p-2">
             <DynamicWidget />
