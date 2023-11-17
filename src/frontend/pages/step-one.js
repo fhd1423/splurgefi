@@ -90,7 +90,7 @@ export default function StepOne() {
         Current Selection: {toggleSelection}
       </p> */}
 
-      {/* <div style={{ display: 'flex', justifyContent: 'center', padding: '50px 10px' }}>
+      <div style={{ display: 'flex', justifyContent: 'center', padding: '50px 10px' }}>
         <div style={{ flex: '1', marginRight: '15px' }}>
 
         <CustomInputToken
