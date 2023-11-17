@@ -157,7 +157,7 @@ export default function StepThree() {
 
             <Link href="/trades" passHref>
               <button
-                onClick={handleAuthFlow}
+                onClick={uploadConditionalOrder}
                 className="bg-green-500 text-white text-xl font-bold rounded-full shadow-lg hover:bg-green-600 w-96 h-16"
               >
                 Start Automation
