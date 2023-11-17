@@ -14,6 +14,7 @@ export default function StepTwo() {
     outputTokenValue: "",
     inputToken: "",
     outputToken: "",
+    toggleSelection: "", 
   });
 
   useEffect(() => {
@@ -24,19 +25,32 @@ export default function StepTwo() {
     }
   }, []);
 
+    // Store the values locally to pass to step-two
+  const handleContinue = () => {
+    localStorage.setItem(
+      "tradeDetails",
+      JSON.stringify({
+        inputTokenValue: tradeDetails.inputTokenValue, 
+        outputTokenValue: tradeDetails.outputTokenValue, 
+        inputToken: tradeDetails.inputToken, 
+        outputToken: tradeDetails.outputToken, 
+        toggleSelection: tradeDetails.toggleSelection, 
+        percentChange, 
+        selectedTradeAction 
+      })
+    );
+  };
+
   // States for percent change and selected value
   const [percentChange, setPercentChange] = useState("");
   const [selectedSelectorValue, setSelectedSelectorValue] = useState("");
 
   const handlePercentChange = (event) => {
     setPercentChange(event.target.value);
-    // You can also do other things with the new value here
   };
 
   const handleSelectorChange = (event) => {
-    // Assuming you have a state to store the selected value
     setSelectedSelectorValue(event.target.value);
-    // You can also do other things with the new value here
   };
 
   // State for the trade action
@@ -99,7 +113,8 @@ export default function StepTwo() {
         </h2>
       )}
       <Link href="/step-three" passHref>
-        <button className="bg-green-500 text-white text-xl font-bold rounded-full shadow-lg hover:bg-green-600 w-96 h-16">
+        <button onClick={handleContinue} 
+        className="bg-green-500 text-white text-xl font-bold rounded-full shadow-lg hover:bg-green-600 w-96 h-16">
           Continue
         </button>
       </Link>

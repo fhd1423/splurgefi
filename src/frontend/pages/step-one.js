@@ -3,7 +3,10 @@
 import React, { useState } from "react";
 import Head from "next/head";
 import CustomInputToken from "../components/CustomInputToken";
+import TokenSelector from "../components/TokenSelector";
 import Link from "next/link";
+import CustomToggle from "../components/CustomToggle";
+import { Typography, Box } from "@mui/material";
 
 export default function StepOne() {
   // Sample options for testing
@@ -12,6 +15,7 @@ export default function StepOne() {
     { label: "JOE", value: "JOE" },
   ];
 
+
   // State to hold input values
   const [inputTokenValue, setInputTokenValue] = useState("");
   const [outputTokenValue, setOutputTokenValue] = useState("");
@@ -19,6 +23,8 @@ export default function StepOne() {
   // State to hold selected tokens
   const [inputToken, setInputToken] = useState("");
   const [outputToken, setOutputToken] = useState("");
+
+  const [toggleSelection, setToggleSelection] = useState('buy');
 
   // Handlers to update the state
   const handleInputTokenChange = (value) => {
@@ -50,6 +56,7 @@ export default function StepOne() {
         outputTokenValue,
         inputToken,
         outputToken,
+        toggleSelection,
       })
     );
   };
@@ -65,20 +72,61 @@ export default function StepOne() {
       </h1>
       <h3 className="text-lg text-custom-green font-bold">Step 1</h3>
 
-      <div className="space-y-8 pt-6 pb-12">
+      <Box sx={{
+      display: 'flex',
+      justifyContent: 'center',
+      alignItems: 'center',
+      gap: '5px', 
+      paddingTop: '20px', 
+      paddingBottom: '0px' 
+      }}>
+        <Typography variant="h5" component="h5" color="white" sx={{ whiteSpace: 'nowrap' }}>
+          I want to automate a
+        </Typography>
+        <CustomToggle selection={toggleSelection} setSelection={setToggleSelection}/>
+      </Box>
+
+      {/* <p className="text-white text-xl">
+        Current Selection: {toggleSelection}
+      </p> */}
+
+      {/* <div style={{ display: 'flex', justifyContent: 'center', padding: '50px 10px' }}>
+        <div style={{ flex: '1', marginRight: '15px' }}>
+
+        <CustomInputToken
+            title="Input Token"
+            options={tokenOptions}
+            onValueChange={handleInputTokenChange}
+            onSelectChange={handleInputTokenSelect}
+          />
+
+        </div>
+        <div style={{ flex: '1', marginLeft: '15px' }}>
+
+          <TokenSelector
+            title="Output Token"
+            options={tokenOptions}
+            onValueChange={handleInputTokenChange}
+            onSelectChange={handleInputTokenSelect}
+          />
+
+        </div>
+      </div>
+
+      {/* <div className="space-y-8 pt-6 pb-12">
         <CustomInputToken
           title="Input Token"
           options={tokenOptions}
           onValueChange={handleInputTokenChange}
           onSelectChange={handleInputTokenSelect}
         />
-        <CustomInputToken
+        <TokenSelector
           title="Output Token"
           options={tokenOptions}
           onValueChange={handleOutputTokenChange}
           onSelectChange={handleOutputTokenSelect}
         />
-      </div>
+      </div> */}
 
       <Link href="/step-two" passHref>
         <button

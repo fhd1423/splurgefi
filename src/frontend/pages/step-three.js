@@ -13,6 +13,25 @@ export default function StepThree() {
   const [selectedDate, setSelectedDate] = useState(dayjs());
   const [isWalletConnected, setIsWalletConnected] = useState(false);
 
+    // Retreive data from previous view
+    const [tradeDetails, setTradeDetails] = useState({
+      inputTokenValue: "",
+      outputTokenValue: "",
+      inputToken: "",
+      outputToken: "",
+      toggleSelection: "", 
+      percentChange: "", 
+      selectedTradeAction: "", 
+    });
+  
+    useEffect(() => {
+      // Retrieve the state from localStorage
+      const savedTradeDetails = localStorage.getItem("tradeDetails");
+      if (savedTradeDetails) {
+        setTradeDetails(JSON.parse(savedTradeDetails));
+      }
+    }, []);
+
   // Access setShowAuthFlow and primaryWallet from useDynamicContext
   const { setShowAuthFlow, primaryWallet } = useDynamicContext();
 
@@ -103,7 +122,7 @@ export default function StepThree() {
                 title="Batches"
                 placeHolder={"5"}
                 value={batchValue}
-                onValueChange={(e) => setBatchValue(e.target.value)} // Corrected: use a handler function to set the value
+                onValueChange={(e) => setBatchValue(e.target.value)} 
               />
             </Grid>
             <Grid item>
@@ -125,7 +144,7 @@ export default function StepThree() {
 
         {isWalletConnected ? (
           <div class="flex flex-col space-y-4 text-center">
-            <p className="py-5 text-xl font-medium">
+            <p className="py-5 text-xl font-medium text-white">
               Wallet succesfully connected! 🎉
             </p>
 
@@ -152,6 +171,7 @@ export default function StepThree() {
           >
             Connect Wallet
           </button>
+
         )}
       </div>
     </LocalizationProvider>

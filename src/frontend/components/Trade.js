@@ -1,9 +1,11 @@
 import React from "react";
 import Grid from "@mui/material/Grid";
 import Paper from "@mui/material/Paper";
-import Typography from "@mui/material/Typography";
+import Button from "@mui/material/Button"; 
+import Typography from "@mui/material/Typography"; 
 
-export default function Trade() {
+
+export default function Trade({complete}) {
   const labelStyle = {
     backgroundColor: "#50D890",
     color: "white",
@@ -15,10 +17,15 @@ export default function Trade() {
     alignItems: "center",
   };
 
-  const pendingStyle = {
+  const completeStyle = {
     ...labelStyle,
     backgroundColor: "transparent",
     border: "1px solid white",
+  };
+
+  const pendingStyle = {
+    ...labelStyle,
+    backgroundColor: "transparent",
   };
 
   return (
@@ -59,9 +66,27 @@ export default function Trade() {
 
         {/* Right section with pending status */}
         <Grid item xs={3} sm={3} md={2} lg={2}>
-          <Typography style={{ ...pendingStyle, textAlign: "right" }}>
-            Pending (2/5)
-          </Typography>
+
+          { complete ?  (
+
+            <Button style={{ paddingRight: '0px', minWidth: 'auto', padding: '0px' }}>
+              <Typography style={{ ...completeStyle, textAlign: "right" }}>
+                Claim
+              </Typography>
+            </Button>
+
+          ) : (
+
+            <Button>
+              <Typography style={{ ...pendingStyle, textAlign: "right" }}>
+                Pending (2/5)
+              </Typography>
+            </Button>
+
+
+          )
+          }
+
         </Grid>
       </Grid>
     </Paper>
