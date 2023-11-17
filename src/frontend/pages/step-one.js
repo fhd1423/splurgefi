@@ -28,22 +28,22 @@ export default function StepOne() {
 
   // Handlers to update the state
   const handleInputTokenChange = (value) => {
-    console.log("Input Token Value:", value); // Log the input token value
+    // console.log("Input Token Value:", value); 
     setInputTokenValue(value);
   };
 
   const handleOutputTokenChange = (value) => {
-    console.log("Output Token Value:", value); // Log the output token value
+    // console.log("Output Token Value:", value); 
     setOutputTokenValue(value);
   };
 
   const handleInputTokenSelect = (token) => {
-    console.log("Input Token Selected:", token); // Log the input token selection
+    // console.log("Input Token Selected:", token); 
     setInputToken(token);
   };
 
   const handleOutputTokenSelect = (token) => {
-    console.log("Output Token Selected:", token); // Log the output token selection
+    // console.log("Output Token Selected:", token); 
     setOutputToken(token);
   };
 
@@ -72,7 +72,7 @@ export default function StepOne() {
       </h1>
       <h3 className="text-lg text-custom-green font-bold">Step 1</h3>
 
-      <Box sx={{
+      {/* <Box sx={{
       display: 'flex',
       justifyContent: 'center',
       alignItems: 'center',
@@ -84,13 +84,13 @@ export default function StepOne() {
           I want to automate a
         </Typography>
         <CustomToggle selection={toggleSelection} setSelection={setToggleSelection}/>
-      </Box>
+      </Box> */}
 
       {/* <p className="text-white text-xl">
         Current Selection: {toggleSelection}
       </p> */}
 
-      <div style={{ display: 'flex', justifyContent: 'center', padding: '50px 10px' }}>
+      {/* <div style={{ display: 'flex', justifyContent: 'center', padding: '50px 10px' }}>
         <div style={{ flex: '1', marginRight: '15px' }}>
 
         <CustomInputToken
@@ -111,9 +111,14 @@ export default function StepOne() {
           />
 
         </div>
-      </div>
+      </div> */}
 
-      {/* <div className="space-y-8 pt-6 pb-12">
+      <div className="space-y-8 pt-6 pb-12">
+
+        <div className="flex justify-center items-center pt-5">
+          <CustomToggle selection={toggleSelection} setSelection={setToggleSelection}/>
+        </div>
+
         <CustomInputToken
           title="Input Token"
           options={tokenOptions}
@@ -126,7 +131,7 @@ export default function StepOne() {
           onValueChange={handleOutputTokenChange}
           onSelectChange={handleOutputTokenSelect}
         />
-      </div> */}
+      </div>
 
       <Link href="/step-two" passHref>
         <button

@@ -26,7 +26,7 @@ const StyledToggleButton = styled(ToggleButton)(({ theme }) => ({
   fontWeight: 'bold', 
   '&.Mui-selected, &.Mui-selected:hover': {
     color: 'white',
-    backgroundColor: '#50D890', // Selected button color 
+    backgroundColor: '#27ae60', // Selected button color 
   },
   border: '1px solid',
   borderColor: theme.palette.divider,

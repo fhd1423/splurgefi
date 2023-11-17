@@ -17,15 +17,22 @@ export default function StepTwo() {
     toggleSelection: "", 
   });
 
+  const [isUpSelected, setIsUpSelected] = useState(null);
+
   useEffect(() => {
     // Retrieve the state from localStorage
     const savedTradeDetails = localStorage.getItem("tradeDetails");
     if (savedTradeDetails) {
-      setTradeDetails(JSON.parse(savedTradeDetails));
+      const details = JSON.parse(savedTradeDetails);
+      setTradeDetails(details);
+      
+      // Set the arrow direction based on the trade action
+      setIsUpSelected(details.toggleSelection === 'sell');
+
     }
   }, []);
 
-    // Store the values locally to pass to step-two
+    // Store the values locally to pass to step-three
   const handleContinue = () => {
     localStorage.setItem(
       "tradeDetails",
@@ -43,23 +50,23 @@ export default function StepTwo() {
 
   // States for percent change and selected value
   const [percentChange, setPercentChange] = useState("");
-  const [selectedSelectorValue, setSelectedSelectorValue] = useState("");
+  // const [selectedSelectorValue, setSelectedSelectorValue] = useState("");
 
   const handlePercentChange = (event) => {
     setPercentChange(event.target.value);
   };
 
-  const handleSelectorChange = (event) => {
-    setSelectedSelectorValue(event.target.value);
-  };
+  // const handleSelectorChange = (event) => {
+  //   setSelectedSelectorValue(event.target.value);
+  // };
 
   // State for the trade action
   const [selectedTradeAction, setSelectedTradeAction] = useState("");
 
   // Handler to update trade action
   const handleTradeActionChange = (action) => {
-    console.log("Selected Trade:", action);
-    setSelectedTradeAction(action); // Corrected to use the right state setter function
+    // console.log("Selected Trade:", action);
+    setSelectedTradeAction(action); 
   };
 
   return (
@@ -75,15 +82,23 @@ export default function StepTwo() {
         <h3 className="text-lg text-custom-green font-bold">Step 2</h3>
       </div>
       <div className="pt-4 pb-12">
+        {/* <CustomInputPercent
+            title="Percent Change"
+            value={percentChange}
+            onValueChange={handlePercentChange}
+            isUpSelected={isUpSelected} // Pass the derived state to the component
+            onToggle={() => setIsUpSelected(!isUpSelected)} // Toggle function for the arrow
+            placeHolder={"0%"}
+          /> */}
         <Grid container spacing={10} justifyContent="center">
           <Grid item>
             <CustomInputPercent
               title="Percent Change"
               value={percentChange}
               onValueChange={handlePercentChange}
-              onSelectorChange={handleSelectorChange}
+              isUpSelected={isUpSelected} // Pass the derived state to the component
+              onToggle={() => setIsUpSelected(!isUpSelected)} // Toggle function for the arrow
               placeHolder={"0%"}
-              selectorValue={selectedSelectorValue}
             />
           </Grid>
           <Grid item>
@@ -95,29 +110,32 @@ export default function StepTwo() {
         </Grid>
       </div>
       {/* <h2 className="pb-10">{tradeDetails.inputTokenValue}</h2> */}
-      {percentChange && selectedSelectorValue && selectedTradeAction && (
-        <h2 className="pb-10 text-white">
+      {percentChange && selectedTradeAction &&(
+        <h1 className="text-white">
           Summary: When{" "}
-          {selectedTradeAction === "Buy output token"
+          {tradeDetails.toggleSelection === "buy"
             ? tradeDetails.outputToken
             : tradeDetails.inputToken}{" "}
-          {selectedSelectorValue === "+" ? "increases" : "decreases"} by{" "}
-          {percentChange}%,
-          {selectedTradeAction === "Buy output token"
+          {isUpSelected === true ? "increases" : "decreases"} by{" "}
+          {percentChange}% over the {selectedTradeAction},
+          {tradeDetails.toggleSelection === "buy"
             ? " buy "
-            : " sell "} for{" "}
-          {selectedTradeAction === "Buy output token"
+            : " sell "} with{" "}
+          {tradeDetails.toggleSelection === "buy"
             ? tradeDetails.inputToken
             : tradeDetails.outputToken}
           {"."}
-        </h2>
+        </h1>
       )}
-      <Link href="/step-three" passHref>
-        <button onClick={handleContinue} 
-        className="bg-green-500 text-white text-xl font-bold rounded-full shadow-lg hover:bg-green-600 w-96 h-16">
-          Continue
-        </button>
-      </Link>
+
+      <div className="pt-20"> 
+        <Link href="/step-three" passHref>
+          <button onClick={handleContinue} 
+          className="bg-green-500 text-white text-xl font-bold rounded-full shadow-lg hover:bg-green-600 w-96 h-16">
+            Continue
+          </button>
+        </Link>
+      </div>
     </div>
   );
 }

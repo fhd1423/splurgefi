@@ -62,7 +62,7 @@ export default function TradeSelector({
         gutterBottom
         style={{ marginBottom: "8px", textAlign: "left" }}
       >
-        Trade
+        Trade Based On
       </Typography>
       <CustomFormControl fullWidth>
         <CustomSelect
@@ -74,11 +74,15 @@ export default function TradeSelector({
           displayEmpty
           IconComponent={KeyboardArrowDownIcon}
         >
-          <MenuItem value={"Buy output token"}>Buy output token</MenuItem>
-          <MenuItem value={"Sell input token"}>Sell input token</MenuItem>
+          <MenuItem value={"avg. 15 min price"}>Avg. 15 min price</MenuItem>
+          <MenuItem value={"avg. 4 hr price"}>Avg. 4 hr price</MenuItem>
+          <MenuItem value={"avg. 8 hr price"}>Avg. 8 hr price</MenuItem>
+          <MenuItem value={"avg. 24 hr price"}>Avg. 24 hr price</MenuItem>
+
+
         </CustomSelect>
         <IconButton
-          onClick={toggleDropdown} // Use the function to toggle dropdown
+          onClick={toggleDropdown} 
           sx={{
             position: "absolute",
             top: "50%",
