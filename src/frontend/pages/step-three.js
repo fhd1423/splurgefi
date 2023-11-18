@@ -77,15 +77,6 @@ export default function StepThree() {
         verifyingContract: '0xCcCCccccCCCCcCCCCCCcCcCccCcCCCcCcccccccC', //CHANGE: to Splurge Addy
       },
       types: {
-        // conditionalOrder: [
-        //   { name: 'inputTokenAddy', type: "address" },
-        //   { name: 'outputTokenAddy', type: "address" },
-        //   { name: 'recipient', type: "address" },
-        //   { name: 'amount', type: "uint256" },
-        //   { name: 'tranches', type: "uint256" },
-        //   { name: 'deadline', type: "uint256" },
-        //   { name: 'salt', type: "bytes64" }
-        // ],
         conditionalOrder: [
           { name: 'inputTokenAddress', type: "address" },
           { name: 'outputTokenAddress', type: "address" },
@@ -96,7 +87,7 @@ export default function StepThree() {
           { name: 'percentChange', type: "uint256" },
           { name: 'priceAvg', type: "uint256" },
           { name: 'deadline', type: "uint256" },
-          { name: 'salt', type: "bytes64" }
+          { name: 'salt', type: "bytes" }
         ],
       },
       primaryType: 'conditionalOrder',
