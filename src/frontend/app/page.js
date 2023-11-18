@@ -8,6 +8,7 @@ import {
 } from "@dynamic-labs/sdk-react-core";
 import Graph from "../components/Graph";
 import { EthereumWalletConnectors } from "@dynamic-labs/ethereum";
+import { supabase } from "@/pages/client";
 
 export default function Home() {
   return (

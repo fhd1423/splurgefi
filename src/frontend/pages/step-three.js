@@ -9,29 +9,35 @@ import Grid from "@mui/material/Grid";
 import dayjs from "dayjs";
 import Link from "next/link";
 import { supabase } from "./client"
+import router from "next/router";
 
 export default function StepThree() {
+
   const [selectedDate, setSelectedDate] = useState(dayjs());
   const [isWalletConnected, setIsWalletConnected] = useState(false);
 
-    // Retreive data from previous view
-    const [tradeDetails, setTradeDetails] = useState({
-      inputTokenValue: "",
-      outputTokenValue: "",
-      inputToken: "",
-      outputToken: "",
-      toggleSelection: "",
-      percentChange: "",
-      selectedTradeAction: "",
-    });
+  const joeContractAddress = "0x6FC71D805f004EE2B5a2962344cb0703A8Ce2b31";
+  const wethContractAddress = "0xC02aaA39b223FE8D0A0e5C4F27eAD9083C756Cc2";
+  const wethToJoePath = "0xC02aaA39b223FE8D0A0e5C4F27eAD9083C756Cc2-0x6FC71D805f004EE2B5a2962344cb0703A8Ce2b31"
+  
+  // Retreive data from previous view
+  const [tradeDetails, setTradeDetails] = useState({
+    inputTokenValue: "",
+    outputTokenValue: "",
+    inputToken: "",
+    outputToken: "",
+    toggleSelection: "",
+    percentChange: "",
+    selectedTradeAction: "",
+  });
 
-    useEffect(() => {
-      // Retrieve the state from localStorage
-      const savedTradeDetails = localStorage.getItem("tradeDetails");
-      if (savedTradeDetails) {
-        setTradeDetails(JSON.parse(savedTradeDetails));
-      }
-    }, []);
+  useEffect(() => {
+    // Retrieve the state from localStorage
+    const savedTradeDetails = localStorage.getItem("tradeDetails");
+    if (savedTradeDetails) {
+      setTradeDetails(JSON.parse(savedTradeDetails));
+    }
+  }, []);
 
   // Access setShowAuthFlow and primaryWallet from useDynamicContext
   const { setShowAuthFlow, primaryWallet } = useDynamicContext();
@@ -41,34 +47,21 @@ export default function StepThree() {
     setShowAuthFlow(true);
   };
 
-  const fetchUserId = async (userIdentifier) => {
+  // Use primary wallet address (verified_credential_address to get verified_credential_id (primary key)
+  const fetchUserId = async () => {
     const { data, error } = await supabase
-      .from('users')
-      .select('id')
-      .eq('your_user_identifier_column', userIdentifier)
-      .single();
+      .from('Users')
+      .select('verified_credential_id')
+      .eq('verified_credential_address', primaryWallet.address)
   
-    if (error) {
-      console.error('Error fetching user ID:', error);
-      return null; // or handle the error as needed
-    }
-  
-    return data.id; // Assuming 'id' is the column name for user ID
-  };
+      if (error) {
+        console.log('error', error)
+      } else {
 
-  const fetchPairId = async (pairIdentifier) => {
-    const { data, error } = await supabase
-      .from('pairs')
-      .select('id')
-      .eq('your_pair_identifier_column', pairIdentifier)
-      .single();
+        console.log("User id:", data[0]?.verified_credential_id)
+        return data[0]?.verified_credential_id;
+      }
   
-    if (error) {
-      console.error('Error fetching pair ID:', error);
-      return null; // or handle the error as needed
-    }
-  
-    return data.id; // Assuming 'id' is the column name for pair ID
   };
 
 
@@ -81,8 +74,6 @@ export default function StepThree() {
       console.log("Salt length:", salt.length);
       return salt;
     };
-
-
 
     const unixTimestamp = selectedDate.unix(); // Unix timestamp in seconds
     const signer = await primaryWallet.connector.getSigner();
@@ -157,12 +148,17 @@ export default function StepThree() {
         }
 
         const jsonData = JSON.stringify(orderData); 
+        // const pairId = await fetchPairId(wethToJoePath);
+        const userId = await fetchUserId(); 
+        console.log("USER ID:", userId); 
 
         // created_at (timestamp), user (referenced to user table), pair (referenced to pair table), SplurgeOrder jsonb, signature - text, ready - bool, ZeroExCalldata - jsonb
         const { data, error } = await supabase
           .from('Trades')
           .insert([
             { created_at: currentTimestamp, 
+              user: userId, 
+              pair: wethToJoePath, 
               SplurgeOrder: jsonData, 
               signature: signature, 
               ready: false
@@ -179,7 +175,7 @@ export default function StepThree() {
     }
 
     uploadData(); 
-    // router.push('/trades');
+    router.push('/trades');
   }
   // Listen for changes in primaryWallet
   useEffect(() => {
@@ -226,7 +222,7 @@ export default function StepThree() {
           </h2>
         )}
         {isWalletConnected ? (
-          <div class="flex flex-col space-y-4 text-center">
+          <div className="flex flex-col space-y-4 text-center">
             <p className="py-5 text-xl font-medium text-white">
               Wallet succesfully connected! 🎉
             </p>
@@ -236,14 +232,14 @@ export default function StepThree() {
             >
               Start Automation
             </button> */}
-            <Link href="/trades" passHref>
+            {/* <Link href="/trades" passHref> */}
               <button
                 onClick={uploadConditionalOrder}
                 className="bg-green-500 text-white text-xl font-bold rounded-full shadow-lg hover:bg-green-600 w-96 h-16"
               >
                 Start Automation
               </button>
-            </Link>
+            {/* </Link> */}
           </div>
         ) : (
           <button
