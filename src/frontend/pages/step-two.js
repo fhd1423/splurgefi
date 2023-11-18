@@ -6,6 +6,7 @@ import TradeSelector from "../components/TradeSelector";
 import Grid from "@mui/material/Grid";
 import Link from "next/link";
 import React, { useEffect, useState } from "react";
+import router from "next/router";
 
 export default function StepTwo() {
   // Retreive data from previous view
@@ -18,6 +19,7 @@ export default function StepTwo() {
   });
 
   const [isUpSelected, setIsUpSelected] = useState(null);
+
 
   useEffect(() => {
     // Retrieve the state from localStorage
@@ -34,18 +36,28 @@ export default function StepTwo() {
 
     // Store the values locally to pass to step-three
   const handleContinue = () => {
-    localStorage.setItem(
-      "tradeDetails",
-      JSON.stringify({
-        inputTokenValue: tradeDetails.inputTokenValue, 
-        outputTokenValue: tradeDetails.outputTokenValue, 
-        inputToken: tradeDetails.inputToken, 
-        outputToken: tradeDetails.outputToken, 
-        toggleSelection: tradeDetails.toggleSelection, 
-        percentChange, 
-        selectedTradeAction 
-      })
-    );
+
+    if (validateInputs()){
+
+      localStorage.setItem(
+        "tradeDetails",
+        JSON.stringify({
+          inputTokenValue: tradeDetails.inputTokenValue, 
+          outputTokenValue: tradeDetails.outputTokenValue, 
+          inputToken: tradeDetails.inputToken, 
+          outputToken: tradeDetails.outputToken, 
+          toggleSelection: tradeDetails.toggleSelection, 
+          percentChange, 
+          selectedTradeAction 
+        })
+
+      );
+
+      router.push("/step-three");
+
+    }
+
+
   };
 
   // States for percent change and selected value
@@ -67,6 +79,29 @@ export default function StepTwo() {
   const handleTradeActionChange = (action) => {
     // console.log("Selected Trade:", action);
     setSelectedTradeAction(action); 
+  };
+
+  // State for error messages
+  const [percentChangeError, setPercentChangeError] = useState("");
+  const [avgPriceError, setAvgPriceError] = useState("");
+
+  const validateInputs = () => {
+    let isValid = true;
+    if (!percentChange) {
+      setPercentChangeError("Please select a percent change.");
+      isValid = false;
+    } else {
+      setPercentChangeError("");
+    }
+
+    if (!selectedTradeAction) {
+      setAvgPriceError("Please select the moving average.");
+      isValid = false;
+    } else {
+      setAvgPriceError("");
+    }
+
+    return isValid;
   };
 
   return (
@@ -133,13 +168,20 @@ export default function StepTwo() {
         </h1>
       )}
 
+      {((percentChangeError && !avgPriceError) || (!percentChangeError && avgPriceError)) && (
+      <p className="text-red-500">{percentChangeError ? percentChangeError : avgPriceError}</p>
+      )}
+      {(percentChangeError && avgPriceError) && (
+        <p className="text-red-500">{percentChangeError + " " + avgPriceError}</p>
+      )}
+
       <div className="pt-20"> 
-        <Link href="/step-three" passHref>
-          <button onClick={handleContinue} 
+        {/* <Link href="/step-three" passHref> */}
+          <button onClick={handleContinue}
           className="bg-green-500 text-white text-xl font-bold rounded-full shadow-lg hover:bg-green-600 w-96 h-16">
             Continue
           </button>
-        </Link>
+        {/* </Link> */}
       </div>
     </div>
   );

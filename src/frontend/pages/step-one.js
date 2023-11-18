@@ -7,6 +7,7 @@ import TokenSelector from "../components/TokenSelector";
 import Link from "next/link";
 import CustomToggle from "../components/CustomToggle";
 import { Typography, Box } from "@mui/material";
+import router from "next/router";
 
 export default function StepOne() {
   // Sample options for testing
@@ -14,7 +15,6 @@ export default function StepOne() {
     { label: "WETH", value: "WETH" },
     { label: "JOE", value: "JOE" },
   ];
-
 
   // State to hold input values
   const [inputTokenValue, setInputTokenValue] = useState("");
@@ -25,6 +25,37 @@ export default function StepOne() {
   const [outputToken, setOutputToken] = useState("");
 
   const [toggleSelection, setToggleSelection] = useState('buy');
+
+  // State for error messages
+  const [inputTokenError, setInputTokenError] = useState("");
+  const [outputTokenError, setOutputTokenError] = useState("");
+  const [inputTokenValueError, setInputTokenValueError] = useState("");
+
+  const validateInputs = () => {
+    let isValid = true;
+    if (!inputToken) {
+      setInputTokenError("Please select an input token.");
+      isValid = false;
+    } else {
+      setInputTokenError("");
+    }
+
+    if (!outputToken) {
+      setOutputTokenError("Please select an output token.");
+      isValid = false;
+    } else {
+      setOutputTokenError("");
+    }
+
+    if (!inputTokenValue) {
+      setInputTokenValueError("Please enter a value for the input token.");
+      isValid = false;
+    } else {
+      setInputTokenValueError("");
+    }
+
+    return isValid;
+  };
 
   // Handlers to update the state
   const handleInputTokenChange = (value) => {
@@ -49,16 +80,23 @@ export default function StepOne() {
 
   // Store the values locally to pass to step-two
   const handleContinue = () => {
-    localStorage.setItem(
-      "tradeDetails",
-      JSON.stringify({
-        inputTokenValue,
-        outputTokenValue,
-        inputToken,
-        outputToken,
-        toggleSelection,
-      })
-    );
+
+    if (validateInputs()){
+      localStorage.setItem(
+        "tradeDetails",
+        JSON.stringify({
+          inputTokenValue,
+          outputTokenValue,
+          inputToken,
+          outputToken,
+          toggleSelection,
+        })
+      );
+
+      router.push('/step-two');  
+
+    }
+
   };
 
   return (
@@ -113,7 +151,7 @@ export default function StepOne() {
         </div>
       </div> */}
 
-      <div className="space-y-8 pt-6 pb-12">
+      <div className={`${inputTokenError || outputTokenError ? 'space-y-3' : 'space-y-8'} pt-6 pb-12`}>
 
         <div className="flex justify-center items-center pt-5">
           <CustomToggle selection={toggleSelection} setSelection={setToggleSelection}/>
@@ -125,22 +163,26 @@ export default function StepOne() {
           onValueChange={handleInputTokenChange}
           onSelectChange={handleInputTokenSelect}
         />
+        {(inputTokenError || inputTokenValueError) && <p className="text-red-500">{inputTokenError ? inputTokenError : inputTokenValueError}</p>}
+
         <TokenSelector
           title="Output Token"
           options={tokenOptions}
           onValueChange={handleOutputTokenChange}
           onSelectChange={handleOutputTokenSelect}
         />
+        {outputTokenError && <p className="text-red-500">{outputTokenError}</p>}
+
       </div>
 
-      <Link href="/step-two" passHref>
+      {/* <Link href="/step-two" passHref> */}
         <button
           onClick={handleContinue}
           className="bg-green-500 text-white text-xl font-bold rounded-full shadow-lg hover:bg-green-600 w-96 h-16"
         >
           Continue
         </button>
-      </Link>
+      {/* </Link> */}
     </div>
   );
 }

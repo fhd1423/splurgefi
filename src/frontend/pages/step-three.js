@@ -39,12 +39,41 @@ export default function StepThree() {
     }
   }, []);
 
+
+
   // Access setShowAuthFlow and primaryWallet from useDynamicContext
   const { setShowAuthFlow, primaryWallet } = useDynamicContext();
   const [batchValue, setBatchValue] = useState("");
+
   // Function to handle the authentication flow
   const handleAuthFlow = () => {
-    setShowAuthFlow(true);
+    if (validateInputs()){
+      setShowAuthFlow(true);
+    }
+  };
+
+
+  // State for error messages
+  const [batchValueError, setBatchValueError] = useState("");
+  const [selectedDateError, setSelectedDateError] = useState("");
+
+  const validateInputs = () => {
+    let isValid = true;
+    if (!batchValue) {
+      setBatchValueError("Please enter the number of batches.");
+      isValid = false;
+    } else {
+      setBatchValueError("");
+    }
+
+    if (!selectedDate) {
+      setSelectedDateError("Please the trade deadline.");
+      isValid = false;
+    } else {
+      setSelectedDateError("");
+    }
+
+    return isValid;
   };
 
   // Use primary wallet address (verified_credential_address to get verified_credential_id (primary key)
@@ -67,122 +96,137 @@ export default function StepThree() {
 
   const uploadConditionalOrder = async () => {
 
-    const generateRandomSalt = () => {
-      const randomBytes = new Uint8Array(64); // Generating 64 random bytes
-      crypto.getRandomValues(randomBytes);
-      const salt = Array.from(randomBytes).map(byte => byte.toString(16).padStart(2, '0')).join('');
-      console.log("Salt length:", salt.length);
-      return salt;
-    };
+    try {
 
-    const unixTimestamp = selectedDate.unix(); // Unix timestamp in seconds
-    const signer = await primaryWallet.connector.getSigner();
-    let selectedPercentChange = parseInt(tradeDetails.percentChange, 10);
-    let selectedPriceAverage = parseInt(tradeDetails.selectedTradeAction, 10);
-    let selectedAmount = tradeDetails.inputTokenValue;
-
-    // Step 1: Parse the Decimal Value
-    const [wholePart, decimalPartRaw] = selectedAmount.includes('.') ? selectedAmount.split('.') : [selectedAmount, ''];
-    // Step 2: Normalize Decimal Part
-    const decimalPart = decimalPartRaw.padEnd(18, '0'); // Add trailing zeros to make it 18 decimal places
-    // Step 3: Convert to Integer
-    const wholePartBigInt = BigInt(wholePart);
-    const decimalPartBigInt = BigInt(decimalPart);
-    // Step 4: Scale to Blockchain Format
-    let amountInWei = wholePartBigInt * BigInt(10) ** BigInt(18) + decimalPartBigInt;
-
-
-    //Sign Payload, send payload and signature to backend
-    const signature = await signer.signTypedData({
-      account: primaryWallet.address,
-      domain: {
-        name: 'Splurge Finance',
-        version: '1',
-        chainId: 1,
-        verifyingContract: '0xCcCCccccCCCCcCCCCCCcCcCccCcCCCcCcccccccC', //CHANGE: to Splurge Addy
-      },
-      types: {
-        conditionalOrder: [
-          { name: 'inputTokenAddress', type: "address" },
-          { name: 'outputTokenAddress', type: "address" },
-          { name: 'recipient', type: "address" },
-          { name: 'orderType', type: "string" },
-          { name: 'amount', type: "uint256" },
-          { name: 'tranches', type: "uint256" },
-          { name: 'percentChange', type: "uint256" },
-          { name: 'priceAvg', type: "uint256" },
-          { name: 'deadline', type: "uint256" },
-          { name: 'salt', type: "bytes" }
-        ],
-      },
-      primaryType: 'conditionalOrder',
-      message: {
-        inputTokenAddress: "0xC02aaA39b223FE8D0A0e5C4F27eAD9083C756Cc2", // WETH
-        outputTokenAddress: "0x8390a1DA07E376ef7aDd4Be859BA74Fb83aA02D5", // GROK
-        recipient: "0xBb6AeaBdf61Ca96e80Aa239bA8cC7e436862E596",
-        orderType: tradeDetails.toggleSelection,
-        amount: amountInWei, // Input token scaled(18 decimal places)
-        tranches: 1,
-        percentChange: selectedPercentChange,
-        priceAvg: selectedPriceAverage,
-        deadline: unixTimestamp,
-        salt: generateRandomSalt()
-      }
-    })
-    console.log(signature);
-
-    async function uploadData() {
-
-      try {
-        // Retrieve and store data to be uploaded to database 
-        const currentTimestamp = new Date().toISOString();
-        const orderData = {
-          tradeOption: tradeDetails.toggleSelection,
-          inputTokenAddy: tradeDetails.inputToken, 
-          outputTokenAddy: tradeDetails.outputToken, 
-          tradeAmount: tradeDetails.inputTokenValue,
-          tradeDelta: tradeDetails.percentChange, 
-          avgPrice: tradeDetails.selectedTradeAction, 
-          batches: batchValue, 
-          deadline: selectedDate.toISOString()
+      const generateRandomSalt = () => {
+        const randomBytes = new Uint8Array(64); // Generating 64 random bytes
+        crypto.getRandomValues(randomBytes);
+        const salt = Array.from(randomBytes).map(byte => byte.toString(16).padStart(2, '0')).join('');
+        console.log("Salt length:", salt.length);
+        return salt;
+      };
+  
+      const unixTimestamp = selectedDate.unix(); // Unix timestamp in seconds
+      const signer = await primaryWallet.connector.getSigner();
+      let selectedPercentChange = parseInt(tradeDetails.percentChange, 10);
+      let selectedPriceAverage = parseInt(tradeDetails.selectedTradeAction, 10);
+      let selectedAmount = tradeDetails.inputTokenValue;
+  
+      // Step 1: Parse the Decimal Value
+      const [wholePart, decimalPartRaw] = selectedAmount.includes('.') ? selectedAmount.split('.') : [selectedAmount, ''];
+      // Step 2: Normalize Decimal Part
+      const decimalPart = decimalPartRaw.padEnd(18, '0'); // Add trailing zeros to make it 18 decimal places
+      // Step 3: Convert to Integer
+      const wholePartBigInt = BigInt(wholePart);
+      const decimalPartBigInt = BigInt(decimalPart);
+      // Step 4: Scale to Blockchain Format
+      let amountInWei = wholePartBigInt * BigInt(10) ** BigInt(18) + decimalPartBigInt;
+  
+  
+      //Sign Payload, send payload and signature to backend
+      const signature = await signer.signTypedData({
+        account: primaryWallet.address,
+        domain: {
+          name: 'Splurge Finance',
+          version: '1',
+          chainId: 1,
+          verifyingContract: '0xCcCCccccCCCCcCCCCCCcCcCccCcCCCcCcccccccC', //CHANGE: to Splurge Addy
+        },
+        types: {
+          conditionalOrder: [
+            { name: 'inputTokenAddress', type: "address" },
+            { name: 'outputTokenAddress', type: "address" },
+            { name: 'recipient', type: "address" },
+            { name: 'orderType', type: "string" },
+            { name: 'amount', type: "uint256" },
+            { name: 'tranches', type: "uint256" },
+            { name: 'percentChange', type: "uint256" },
+            { name: 'priceAvg', type: "uint256" },
+            { name: 'deadline', type: "uint256" },
+            { name: 'salt', type: "bytes" }
+          ],
+        },
+        primaryType: 'conditionalOrder',
+        message: {
+          inputTokenAddress: "0xC02aaA39b223FE8D0A0e5C4F27eAD9083C756Cc2", // WETH
+          outputTokenAddress: "0x8390a1DA07E376ef7aDd4Be859BA74Fb83aA02D5", // GROK
+          recipient: "0xBb6AeaBdf61Ca96e80Aa239bA8cC7e436862E596",
+          orderType: tradeDetails.toggleSelection,
+          amount: amountInWei, // Input token scaled(18 decimal places)
+          tranches: 1,
+          percentChange: selectedPercentChange,
+          priceAvg: selectedPriceAverage,
+          deadline: unixTimestamp,
+          salt: generateRandomSalt()
+        }
+      })
+      console.log(signature);
+  
+      async function uploadData() {
+  
+        try {
+          // Retrieve and store data to be uploaded to database 
+          const currentTimestamp = new Date().toISOString();
+          const orderData = {
+            tradeOption: tradeDetails.toggleSelection,
+            inputTokenAddy: tradeDetails.inputToken, 
+            outputTokenAddy: tradeDetails.outputToken, 
+            tradeAmount: tradeDetails.inputTokenValue,
+            tradeDelta: tradeDetails.percentChange, 
+            avgPrice: tradeDetails.selectedTradeAction, 
+            batches: batchValue, 
+            deadline: selectedDate.toISOString()
+          }
+  
+          const jsonData = JSON.stringify(orderData); 
+          // const pairId = await fetchPairId(wethToJoePath);
+          const userId = await fetchUserId(); 
+          console.log("USER ID:", userId); 
+  
+          // created_at (timestamp), user (referenced to user table), pair (referenced to pair table), SplurgeOrder jsonb, signature - text, ready - bool, ZeroExCalldata - jsonb
+          const { data, error } = await supabase
+            .from('Trades')
+            .insert([
+              { created_at: currentTimestamp, 
+                user: userId, 
+                pair: wethToJoePath, 
+                SplurgeOrder: jsonData, 
+                signature: signature, 
+                ready: false
+              }
+            ]);
+  
+          if (error) throw error; 
+  
+        } catch (error) {
+          console.error("Error uploading data to Supabase:", error)
         }
 
-        const jsonData = JSON.stringify(orderData); 
-        // const pairId = await fetchPairId(wethToJoePath);
-        const userId = await fetchUserId(); 
-        console.log("USER ID:", userId); 
-
-        // created_at (timestamp), user (referenced to user table), pair (referenced to pair table), SplurgeOrder jsonb, signature - text, ready - bool, ZeroExCalldata - jsonb
-        const { data, error } = await supabase
-          .from('Trades')
-          .insert([
-            { created_at: currentTimestamp, 
-              user: userId, 
-              pair: wethToJoePath, 
-              SplurgeOrder: jsonData, 
-              signature: signature, 
-              ready: false
-            }
-          ]);
-
-        if (error) throw error; 
-
-      } catch (error) {
-        console.error("Error uploading data to Supabase:", error)
+  
       }
+  
+      uploadData(); 
+      router.push('/trades');  
+
+    } catch (error){
+
+      console.error("Error during signature or data upload:", error);
+      setErrorMessage("Signature denied or failed to upload data. Please try again.");
 
 
     }
 
-    uploadData(); 
-    router.push('/trades');
   }
+
+  const [errorMessage, setErrorMessage] = useState('');
+
   // Listen for changes in primaryWallet
   useEffect(() => {
     if (primaryWallet?.address) {
       setIsWalletConnected(true);
     }
   }, [primaryWallet?.address]);
+
   return (
     <LocalizationProvider dateAdapter={AdapterDayjs}>
       <div className="h-screen bg-black flex flex-col justify-center items-center">
@@ -221,6 +265,14 @@ export default function StepThree() {
             are met.
           </h2>
         )}
+
+
+        {((batchValueError && !selectedDateError) || (!batchValueError && selectedDateError)) && (
+          <p className="text-red-500 p-5">{batchValueError ? batchValueError : selectedDateError}</p>
+        )}
+        {(batchValueError && selectedDateError) && (
+          <p className="text-red-500 p-5">{batchValueError + " " + selectedDateError}</p>
+        )}
         {isWalletConnected ? (
           <div className="flex flex-col space-y-4 text-center">
             <p className="py-5 text-xl font-medium text-white">
@@ -249,6 +301,13 @@ export default function StepThree() {
             Connect Wallet
           </button>
         )}
+
+        {errorMessage && (
+          <div className="text-red-500 text-center p-5">
+            {errorMessage}
+          </div>
+        )}
+
       </div>
     </LocalizationProvider>
   );
