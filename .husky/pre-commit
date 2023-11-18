@@ -1,5 +1,5 @@
 #!/usr/bin/env sh
 . "$(dirname -- "$0")/_/husky.sh"
 
-npx prettier --write "src/**/*.*" "offchain/**/*.*"
+npx prettier --write "src/**/*.*" "offchain/**/*.*" "supabase/**/*.*"
 npm run solhint

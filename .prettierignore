@@ -9,3 +9,7 @@
 .gitignore
 
 *.ico
+
+*.toml
+
+*.sql
