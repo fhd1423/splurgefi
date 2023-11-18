@@ -43,20 +43,49 @@ export default function StepThree() {
   };
 
   const uploadConditionalOrder = async () => {
+
+    console.log("uploadConditionalOrder is called");
+
+    // const generateRandomSalt = () => {
+    //   const randomBytes = new Uint8Array(32);
+    //   crypto.getRandomValues(randomBytes);
+
+    //   // Convert the Uint8Array to a hex string
+    //   const salt = Array.from(randomBytes).map(byte => byte.toString(16).padStart(2, '0')).join('');
+
+    //   return salt;
+    // };
+
     const generateRandomSalt = () => {
-      const randomBytes = new Uint8Array(32);
+      const randomBytes = new Uint8Array(64); // Generating 64 random bytes
       crypto.getRandomValues(randomBytes);
-
-      // Convert the Uint8Array to a hex string
+    
       const salt = Array.from(randomBytes).map(byte => byte.toString(16).padStart(2, '0')).join('');
-
+      console.log("Salt length:", salt.length);
       return salt;
     };
 
-    const deadlineDate = new Date("2023-12-01T12:00:00") //December 1st 2023 at 12PM
-    const unixTimestamp = deadlineDate.getTime() / 1000; //In seconds
-
+    // const deadlineDate = new Date("2023-12-01T12:00:00") //December 1st 2023 at 12PM
+    // const unixTimestamp = deadlineDate.getTime() / 1000; //In seconds
+    const unixTimestamp = selectedDate.unix(); // Unix timestamp in seconds
     const signer = await primaryWallet.connector.getSigner();
+
+    let selectedPercentChange = parseInt(tradeDetails.percentChange, 10);
+    let selectedPriceAverage = parseInt(tradeDetails.selectedTradeAction, 10); 
+    let selectedAmount = tradeDetails.inputTokenValue; 
+
+    // Step 1: Parse the Decimal Value
+    const [wholePart, decimalPartRaw] = selectedAmount.includes('.') ? selectedAmount.split('.') : [selectedAmount, ''];
+
+    // Step 2: Normalize Decimal Part
+    const decimalPart = decimalPartRaw.padEnd(18, '0'); // Add trailing zeros to make it 18 decimal places
+
+    // Step 3: Convert to Integer
+    const wholePartBigInt = BigInt(wholePart);
+    const decimalPartBigInt = BigInt(decimalPart);
+
+    // Step 4: Scale to Blockchain Format
+    let amountInWei = wholePartBigInt * BigInt(10) ** BigInt(18) + decimalPartBigInt;
 
     //Sign Payload, send payload and signature to backend
     const signature = await signer.signTypedData({
@@ -68,29 +97,46 @@ export default function StepThree() {
         verifyingContract: '0xCcCCccccCCCCcCCCCCCcCcCccCcCCCcCcccccccC', //CHANGE: to Splurge Addy
       },
       types: {
+        // conditionalOrder: [
+        //   { name: 'inputTokenAddy', type: "address" },
+        //   { name: 'outputTokenAddy', type: "address" },
+        //   { name: 'recipient', type: "address" },
+        //   { name: 'amount', type: "uint256" },
+        //   { name: 'tranches', type: "uint256" },
+        //   { name: 'deadline', type: "uint256" },
+        //   { name: 'salt', type: "bytes64" }
+        // ],
         conditionalOrder: [
-          { name: 'inputTokenAddy', type: "address" },
-          { name: 'outputTokenAddy', type: "address" },
+          { name: 'inputTokenAddress', type: "address" },
+          { name: 'outputTokenAddress', type: "address" },
           { name: 'recipient', type: "address" },
+          { name: 'orderType', type: "string" },
           { name: 'amount', type: "uint256" },
           { name: 'tranches', type: "uint256" },
+          { name: 'percentChange', type: "uint256" },
+          { name: 'priceAvg', type: "uint256" },
           { name: 'deadline', type: "uint256" },
           { name: 'salt', type: "bytes64" }
         ],
       },
       primaryType: 'conditionalOrder',
       message: {
-        inputTokenAddy: "0xC02aaA39b223FE8D0A0e5C4F27eAD9083C756Cc2", //WETH
-        outputTokenAddy: "0x8390a1DA07E376ef7aDd4Be859BA74Fb83aA02D5", //GROK
-        recipient: "0xBb6AeaBdf61Ca96e80Aa239bA8cC7e436862E596", //
-        amount: 690 * 10 ** 18, //Input token scaled(18 decimal places)
+        inputTokenAddress: "0xC02aaA39b223FE8D0A0e5C4F27eAD9083C756Cc2", // WETH
+        outputTokenAddress: "0x8390a1DA07E376ef7aDd4Be859BA74Fb83aA02D5", // GROK
+        recipient: "0xBb6AeaBdf61Ca96e80Aa239bA8cC7e436862E596", 
+        orderType: tradeDetails.toggleSelection, 
+        amount: amountInWei, // Input token scaled(18 decimal places)
         tranches: 1,
+        percentChange: selectedPercentChange, 
+        priceAvg: selectedPriceAverage, 
         deadline: unixTimestamp,
         salt: generateRandomSalt()
       }
     })
 
     console.log(signature);
+    router.push('/trades');
+
   }
 
   // Listen for changes in primaryWallet
@@ -155,14 +201,14 @@ export default function StepThree() {
               Start Automation
             </button> */}
 
-            <Link href="/trades" passHref>
+            {/* <Link href="/trades" passHref> */}
               <button
                 onClick={uploadConditionalOrder}
                 className="bg-green-500 text-white text-xl font-bold rounded-full shadow-lg hover:bg-green-600 w-96 h-16"
               >
                 Start Automation
               </button>
-            </Link>
+            {/* </Link> */}
           </div>
         ) : (
           <button

@@ -117,7 +117,12 @@ export default function StepTwo() {
             ? tradeDetails.outputToken
             : tradeDetails.inputToken}{" "}
           {isUpSelected === true ? "increases" : "decreases"} by{" "}
-          {percentChange}% over the {selectedTradeAction},
+          {percentChange}% based on the avg. {selectedTradeAction}{" "}
+          {selectedTradeAction === "15"
+            ? "min" 
+            : "hr"
+          }
+          {" "} price, 
           {tradeDetails.toggleSelection === "buy"
             ? " buy "
             : " sell "} with{" "}

@@ -28,7 +28,7 @@ const CustomSelect = styled(Select)({
     lineHeight: "80px", // Center the text vertically
     paddingLeft: "10px", // Give some space from the left side
     paddingRight: "32px", // Make room for the icon
-    fontSize: "1.25rem",
+    fontSize: "1.75rem",
   },
   "& .MuiSelect-icon": {
     display: "none", // Hide the default icon
@@ -74,10 +74,10 @@ export default function TradeSelector({
           displayEmpty
           IconComponent={KeyboardArrowDownIcon}
         >
-          <MenuItem value={"avg. 15 min price"}>Avg. 15 min price</MenuItem>
-          <MenuItem value={"avg. 4 hr price"}>Avg. 4 hr price</MenuItem>
-          <MenuItem value={"avg. 8 hr price"}>Avg. 8 hr price</MenuItem>
-          <MenuItem value={"avg. 24 hr price"}>Avg. 24 hr price</MenuItem>
+          <MenuItem value={"15"}>Avg. 15 min price</MenuItem>
+          <MenuItem value={"4"}>Avg. 4 hr price</MenuItem>
+          <MenuItem value={"8"}>Avg. 8 hr price</MenuItem>
+          <MenuItem value={"24"}>Avg. 24 hr price</MenuItem>
 
 
         </CustomSelect>
