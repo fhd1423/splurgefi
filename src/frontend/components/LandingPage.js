@@ -4,8 +4,12 @@ import { useEffect, useState } from "react";
 import { useDynamicContext, DynamicWidget } from "@dynamic-labs/sdk-react-core";
 import GradientText from "./GradientText";
 import Link from "next/link";
+import { useRouter } from 'next/navigation'
 
 const LandingPage = () => {
+
+  const router = useRouter()
+
   // Local state to track if the wallet is connected
   const [isWalletConnected, setIsWalletConnected] = useState(false);
 
@@ -17,15 +21,17 @@ const LandingPage = () => {
     setShowAuthFlow(true);
   };
 
-  // Use useEffect to listen for changes in primaryWallet
+  // Use useEffect to listen for changes in primaryWallet and redirect on successful connection
   useEffect(() => {
     if (primaryWallet?.address) {
       setIsWalletConnected(true);
+      localStorage.setItem('walletAddress', primaryWallet.address); // Store wallet address
+      router.push('/trades'); // Redirect to the trades page
     }
-  }, [primaryWallet?.address]);
+  }, [primaryWallet?.address, router]);
 
   return (
-    <div className="flex flex-col h-screen justify-center items-center bg-black font-sans px-4 sm:px-6 lg:px-8">
+    <div className="flex flex-col h-screen bg-black font-sans px-4 sm:px-6 lg:px-8">
       <Head>
         <title>SplurgeFi</title>
         <meta name="description" content="Welcome to SplurgeFi" />
@@ -36,7 +42,20 @@ const LandingPage = () => {
         />
       </Head>
 
-      <div className="text-center w-full max-w-2xl">
+      {/* Navigation Bar */}
+      <header className="w-full py-6 px-6 flex justify-between items-center">
+        <h2 className="text-xl text-white font-bold">SplurgeFi</h2>
+
+        <button onClick={handleAuthFlow} className="bg-green-500 text-white text-sm font-semibold py-2 px-4 rounded-md shadow-lg hover:bg-green-600">
+          Log In
+        </button>
+        {/* <button onClick={() => router.push('/trades')} className="bg-green-500 text-white text-sm font-semibold py-2 px-4 rounded-md shadow-lg hover:bg-green-600">
+          Log In
+        </button> */}
+
+      </header>
+
+      <div className="text-center w-full max-w-2xl m-auto">
         <h1 className="text-4xl sm:text-5xl md:text-6xl mb-4 text-white font-bold tracking-wide leading-tight">
           <GradientText>Automate your trades on DEXs seamlessly</GradientText>
         </h1>

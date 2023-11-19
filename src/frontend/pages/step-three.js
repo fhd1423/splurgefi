@@ -7,7 +7,6 @@ import { LocalizationProvider } from "@mui/x-date-pickers/LocalizationProvider";
 import { useDynamicContext } from "@dynamic-labs/sdk-react-core";
 import Grid from "@mui/material/Grid";
 import dayjs from "dayjs";
-import Link from "next/link";
 import { supabase } from "./client"
 import router from "next/router";
 
@@ -19,7 +18,6 @@ export default function StepThree() {
   const joeContractAddress = "0x6FC71D805f004EE2B5a2962344cb0703A8Ce2b31";
   const wethContractAddress = "0xC02aaA39b223FE8D0A0e5C4F27eAD9083C756Cc2";
   const wethToJoePath = "0xC02aaA39b223FE8D0A0e5C4F27eAD9083C756Cc2-0x6FC71D805f004EE2B5a2962344cb0703A8Ce2b31"
-  
   // Retreive data from previous view
   const [tradeDetails, setTradeDetails] = useState({
     inputTokenValue: "",
@@ -77,21 +75,46 @@ export default function StepThree() {
   };
 
   // Use primary wallet address (verified_credential_address to get verified_credential_id (primary key)
-  const fetchUserId = async () => {
-    const { data, error } = await supabase
-      .from('Users')
-      .select('verified_credential_id')
-      .eq('verified_credential_address', primaryWallet.address)
-  
-      if (error) {
-        console.log('error', error)
-      } else {
+  // const fetchUserId = async () => {
 
-        console.log("User id:", data[0]?.verified_credential_id)
-        return data[0]?.verified_credential_id;
-      }
+  //   console.log('WALLET ADDRESS INSIDE FETCH', primaryWallet.address);
+  //   const { data, error } = await supabase
+  //     .from('Users')
+  //     .select('verified_credential_id')
+  //     .eq('verified_credential_address', primaryWallet.address)
   
-  };
+  //     console.log('Response:', data, 'Error:', error);
+
+  //     if (error) {
+  //       console.log('error', error)
+  //       console.log('Response:', data, 'Error:', error);
+
+  //     } else {
+
+  //       console.log("User id inside fetch:", data[0]?.verified_credential_id)
+  //       return data[0]?.verified_credential_id;
+  //     }
+  
+  // };
+
+  // const fetchUserId = async () => {
+
+  //   console.log("ADDRES INSIDE TRADES NEW:", primaryWallet.address);
+
+  //   const { data, error } = await supabase
+  //     .from('Users')
+  //     .select('verified_credential_id')
+  //     .eq('verified_credential_address', primaryWallet.address)
+  
+  //     if (error) {
+  //       console.log('error', error)
+  //     } else {
+
+  //       console.log("User id:", data[0]?.verified_credential_id)
+  //       return data[0]?.verified_credential_id;
+  //     }
+  
+  // };
 
 
   const uploadConditionalOrder = async () => {
@@ -180,18 +203,20 @@ export default function StepThree() {
   
           const jsonData = JSON.stringify(orderData); 
           // const pairId = await fetchPairId(wethToJoePath);
-          const userId = await fetchUserId(); 
-          console.log("USER ID:", userId); 
+          console.log('WALLET ADDRESS INSIDE FETCH', primaryWallet.address);
+
+          // console.log("USER ID INSIDE:", userId); 
   
           // created_at (timestamp), user (referenced to user table), pair (referenced to pair table), SplurgeOrder jsonb, signature - text, ready - bool, ZeroExCalldata - jsonb
           const { data, error } = await supabase
             .from('Trades')
             .insert([
               { created_at: currentTimestamp, 
-                user: userId, 
+                user: primaryWallet.address, 
                 pair: wethToJoePath, 
-                SplurgeOrder: jsonData, 
+                order: jsonData, 
                 signature: signature, 
+                complete: false, 
                 ready: false
               }
             ]);

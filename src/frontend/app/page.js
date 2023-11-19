@@ -8,9 +8,11 @@ import {
 } from "@dynamic-labs/sdk-react-core";
 import Graph from "../components/Graph";
 import { EthereumWalletConnectors } from "@dynamic-labs/ethereum";
-import { supabase } from "@/pages/client";
+import { useEffect, useState } from "react";
+import router from "next/router";
 
 export default function Home() {
+
   return (
     <div className="flex flex-col bg-black font-sans w-full">
       <DynamicContextProvider

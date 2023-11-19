@@ -17,15 +17,15 @@ const CustomInputContainer = styled("div")({
   backgroundColor: "#1B1B1B",
   borderRadius: "10px",
   padding: "0 10px",
-  width: "400px",
-  height: "90px",
+  width: "455px",
+  height: "80px",
   justifyContent: "space-between",
 });
 
 // Custom styles for the input component
 const CustomInput = styled(InputBase)(({ theme }) => ({
   color: "white",
-  fontSize: "2rem",
+  fontSize: "1.5rem",
   "& .MuiInputBase-input": {
     padding: "20px 12px",
     flex: 1,
@@ -110,9 +110,9 @@ export default function TokenSelector({
       <Typography
         variant="h6"
         color="white"
-        fontWeight="600"
+        fontWeight="500"
         gutterBottom
-        style={{ marginBottom: "8px", fontSize: "1rem" }}
+        style={{ marginBottom: "3px", fontSize: "1rem" }}
       >
         {title}
       </Typography>

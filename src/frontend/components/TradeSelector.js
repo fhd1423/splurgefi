@@ -12,8 +12,8 @@ import Typography from "@mui/material/Typography";
 const CustomFormControl = styled(FormControl)({
   backgroundColor: "#1B1B1B",
   borderRadius: "10px",
-  width: "340px",
-  height: "90px",
+  width: "130px",
+  height: "55px",
   display: "flex",
   flexDirection: "row",
   alignItems: "center",
@@ -28,7 +28,7 @@ const CustomSelect = styled(Select)({
     lineHeight: "80px", // Center the text vertically
     paddingLeft: "10px", // Give some space from the left side
     paddingRight: "32px", // Make room for the icon
-    fontSize: "1.75rem",
+    fontSize: "1.2rem",
   },
   "& .MuiSelect-icon": {
     display: "none", // Hide the default icon
@@ -58,9 +58,9 @@ export default function TradeSelector({
       <Typography
         variant="subtitle1"
         color="white"
-        fontWeight="600"
+        fontWeight="500"
         gutterBottom
-        style={{ marginBottom: "8px", textAlign: "left" }}
+        style={{ marginBottom: "3px", fontSize: "1rem", textAlign: "left" }}
       >
         Trade Based On
       </Typography>
@@ -74,10 +74,10 @@ export default function TradeSelector({
           displayEmpty
           IconComponent={KeyboardArrowDownIcon}
         >
-          <MenuItem value={"15"}>Avg. 15 min price</MenuItem>
-          <MenuItem value={"4"}>Avg. 4 hr price</MenuItem>
-          <MenuItem value={"8"}>Avg. 8 hr price</MenuItem>
-          <MenuItem value={"24"}>Avg. 24 hr price</MenuItem>
+          <MenuItem value={"15"}>15 min</MenuItem>
+          <MenuItem value={"4"}>4 hr</MenuItem>
+          <MenuItem value={"8"}>8 hr</MenuItem>
+          <MenuItem value={"24"}>24 hr</MenuItem>
 
 
         </CustomSelect>

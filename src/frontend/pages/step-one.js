@@ -4,32 +4,50 @@ import React, { useState } from "react";
 import Head from "next/head";
 import CustomInputToken from "../components/CustomInputToken";
 import TokenSelector from "../components/TokenSelector";
-import Link from "next/link";
 import CustomToggle from "../components/CustomToggle";
 import { Typography, Box } from "@mui/material";
 import router from "next/router";
+import Paper from '@mui/material/Paper';
+import Grid from '@mui/material/Grid';
+import CustomInputPercent from "../components/CustomInputPercent";
+import CustomInputBatches from "../components/CustomInputBatches";
+import TradeSelector from "../components/TradeSelector";
+import dayjs from "dayjs";
+import CustomDatePicker from "@/components/CustomDatePicker";
+import { LocalizationProvider } from "@mui/x-date-pickers/LocalizationProvider";
+import { AdapterDayjs } from "@mui/x-date-pickers/AdapterDayjs";
 
 export default function StepOne() {
+
   // Sample options for testing
   const tokenOptions = [
     { label: "WETH", value: "WETH" },
     { label: "JOE", value: "JOE" },
   ];
+  
 
   // State to hold input values
   const [inputTokenValue, setInputTokenValue] = useState("");
   const [outputTokenValue, setOutputTokenValue] = useState("");
+  const [selectedTradeAction, setSelectedTradeAction] = useState("");
+
+  const [batchValue, setBatchValue] = useState("");
+  const [selectedDate, setSelectedDate] = useState(dayjs());
 
   // State to hold selected tokens
   const [inputToken, setInputToken] = useState("");
   const [outputToken, setOutputToken] = useState("");
 
   const [toggleSelection, setToggleSelection] = useState('buy');
+  const [isUpSelected, setIsUpSelected] = useState(null);
 
   // State for error messages
   const [inputTokenError, setInputTokenError] = useState("");
   const [outputTokenError, setOutputTokenError] = useState("");
   const [inputTokenValueError, setInputTokenValueError] = useState("");
+  const [tokenSelectionError, setTokenSelectionError] = useState("");
+  // States for percent change and selected value
+  const [percentChange, setPercentChange] = useState("");
 
   const validateInputs = () => {
     let isValid = true;
@@ -57,6 +75,20 @@ export default function StepOne() {
     return isValid;
   };
 
+  const checkForWETH = () => {
+
+    let selectedWETH = true; 
+
+    if (validateInputs()){
+      if (inputToken !== 'WETH' && outputToken !== 'WETH'){
+        setTokenSelectionError("Please make sure that either your input or output token is WETH.")
+        selectedWETH = false;
+      }
+    }
+
+    return selectedWETH; 
+  }
+
   // Handlers to update the state
   const handleInputTokenChange = (value) => {
     // console.log("Input Token Value:", value); 
@@ -78,10 +110,19 @@ export default function StepOne() {
     setOutputToken(token);
   };
 
+  const handleTradeActionChange = (action) => {
+    // console.log("Selected Trade:", action);
+    setSelectedTradeAction(action); 
+  };
+
+  const handlePercentChange = (event) => {
+    setPercentChange(event.target.value);
+  };
+
   // Store the values locally to pass to step-two
   const handleContinue = () => {
 
-    if (validateInputs()){
+    if (validateInputs() && checkForWETH()){
       localStorage.setItem(
         "tradeDetails",
         JSON.stringify({
@@ -100,89 +141,84 @@ export default function StepOne() {
   };
 
   return (
-    <div className="h-screen bg-black flex flex-col justify-center items-center">
-      <Head>
-        <title>Step One</title>
-        <link rel="icon" href="/favicon.ico" />
-      </Head>
-      <h1 className="text-4xl text-white mb-6 font-semibold">
-        What tokens do you want to trade?
-      </h1>
-      <h3 className="text-lg text-custom-green font-bold">Step 1</h3>
+    <LocalizationProvider dateAdapter={AdapterDayjs}>
 
-      {/* <Box sx={{
-      display: 'flex',
-      justifyContent: 'center',
-      alignItems: 'center',
-      gap: '5px', 
-      paddingTop: '20px', 
-      paddingBottom: '0px' 
-      }}>
-        <Typography variant="h5" component="h5" color="white" sx={{ whiteSpace: 'nowrap' }}>
-          I want to automate a
-        </Typography>
-        <CustomToggle selection={toggleSelection} setSelection={setToggleSelection}/>
-      </Box> */}
+      <div className="h-screen bg-black flex flex-col justify-center items-center">
+        <Head>
+          <title>Step One</title>
+          <link rel="icon" href="/favicon.ico" />
+        </Head>
 
-      {/* <p className="text-white text-xl">
-        Current Selection: {toggleSelection}
-      </p> */}
-
-      {/* <div style={{ display: 'flex', justifyContent: 'center', padding: '50px 10px' }}>
-        <div style={{ flex: '1', marginRight: '15px' }}>
-
-        <CustomInputToken
-            title="Input Token"
-            options={tokenOptions}
-            onValueChange={handleInputTokenChange}
-            onSelectChange={handleInputTokenSelect}
-          />
-
-        </div>
-        <div style={{ flex: '1', marginLeft: '15px' }}>
-
-          <TokenSelector
-            title="Output Token"
-            options={tokenOptions}
-            onValueChange={handleInputTokenChange}
-            onSelectChange={handleInputTokenSelect}
-          />
-
-        </div>
-      </div> */}
-
-      <div className={`${inputTokenError || outputTokenError ? 'space-y-3' : 'space-y-8'} pt-6 pb-12`}>
-
-        <div className="flex justify-center items-center pt-5">
-          <CustomToggle selection={toggleSelection} setSelection={setToggleSelection}/>
-        </div>
-
-        <CustomInputToken
-          title="Input Token"
-          options={tokenOptions}
-          onValueChange={handleInputTokenChange}
-          onSelectChange={handleInputTokenSelect}
-        />
-        {(inputTokenError || inputTokenValueError) && <p className="text-red-500">{inputTokenError ? inputTokenError : inputTokenValueError}</p>}
-
-        <TokenSelector
-          title="Output Token"
-          options={tokenOptions}
-          onValueChange={handleOutputTokenChange}
-          onSelectChange={handleOutputTokenSelect}
-        />
-        {outputTokenError && <p className="text-red-500">{outputTokenError}</p>}
-
-      </div>
-
-      {/* <Link href="/step-two" passHref> */}
-        <button
-          onClick={handleContinue}
-          className="bg-green-500 text-white text-xl font-bold rounded-full shadow-lg hover:bg-green-600 w-96 h-16"
+        <Box
+          sx={{
+            width: 500, 
+            mx: "auto", 
+          }}
         >
-          Continue
-        </button>
-      {/* </Link> */}
-    </div>
+          <Paper elevation={3} sx={{backgroundColor: '#2B2B2B', padding: 2, color: 'text.primary', maxWidth: '100%', mx: 'auto', borderRadius: '16px'}}>
+            <Grid container spacing={1.25}> 
+              <Grid item xs={12}>
+                  <CustomToggle selection={toggleSelection} setSelection={setToggleSelection}/>
+              </Grid>
+              <Grid item xs={12}>
+                  <CustomInputToken
+                      title="Input Token"
+                      options={tokenOptions}
+                      onValueChange={handleInputTokenChange}
+                      onSelectChange={handleInputTokenSelect}
+                  />
+              </Grid>
+              <Grid item xs={12}>
+                <TokenSelector
+                  title="Output Token"
+                  options={tokenOptions}
+                  onValueChange={handleInputTokenChange}
+                  onSelectChange={handleInputTokenSelect}
+                />
+              </Grid>
+              <Grid item xs={4}>
+                <CustomInputPercent
+                  title="Percent Change"
+                  value={percentChange}
+                  onValueChange={handlePercentChange}
+                  isUpSelected={isUpSelected} // Pass the derived state to the component
+                  onToggle={() => setIsUpSelected(!isUpSelected)} // Toggle function for the arrow
+                  placeHolder={"0%"}
+                />
+              </Grid>
+              <Grid item xs={4}>
+                <CustomInputBatches
+                    title="Batches"
+                    placeHolder={"5"}
+                    value={batchValue}
+                    onValueChange={(e) => setBatchValue(e.target.value)}
+                />
+              </Grid>
+              <Grid item xs={4}>
+                <TradeSelector
+                  selectedTradeAction={selectedTradeAction}
+                  onTradeActionChange={handleTradeActionChange}
+                />
+              </Grid>
+              <Grid item xs={12}>
+                <CustomDatePicker
+                    selectedDate={selectedDate}
+                    setSelectedDate={setSelectedDate}
+                />
+              </Grid>
+              <Grid item xs={12} sx={{ display: 'flex', justifyContent: 'center', alignItems: 'center', pt: 4 }}>
+                <button
+                  className="bg-green-500 text-white text-xl font-bold rounded-lg shadow-lg hover:bg-green-600 w-96 h-14"
+                >
+                  Connect Wallet
+                </button>
+              </Grid>
+            </Grid>
+          </Paper>
+
+        </Box>
+      </div> 
+
+    </LocalizationProvider>
   );
 }

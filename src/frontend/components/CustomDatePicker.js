@@ -20,7 +20,8 @@ const customDatePickerTheme = createTheme({
         root: {
           input: {
             color: "#ffffff",
-            height: "70px",
+            height: "55px",
+            width: "375px",
             padding: "10px 14px",
             fontSize: "1.25rem", // Adjust the font size as needed
           },
@@ -53,9 +54,9 @@ const CustomDatePicker = ({ selectedDate, setSelectedDate }) => {
       <Typography
         variant="subtitle1"
         color="white"
-        fontWeight="600"
+        fontWeight="500"
         gutterBottom
-        style={{ marginBottom: "8px", textAlign: "left" }}
+        style={{ marginBottom: "3px", textAlign: "left" }}
       >
         Automation Deadline
       </Typography>

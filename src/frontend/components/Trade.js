@@ -20,7 +20,7 @@ export default function Trade({complete}) {
   const completeStyle = {
     ...labelStyle,
     backgroundColor: "transparent",
-    border: "1px solid white",
+    color: "green",
   };
 
   const pendingStyle = {
@@ -69,9 +69,9 @@ export default function Trade({complete}) {
 
           { complete ?  (
 
-            <Button style={{ paddingRight: '0px', minWidth: 'auto', padding: '0px' }}>
+            <Button>
               <Typography style={{ ...completeStyle, textAlign: "right" }}>
-                Claim
+                Complete
               </Typography>
             </Button>
 

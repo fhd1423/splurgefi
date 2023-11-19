@@ -12,18 +12,18 @@ const CustomInputContainer = styled("div")({
   alignItems: "center",
   backgroundColor: "#1B1B1B",
   borderRadius: "10px",
-  width: "170px",
-  height: "90px",
+  width: "130px",
+  height: "55px",
 });
 
 // Custom styles for textfield component
 const CustomInput = styled(InputBase)({
   color: "white",
-  fontSize: "2rem", 
+  fontSize: "1.75rem", 
   "& .MuiInputBase-input": {
     textAlign: "center",
     padding: "0 10px", 
-    width: "calc(100% - 40px)", 
+    width: "calc(100% - 35px)", 
     height: "100%",
   },
 });
@@ -41,9 +41,9 @@ export default function CustomInputPercent({
       <Typography
         variant="subtitle1"
         color="white"
-        fontWeight="600"
+        fontWeight="500"
         gutterBottom
-        style={{ marginBottom: "8px", textAlign: "left" }}
+        style={{ marginBottom: "3px", fontSize: "1rem", textAlign: "left" }}
       >
         {title}
       </Typography>

@@ -10,15 +10,15 @@ const CustomInputContainer = styled("div")({
   justifyContent: "center",
   backgroundColor: "#1B1B1B",
   borderRadius: "10px",
-  width: "160px",
-  height: "90px",
+  width: "130px",
+  height: "55px",
   padding: "0",
 });
 
 // Custom styles for the input component
 const CustomInput = styled(InputBase)({
   color: "white",
-  fontSize: "2rem",
+  fontSize: "1.75rem",
   "& .MuiInputBase-input": {
     textAlign: "center",
     padding: "0",
@@ -38,9 +38,9 @@ export default function CustomInputBatches({
       <Typography
         variant="subtitle1"
         color="white"
-        fontWeight="600"
+        fontWeight="500"
         gutterBottom
-        style={{ marginBottom: "8px", textAlign: "left" }}
+        style={{ marginBottom: "3px", fontSize: "1rem", textAlign: "left" }}
       >
         {title}
       </Typography>
