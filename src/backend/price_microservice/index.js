@@ -17,7 +17,7 @@ const headers = {
 const getPairs = async () => {
   let { data: Pairs, error } = await supabase
     .from('Pairs')
-    .select('path,daily_prices');
+    .select("*");
 
   return Pairs;
 };
@@ -40,22 +40,53 @@ const updatePriceData = async () => {
       sellAmount: '1000000000000000000', //Arbitrary, just trying to get exchange rate
     };
 
+    const intervals = [15, 60, 240, 1440];
+
+    let interval_columnName = null;
+    let interval_columnValue;
+
+    intervals.forEach((interval) => {
+        if(isTimeInterval(interval)){
+            interval_columnName = `${interval}min_avg`;
+        }
+    });
+
+    let xmin_avg = pair[interval_columnName];
+
     axios
       .get(apiUrl, { params, headers })
       .then((response) => {
-        daily_prices.priceFeed.push(response.data.price);
+        interval_columnValue = response.data.price;
+        daily_prices.priceFeed.push(interval_columnValue);
+        xmin_avg.close_prices.push(interval_columnValue)
         console.log(daily_prices);
-        supabase
-          .from('Pairs')
-          .upsert([
-            {
-              path: pair.path,
-              ['daily_prices']: daily_prices,
-            },
-          ])
-          .then((upsertResponse) => {
-            console.log('Upsert Response:', upsertResponse);
-          });
+        if(interval_columnName != null){
+            supabase
+            .from('Pairs')
+            .upsert([
+              {
+                path: pair.path,
+                ['daily_prices']: daily_prices,
+                [interval_columnName]: xmin_avg
+              },
+            ])
+            .then((upsertResponse) => {
+              console.log('Upsert Response:', upsertResponse);
+            });
+        }
+        else{
+            supabase
+            .from('Pairs')
+            .upsert([
+              {
+                path: pair.path,
+                ['daily_prices']: daily_prices,
+              },
+            ])
+            .then((upsertResponse) => {
+              console.log('Upsert Response:', upsertResponse);
+            });
+        }
       })
       .catch((error) => {
         console.error('Error:', error.message);
@@ -68,6 +99,14 @@ const updatePriceData = async () => {
 //UTILITY FUNCTIONS
 const sleep = (delay) => new Promise((resolve) => setTimeout(resolve, delay));
 
+
+//Margin of error is 1 minute
+const isTimeInterval = (intervalInMinutes) => {
+    const now = new Date();
+    //const minutes = now.getMinutes();
+    const minutes = 150;
+    return minutes % intervalInMinutes === 0;
+};
 
 //EXECUTION
 updatePriceData();
