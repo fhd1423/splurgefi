@@ -59,12 +59,6 @@ const updatePriceData = async () => {
       })
       .catch((error) => {
         console.error('Error:', error.message);
-        // setTimeout(() => {
-        //     axios.get(apiUrl, { params, headers })
-        //     .then(response => {
-        //         console.log('API Response:', response.data);
-        //     },5000);
-        // });
       });
 
     await sleep(1000);
@@ -74,4 +68,6 @@ const updatePriceData = async () => {
 //UTILITY FUNCTIONS
 const sleep = (delay) => new Promise((resolve) => setTimeout(resolve, delay));
 
+
+//EXECUTION
 updatePriceData();
