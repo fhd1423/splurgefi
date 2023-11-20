@@ -8,34 +8,30 @@ import { supabase } from "./client"
 import NavBar from "../components/NavBar";
 
 export default function Trades() {
-  const [isWalletConnected, setIsWalletConnected] = useState(false);
-  const { setShowAuthFlow, primaryWallet } = useDynamicContext();
+  const  primaryWallet  = useDynamicContext();
   const [userTrades, setUserTrades] = useState(new Map());
 
-  useEffect(() => {
-    const fetchTrades = async () => {
-      if (primaryWallet?.address) {
-        const { data, error } = await supabase
-          .from('Trades')
-          .select('id, pair, complete, batches, percent_change, deadline, remainingBatches')
-          .eq('user', primaryWallet.address);
-    
-        if (error) {
-          console.error('Error fetching trades:', error);
-          return;
-        }
-        
-        let newTrades = new Map();
-        data.forEach(trade => {
-          newTrades.set(trade.id, [trade.pair, trade.complete, trade.batches, trade.percent_change, trade.deadline, trade.remainingBatches]);
-        });
-        
-        setUserTrades(newTrades);
+  const fetchTrades = async () => {
+    console.log("PRIMARY WALLET ADDRESS:", primaryWallet.address)
+    if (primaryWallet?.address) {
+      const { data, error } = await supabase
+        .from('Trades')
+        .select('id, pair, complete, batches, percent_change, deadline, remainingBatches')
+        .eq('user', primaryWallet.address);
+  
+      if (error) {
+        console.error('Error fetching trades:', error);
+        return;
       }
-    };
-
-    fetchTrades();
-  }, [primaryWallet?.address]);
+      
+      let newTrades = new Map();
+      data.forEach(trade => {
+        newTrades.set(trade.id, [trade.pair, trade.complete, trade.batches, trade.percent_change, trade.deadline, trade.remainingBatches]);
+      });
+      
+      setUserTrades(newTrades);
+    }
+  };
 
   return (
 
@@ -46,7 +42,13 @@ export default function Trades() {
           settings={{
             environmentId: "a8961ac2-2a97-4735-a2b2-253f2485557e",
             walletConnectors: [EthereumWalletConnectors],
-            siweStatement: "Welcome to Splurge! Signing this gas-free message verifies you as the owner of this wallet."
+            siweStatement: "Welcome to Splurge! Signing this gas-free message verifies you as the owner of this wallet.", 
+            eventsCallbacks: {
+              onAuthSuccess: (args) => {
+                console.log('onAuthSuccess was called', args);
+                fetchTrades();
+              }
+            }
           }}
         >
           <Head>
@@ -61,7 +63,7 @@ export default function Trades() {
             />
           </div>
 
-          <p className="text-white">{primaryWallet ? primaryWallet.address : "Address null"}</p>
+          <p className="text-white">{primaryWallet.address ? primaryWallet.address : "Address null"}</p>
           {/* <p className="text-white">{userTrades.size}</p> */}
 
           {userTrades.size > 0 ? 
