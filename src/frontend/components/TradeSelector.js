@@ -74,11 +74,10 @@ export default function TradeSelector({
           displayEmpty
           IconComponent={KeyboardArrowDownIcon}
         >
-          <MenuItem value={"15"}>15 min</MenuItem>
-          <MenuItem value={"4"}>4 hr</MenuItem>
-          <MenuItem value={"8"}>8 hr</MenuItem>
-          <MenuItem value={"24"}>24 hr</MenuItem>
-
+          <MenuItem value={15}>15 min</MenuItem>
+          <MenuItem value={240}>4 hr</MenuItem>
+          <MenuItem value={480}>8 hr</MenuItem>
+          <MenuItem value={1440}>24 hr</MenuItem>
 
         </CustomSelect>
         <IconButton

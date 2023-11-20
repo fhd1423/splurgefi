@@ -61,7 +61,7 @@ export default function Trades() {
             />
           </div>
 
-          <p className="text-white">{primaryWallet?.address || "Address null"}</p>
+          {/* <p className="text-white">{primaryWallet?.address || "Address null"}</p> */}
           {/* <p className="text-white">{userTrades.size}</p> */}
 
           {userTrades.size > 0 ? 
