@@ -146,7 +146,6 @@ Web3Function.onRun(async (context: Web3FunctionContext) => {
       console.log('Signature:', tradeMapping.signature);
       console.log('Order Details:', tradeMapping.orderDetails);
 
-
       const order = [
         tradeMapping.orderDetails.inputTokenAddy,
         tradeMapping.orderDetails.outputTokenAddy,
@@ -157,8 +156,8 @@ Web3Function.onRun(async (context: Web3FunctionContext) => {
         tradeMapping.orderDetails.percentChange,
         tradeMapping.orderDetails.priceAvg,
         tradeMapping.orderDetails.deadline,
-        tradeMapping.orderDetails.salt
-      ]
+        tradeMapping.orderDetails.salt,
+      ];
 
       //const order = tradeMapping.orderDetails;
       const signature = tradeMapping.signature;
