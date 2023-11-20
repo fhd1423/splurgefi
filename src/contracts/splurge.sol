@@ -12,7 +12,8 @@ contract Splurge is ReentrancyGuard {
     mapping(address => mapping(address => uint256)) public tokenBalances;
     mapping(bytes => uint256) public tranchesCompleted;
 
-    event TradeEvent(address indexed _from, bytes32 _signature);
+    //Can index/search by trade w/ signature
+    event TradeEvent(address indexed _from, bytes32 indexed _signature);
 
     constructor(address _swapRouter, address _wethAddress) {
         swapRouter = IZeroExSwap(_swapRouter);
@@ -28,11 +29,11 @@ contract Splurge is ReentrancyGuard {
             order.inputTokenAddy,
             order.outputTokenAddy,
             order.recipient,
-            order.orderType, 
+            order.orderType,
             order.amount,
             order.tranches,
-            order.percentChange, 
-            order.priceAvg, 
+            order.percentChange,
+            order.priceAvg,
             order.deadline,
             order.salt
         );

@@ -17,10 +17,11 @@ struct SplurgeOrderStruct {
     string orderType;
     uint256 amount;
     uint256 tranches;
-    uint256 percentChange; 
-    uint256 priceAvg; 
+    uint256 percentChange;
+    uint256 priceAvg;
     uint256 deadline; // when the order expires
     bytes salt; // random number
+    bytes signature;
 }
 
 struct Transformation {
