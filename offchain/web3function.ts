@@ -20,15 +20,18 @@ const supabaseKey = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZS
 const supabase = createClient(supabaseUrl, supabaseKey);
 
 interface OrderDetails {
-  batches: string;
-  avgPrice: string;
-  deadline: string;
-  tradeDelta: string;
-  tradeAmount: string;
-  tradeOption: string;
-  inputTokenAddy: string;
-  outputTokenAddy: string;
+  inputTokenAddy: string; 
+  outputTokenAddy: string; 
+  recipient: string; 
+  orderType: string; 
+  amount: string; 
+  tranches: string; 
+  percentChange: string; 
+  priceAvg: string; 
+  deadline: string; 
+  salt: string; 
 }
+
 // Create order with the following data 
 // inputTokenAddy,
 // outputTokenAddy,
