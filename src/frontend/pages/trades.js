@@ -65,9 +65,9 @@ export default function Trades() {
           {/* <p className="text-white">{userTrades.size}</p> */}
 
           {userTrades.size > 0 ? 
-            <Grid container spacing={3} direction="column">
+            <div className="flex flex-col overflow-y-auto space-y-5 pb-10 w-full"> 
               {Array.from(userTrades).map(([id, [pair, complete, batches, percentChange, deadline, remainingBatches]]) => (
-                <Grid item key={id}>
+                <div key={id} className="first:mt-0 mt-3">
                   <Trade 
                     complete={complete}
                     batches={batches}
@@ -75,12 +75,15 @@ export default function Trades() {
                     deadline={deadline}
                     remainingBatches={remainingBatches}
                   />
-                </Grid>
+                </div>
               ))}
-            </Grid>
+            </div>
             : 
             <h3 className="text-white p-4">No trades linked to account. Please make sure you connect your wallet.</h3>
           }
+
+
+
         </DynamicContextProvider>
       </div>
     </div>
