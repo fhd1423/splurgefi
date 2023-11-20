@@ -10,12 +10,15 @@ COPY package.json .
 
 #APK is alpinePackageManager for dependencies. Adding python3,make,g++ build tools before building packages
 RUN apk --no-cache add \
-    python3 \
-    make \
-    g++ \
+  python3 \
+  make \
+  g++ \
   && npm install
 
-#Copy/Move script into working directory
-COPY index.js .
+#Copy env variables
+COPY .env .env
 
-CMD ["node","index.js"]
+#Copy/Move script into working directory
+COPY index.ts .
+
+CMD ["npx","ts-node","index.ts"]

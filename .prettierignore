@@ -13,3 +13,7 @@
 *.toml
 
 *.sql
+
+*.code-workspace
+
+.dockerignore

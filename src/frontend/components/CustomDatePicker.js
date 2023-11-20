@@ -1,17 +1,17 @@
-import React from "react";
-import { DatePicker } from "@mui/x-date-pickers/DatePicker";
+import React from 'react';
+import { DatePicker } from '@mui/x-date-pickers/DatePicker';
 import {
   TextField,
   createTheme,
   ThemeProvider,
   Typography,
-} from "@mui/material";
+} from '@mui/material';
 
 const customDatePickerTheme = createTheme({
   palette: {
     primary: {
-      main: "#50D890",
-      contrastText: "#1B1B1B",
+      main: '#50D890',
+      contrastText: '#1B1B1B',
     },
   },
   components: {
@@ -19,19 +19,19 @@ const customDatePickerTheme = createTheme({
       styleOverrides: {
         root: {
           input: {
-            color: "#ffffff",
-            height: "70px",
-            padding: "10px 14px",
-            fontSize: "1.25rem", // Adjust the font size as needed
+            color: '#ffffff',
+            height: '70px',
+            padding: '10px 14px',
+            fontSize: '1.25rem', // Adjust the font size as needed
           },
-          "& .MuiInputLabel-root": {
-            color: "#ffffff",
+          '& .MuiInputLabel-root': {
+            color: '#ffffff',
           },
-          "& .MuiOutlinedInput-root": {
-            backgroundColor: "#1B1B1B",
-            borderRadius: "10px",
-            "&.Mui-focused fieldset": {
-              borderColor: "transparent",
+          '& .MuiOutlinedInput-root': {
+            backgroundColor: '#1B1B1B',
+            borderRadius: '10px',
+            '&.Mui-focused fieldset': {
+              borderColor: 'transparent',
             },
           },
         },
@@ -40,7 +40,7 @@ const customDatePickerTheme = createTheme({
     MuiSvgIcon: {
       styleOverrides: {
         root: {
-          color: "#ffffff",
+          color: '#ffffff',
         },
       },
     },
@@ -51,11 +51,11 @@ const CustomDatePicker = ({ selectedDate, setSelectedDate }) => {
   return (
     <ThemeProvider theme={customDatePickerTheme}>
       <Typography
-        variant="subtitle1"
-        color="white"
-        fontWeight="600"
+        variant='subtitle1'
+        color='white'
+        fontWeight='600'
         gutterBottom
-        style={{ marginBottom: "8px", textAlign: "left" }}
+        style={{ marginBottom: '8px', textAlign: 'left' }}
       >
         Automation Deadline
       </Typography>

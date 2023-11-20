@@ -1,16 +1,15 @@
-console.log("Hello from Functions!")
+console.log('Hello from Functions!');
 
 Deno.serve(async (req) => {
-  const { name } = await req.json()
+  const { name } = await req.json();
   const data = {
     message: `Hello ${name}!`,
-  }
+  };
 
-  return new Response(
-    JSON.stringify(data),
-    { headers: { "Content-Type": "application/json" } },
-  )
-})
+  return new Response(JSON.stringify(data), {
+    headers: { 'Content-Type': 'application/json' },
+  });
+});
 
 // To invoke:
 // curl -i --location --request POST 'http://127.0.0.1:54321/functions/v1/' \
