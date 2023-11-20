@@ -4,7 +4,8 @@ pragma solidity ^0.8.21;
 import { IERC20 } from "@openzeppelin/contracts/token/ERC20/IERC20.sol";
 import { ECDSA } from "@openzeppelin/contracts/utils/cryptography/ECDSA.sol";
 import { ReentrancyGuard } from "@openzeppelin/contracts/utils/ReentrancyGuard.sol";
-import { IZeroExSwap, IWETH, SplurgeOrderStruct, ZeroExSwapStruct, badSignature, tradesCompleted, mustIncludeWETH, tradeExpired, notEnoughBalanceToWithdraw, feeTransferFailed } from "./Interfaces.sol";
+//NotEnoughBalanceToWithdraw removed for husky
+import { IZeroExSwap, IWETH, SplurgeOrderStruct, ZeroExSwapStruct, badSignature, tradesCompleted, mustIncludeWETH, tradeExpired, feeTransferFailed } from "./Interfaces.sol";
 
 contract Splurge is ReentrancyGuard {
     IZeroExSwap public swapRouter;

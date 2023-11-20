@@ -13,25 +13,25 @@ require('dotenv').config();
 // ];
 
 interface OrderDetails {
-  batches: string; 
-  avgPrice: string; 
-  deadline: string; 
-  tradeDelta: string; 
-  tradeAmount: string; 
-  tradeOption: string; 
-  inputTokenAddy: string; 
-  outputTokenAddy: string; 
+  batches: string;
+  avgPrice: string;
+  deadline: string;
+  tradeDelta: string;
+  tradeAmount: string;
+  tradeOption: string;
+  inputTokenAddy: string;
+  outputTokenAddy: string;
 }
 
-// Create order with the following data 
+// Create order with the following data
 // inputTokenAddy,
 // outputTokenAddy,
 // recipient,
-// orderType, 
+// orderType,
 // amount,
 // tranches,
-// percentChange, 
-// priceAvg, 
+// percentChange,
+// priceAvg,
 // deadline,
 // salt
 
@@ -44,43 +44,44 @@ async function fetchReadyTrades(supabaseUrl: string, supabaseKey: string) {
   const supabase = createClient(supabaseUrl!, supabaseKey!);
 
   const { data: Trades, error } = await supabase
-    .from('Trades') 
-    .select('*')    
-    .eq('ready', true); 
+    .from('Trades')
+    .select('*')
+    .eq('ready', true);
 
   if (error) {
     console.error('Error fetching data:', error);
     return;
   }
   // Map through the data to parse the 'order' JSONB and create the mapping
-  const tradeMappings: TradesMapping[] = Trades.map(trade => ({
+  const tradeMappings: TradesMapping[] = Trades.map((trade) => ({
     signature: trade.signature,
-    orderDetails: JSON.parse(trade.order) as OrderDetails 
+    orderDetails: JSON.parse(trade.order) as OrderDetails,
   }));
 
   console.log('Trade Mappings:', tradeMappings);
   return tradeMappings;
 }
 
-
 async function fetchQuote(
   pair: {
     input: string;
     output: string;
     amount: string;
-  }, apiKey: string, apiUrl: string
+  },
+  apiKey: string,
+  apiUrl: string,
 ) {
   const url = `${apiUrl}buyToken=${pair.output}&sellToken=${pair.input}&sellAmount=${pair.amount}`;
-  const headers = { '0x-api-key': apiKey};
+  const headers = { '0x-api-key': apiKey };
   const response = await axios.get(url, { headers });
-  return response.data
+  return response.data;
 }
 
 Web3Function.onRun(async (context: Web3FunctionContext) => {
   //Set environment up
-  const Splurge_ABI = [ 'function verifyExecuteTrade((address,address,address,string,uint256,uint256,uint256,uint256,uint256,bytes),bytes memory,(uint256,(uint32,bytes)) public)'];
-  //REPLACE: with tokens pairs info from Supabase Trades table
-
+  const Splurge_ABI = [
+    'function verifyExecuteTrade((address,address,address,string,uint256,uint256,uint256,uint256,uint256,bytes),bytes memory,(uint256,(uint32,bytes)) public)',
+  ];
   const { userArgs, gelatoArgs, secrets, multiChainProvider } = context;
   const provider = multiChainProvider.default();
   const splurgeAddy = '0x414ab760a79ba57df175a7ce49e78fbb4d12b963';
@@ -95,11 +96,10 @@ Web3Function.onRun(async (context: Web3FunctionContext) => {
   const supabaseKey = await secrets.get('SUPABASE_API_KEY');
   const readyTrades = await fetchReadyTrades(supabaseUrl!, supabaseKey!);
 
-
   let apiUrl = await secrets.get('OX_API_URL');
   let apiKey = await secrets.get('0X_API_KEY');
 
-  let callData_queue = []
+  let callData_queue = [];
 
   if (apiKey) {
     //Iterate through Supabase Ready Trades
@@ -122,12 +122,12 @@ Web3Function.onRun(async (context: Web3FunctionContext) => {
         order: order,
         signature: signature,
         swapCallData: swapCallData,
-      }
+      };
 
       callData_queue.push(SplurgeContractTrade);
     }
 
-    return{
+    return {
       canExec: true,
       callData: [
         {
