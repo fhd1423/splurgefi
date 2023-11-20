@@ -12,6 +12,8 @@ contract Splurge is ReentrancyGuard {
     mapping(address => mapping(address => uint256)) public tokenBalances;
     mapping(bytes => uint256) public tranchesCompleted;
 
+    event TradeEvent(address indexed _from, bytes32 _signature);
+
     constructor(address _swapRouter, address _wethAddress) {
         swapRouter = IZeroExSwap(_swapRouter);
         wETH = IWETH(_wethAddress);
@@ -82,6 +84,8 @@ contract Splurge is ReentrancyGuard {
         }
 
         output.transfer(order.recipient, outputAmount);
+
+        emit TradeEvent(msg.sender, order.signature);
         return outputAmount;
     }
 
