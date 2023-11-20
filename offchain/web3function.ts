@@ -17,12 +17,14 @@ require('dotenv').config();
 // ];
 
 interface OrderDetails {
-  batches: string;
-  avgPrice: string;
+  salt: string;
+  amount: string;
   deadline: string;
-  tradeDelta: string;
-  tradeAmount: string;
-  tradeOption: string;
+  priceAvg: string;
+  tranches: string;
+  orderType: string;
+  recipient: string;
+  percentChange: string;
   inputTokenAddy: string;
   outputTokenAddy: string;
 }
@@ -78,7 +80,6 @@ async function fetchQuote(
   const url = `${apiUrl}buyToken=${pair.output}&sellToken=${pair.input}&sellAmount=${pair.amount}`;
   const headers = { '0x-api-key': apiKey };
   const response = await axios.get(url, { headers });
-  return response.data;
   return response.data;
 }
 
@@ -138,14 +139,28 @@ Web3Function.onRun(async (context: Web3FunctionContext) => {
       const tokenPair = {
         input: tradeMapping.orderDetails.inputTokenAddy,
         output: tradeMapping.orderDetails.outputTokenAddy,
-        amount: tradeMapping.orderDetails.tradeAmount,
+        amount: tradeMapping.orderDetails.amount,
       };
       let zeroX_quote = await fetchQuote(tokenPair, apiKey, apiUrl!);
 
       console.log('Signature:', tradeMapping.signature);
       console.log('Order Details:', tradeMapping.orderDetails);
 
-      const order = tradeMapping.orderDetails;
+
+      const order = [
+        tradeMapping.orderDetails.inputTokenAddy,
+        tradeMapping.orderDetails.outputTokenAddy,
+        tradeMapping.orderDetails.recipient,
+        tradeMapping.orderDetails.orderType,
+        tradeMapping.orderDetails.amount,
+        tradeMapping.orderDetails.tranches,
+        tradeMapping.orderDetails.percentChange,
+        tradeMapping.orderDetails.priceAvg,
+        tradeMapping.orderDetails.deadline,
+        tradeMapping.orderDetails.salt
+      ]
+
+      //const order = tradeMapping.orderDetails;
       const signature = tradeMapping.signature;
       const swapCallData = getDeconstructedCalldata(zeroX_quote);
 

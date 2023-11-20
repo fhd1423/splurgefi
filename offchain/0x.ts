@@ -48,6 +48,8 @@ async function fetchPrice(pair: {
 
     let object = [];
 
+    console.log(ZeroExCalldata);
+
     // Loop through each row in ZeroExCalldata[4]
     for (let i = 0; i < ZeroExCalldata[4].length; i++) {
       // Create an object for each row and add it to the object array
@@ -57,7 +59,7 @@ async function fetchPrice(pair: {
       });
     }
 
-    console.log(object);
+    //console.log(object);
 
     const key = `${pair.input}:${pair.output}`;
     const priceQueue = priceQueues.get(key);
