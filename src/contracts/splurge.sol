@@ -26,11 +26,8 @@ contract Splurge is ReentrancyGuard {
             order.inputTokenAddy,
             order.outputTokenAddy,
             order.recipient,
-            order.orderType,
             order.amount,
             order.tranches,
-            order.percentChange,
-            order.priceAvg,
             order.deadline,
             order.salt
         );

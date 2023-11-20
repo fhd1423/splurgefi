@@ -14,11 +14,8 @@ struct SplurgeOrderStruct {
     address inputTokenAddy;
     address outputTokenAddy;
     address recipient; // the user we are executing the trade for
-    string orderType;
     uint256 amount;
     uint8 tranches;
-    uint256 percentChange;
-    uint256 priceAvg;
     uint256 deadline; // when the order expires
     uint8 salt; // random number
 }
