@@ -17,7 +17,7 @@ struct SplurgeOrderStruct {
     uint256 amount;
     uint8 tranches;
     uint256 deadline; // when the order expires
-    uint8 salt; // random number
+    bytes salt; // random number
 }
 
 struct Transformation {
@@ -26,9 +26,6 @@ struct Transformation {
 }
 
 struct ZeroExSwapStruct {
-    address inputToken;
-    address outputToken;
-    uint256 inputTokenAmount;
     uint256 minOutputTokenAmount;
     Transformation[] transformations;
 }

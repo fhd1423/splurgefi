@@ -61,50 +61,28 @@ contract Splurge is ReentrancyGuard {
 
         uint256 tranche = order.amount / order.tranches;
         input.transferFrom(order.recipient, address(this), tranche);
-        if (order.inputTokenAddy == address(wETH)) feeToSender();
+        if (order.inputTokenAddy == address(wETH)) {
+            tranche = feeToSender();
+        }
 
         // approve infinite only if needed
         if (input.allowance(address(this), address(swapRouter)) < order.amount)
             input.approve(address(swapRouter), type(uint256).max);
 
         uint256 outputAmount = swapRouter.transformERC20(
-            swapCallData.inputToken,
-            swapCallData.outputToken,
-            swapCallData.inputTokenAmount,
+            order.inputTokenAddy,
+            order.outputTokenAddy,
+            tranche,
             swapCallData.minOutputTokenAmount,
             swapCallData.transformations
         );
 
-        if (order.outputTokenAddy == address(wETH)) feeToSender();
-
-        // tokenBalances[order.recipient][order.outputTokenAddy] += outputAmount;
-
-        // Check if all tranches are completed
-        if (tranchesCompleted[order.signature] + 1 >= order.tranches) {
-            output.transfer(order.recipient, outputAmount);
-        } else {
-            // If not all tranches are completed, keep track of the balance
-            tokenBalances[order.recipient][
-                order.outputTokenAddy
-            ] += outputAmount;
+        if (order.outputTokenAddy == address(wETH)) {
+            outputAmount = feeToSender();
         }
+
+        output.transfer(order.recipient, outputAmount);
         return outputAmount;
-    }
-
-    function withdrawBalances(
-        address tokenToWithdraw,
-        uint256 amount
-    ) public nonReentrant {
-        if (tokenBalances[msg.sender][tokenToWithdraw] < amount)
-            revert notEnoughBalanceToWithdraw(
-                tokenBalances[msg.sender][tokenToWithdraw],
-                amount
-            );
-
-        IERC20 token = IERC20(tokenToWithdraw);
-        token.transfer(msg.sender, amount);
-        // solhint-disable-next-line reentrancy
-        tokenBalances[msg.sender][tokenToWithdraw] -= amount;
     }
 
     function verifyTrade(
@@ -115,7 +93,7 @@ contract Splurge is ReentrancyGuard {
         return ECDSA.recover(hashedMessage, signature);
     }
 
-    function feeToSender() private {
+    function feeToSender() private returns (uint256) {
         uint256 balance = wETH.balanceOf(address(this));
 
         uint256 fee = (balance * 5) / 1000;
@@ -123,6 +101,7 @@ contract Splurge is ReentrancyGuard {
         wETH.withdraw(fee);
         (bool success, ) = payable(msg.sender).call{ value: fee }("");
         if (!success) revert feeTransferFailed(balance, fee);
+        return balance - fee;
     }
 
     receive() external payable {}
