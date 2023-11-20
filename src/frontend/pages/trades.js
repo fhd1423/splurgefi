@@ -11,8 +11,51 @@ export default function Trades() {
   const [isWalletConnected, setIsWalletConnected] = useState(false);
   const { setShowAuthFlow, primaryWallet } = useDynamicContext();
   const [userTrades, setUserTrades] = useState(new Map());
+  const [userTradeSignatures, setUserTradeSignatures] = useState(new Array());
+
+  const checkRemainingBatches = (trade_signature) => {
+
+    const contractABI = ['NEED TO ADD ABI']; 
+
+    const contractAddress = 'CONTRACT_ADDRESS';
+    const contract = new web3.eth.Contract(contractABI, contractAddress);
+
+    contract.events.TradeEvent({
+        filter: { _signature: 'WE NEED TO ADD SIGNATURE HER' },
+        fromBlock: 'latest'
+    })
+    .on('data', (event) => {
+        console.log(event);
+    })
+    .on('error', console.error);
+  }
+
 
   useEffect(() => {
+
+    const fetchUsersTradeSignatures = async () => {
+      if (primaryWallet?.address){
+        const { data, error } = await supabase 
+          .from('Trades')
+          .select('signature')
+          .eq('user', primaryWallet.address)
+
+          if (error) {
+            console.error('Error fetching trade signatures:', error);
+            return;
+          }
+
+          // Empty array 
+          const signatureArray = [];
+
+          // data.forEach(trade => {
+          //   signatureArray.push()
+          // });
+
+      }
+
+      
+    }
     const fetchTrades = async () => {
       if (primaryWallet?.address) {
         const { data, error } = await supabase
@@ -34,6 +77,9 @@ export default function Trades() {
       }
     };
 
+    // Check remaining balances from smart contract 
+
+    // Update remaining balances 
     fetchTrades();
   }, [primaryWallet?.address]);
 

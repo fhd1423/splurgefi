@@ -29,10 +29,14 @@ export default function Automate() {
     { label: 'JOE', value: '0x76e222b07C53D28b89b0bAc18602810Fc22B49A8' },
     { label: 'ROLBIT', value: '0x046EeE2cc3188071C02BfC1745A6b17c656e3f3d'}, 
     { label: 'LINK', value: '0x514910771AF9Ca656af840dff83E8264EcF986CA'}, 
+    { label: 'YUNKI', value: '0x52C6CCc28C9B5f0f4F37b61316CD4F14C2D4197D'}, 
+
   ];
 
   const inputOptions = [
     { label: 'WETH', value: '0xC02aaA39b223FE8D0A0e5C4F27eAD9083C756Cc2' },
+    { label: 'WMATIC', value: '0x9c3C9283D3e44854697Cd22D3Faa240Cfb032889' },
+
   ];
 
   const path =
@@ -127,23 +131,6 @@ export default function Automate() {
     setShowAuthFlow(true);
     // Additional logic can be added here if needed
   };
-
-  const checkRemainingBatches = () => {
-
-    const contractABI = ['NEED TO ADD ABI']; 
-
-    const contractAddress = 'CONTRACT_ADDRESS';
-    const contract = new web3.eth.Contract(contractABI, contractAddress);
-
-    contract.events.TradeEvent({
-        filter: { _signature: 'WE NEED TO ADD SIGNATURE HER' },
-        fromBlock: 'latest'
-    })
-    .on('data', (event) => {
-        console.log(event);
-    })
-    .on('error', console.error);
-  }
 
   const uploadConditionalOrder = async () => {
     try {
@@ -276,7 +263,6 @@ export default function Automate() {
           console.error('Error uploading data to Supabase:', error);
         }
       }
-
       uploadData();
       router.push('/trades');
     } catch (error) {
