@@ -4,6 +4,7 @@ import {
 } from '@gelatonetwork/web3-functions-sdk';
 import { Contract } from '@ethersproject/contracts';
 import axios from 'axios';
+import { createClient } from '@supabase/supabase-js';
 
 const Splurge_ABI = [
   'function prepareVerifyTrade((address,address,address,uint256,uint8,uint256,uint8),bytes memory,bytes memory) public',
@@ -12,6 +13,59 @@ const tokenPair = {
   input: '0xbcdCB26fFec1bE5991FA4b5aF5B2BbC878965Db1',
   output: '0xFA75399b5ce8C0299B0434E0D1bcFDFd8fF8a755',
 };
+
+const supabaseUrl = 'https://gmupexxqnzrrzozcovjp.supabase.co';
+const supabaseKey = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImdtdXBleHhxbnpycnpvemNvdmpwIiwicm9sZSI6ImFub24iLCJpYXQiOjE2OTkyMTkxMjcsImV4cCI6MjAxNDc5NTEyN30.xetdfXSWa5-VMERkCTAnLEhrD2sb1anc3hast3jij_g';
+
+const supabase = createClient(supabaseUrl, supabaseKey);
+
+interface OrderDetails {
+  batches: string;
+  avgPrice: string;
+  deadline: string;
+  tradeDelta: string;
+  tradeAmount: string;
+  tradeOption: string;
+  inputTokenAddy: string;
+  outputTokenAddy: string;
+}
+// Create order with the following data 
+// inputTokenAddy,
+// outputTokenAddy,
+// recipient,
+// orderType, 
+// amount,
+// tranches,
+// percentChange, 
+// priceAvg, 
+// deadline,
+// salt
+
+interface TradeMapping {
+  signature: string;
+  orderDetails: OrderDetails;
+}
+
+async function fetchReadyTrades() {
+  const { data, error } = await supabase
+    .from('Trades') 
+    .select('*')    
+    .eq('ready', true); 
+
+  if (error) {
+    console.error('Error fetching data:', error);
+    return;
+  }
+  // Map through the data to parse the 'order' JSONB and create the mapping
+  const tradeMappings: TradeMapping[] = data.map(trade => ({
+    signature: trade.signature,
+    orderDetails: JSON.parse(trade.order) as OrderDetails 
+  }));
+
+  console.log('Trade Mappings:', tradeMappings);
+  return tradeMappings;
+}
+
 
 async function fetchPrice(
   pair: {
