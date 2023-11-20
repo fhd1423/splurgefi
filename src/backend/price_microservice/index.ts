@@ -33,7 +33,7 @@ const updatePriceData = async () => {
       const sellToken = splitPair[0];
       const buyToken = splitPair[1];
 
-      //const daily_prices = pair.daily_prices;
+      //const current_price = pair.current_price;
 
       const params = {
         sellToken: sellToken,
@@ -58,8 +58,8 @@ const updatePriceData = async () => {
           headers,
         });
         interval_columnValue = response.data.price;
-        const daily_prices = interval_columnValue;
-        console.log(daily_prices);
+        const current_price = interval_columnValue;
+        console.log(current_price);
 
         if (interval_columnName != null) {
           let xmin_avg = pair[interval_columnName];
@@ -70,7 +70,7 @@ const updatePriceData = async () => {
 
           const upsertData = {
             path: pair.path,
-            ['daily_prices']: daily_prices,
+            ['current_price']: current_price,
             [interval_columnName]: xmin_avg,
           };
 
@@ -81,7 +81,7 @@ const updatePriceData = async () => {
         } else {
           const upsertData = {
             path: pair.path,
-            ['daily_prices']: daily_prices,
+            ['current_price']: current_price,
           };
 
           const upsertResponse = await supabase
