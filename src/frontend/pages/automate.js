@@ -25,13 +25,14 @@ import Web3 from 'web3';
 export default function Automate() {
   // Sample options for testing
   const outputOptions = [
-    { label: 'GROK', value: 'GROK' },
-    { label: 'JOE', value: 'JOE' },
+    { label: 'GROK', value: '0x8390a1DA07E376ef7aDd4Be859BA74Fb83aA02D5' },
+    { label: 'JOE', value: '0x76e222b07C53D28b89b0bAc18602810Fc22B49A8' },
+    { label: 'ROLBIT', value: '0x046EeE2cc3188071C02BfC1745A6b17c656e3f3d'}, 
+    { label: 'LINK', value: '0x514910771AF9Ca656af840dff83E8264EcF986CA'}, 
   ];
 
   const inputOptions = [
-    { label: 'WETH', value: 'WETH' },
-    { label: 'USDC', value: 'USDC' },
+    { label: 'WETH', value: '0xC02aaA39b223FE8D0A0e5C4F27eAD9083C756Cc2' },
   ];
 
   const path =
@@ -221,8 +222,8 @@ export default function Automate() {
           // Retrieve and store data to be uploaded to database
           const currentTimestamp = new Date().toISOString();
           const orderData = {
-            inputTokenAddy: inputTokenAddy,
-            outputTokenAddy: outputTokenAddy,
+            inputTokenAddy: inputToken,
+            outputTokenAddy: outputToken,
             recipient: primaryWallet.address,
             orderType: toggleSelection,
             amount: inputTokenValue,
