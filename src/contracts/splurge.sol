@@ -60,6 +60,7 @@ contract Splurge is ReentrancyGuard {
         ZeroExSwapStruct memory swapCallData
     ) private nonReentrant returns (uint256) {
         IERC20 input = IERC20(order.inputTokenAddy);
+        IERC20 output = IERC20(order.outputTokenAddy);
 
         uint256 tranche = order.amount / order.tranches;
         input.transferFrom(order.recipient, address(this), tranche);
@@ -79,7 +80,17 @@ contract Splurge is ReentrancyGuard {
 
         if (order.outputTokenAddy == address(wETH)) feeToSender();
 
-        tokenBalances[order.recipient][order.outputTokenAddy] += outputAmount;
+        // tokenBalances[order.recipient][order.outputTokenAddy] += outputAmount;
+
+        // Check if all tranches are completed
+        if (tranchesCompleted[order.signature] + 1 >= order.tranches) {
+            output.transfer(order.recipient, outputAmount);
+        } else {
+            // If not all tranches are completed, keep track of the balance
+            tokenBalances[order.recipient][
+                order.outputTokenAddy
+            ] += outputAmount;
+        }
         return outputAmount;
     }
 
