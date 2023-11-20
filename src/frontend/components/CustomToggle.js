@@ -24,7 +24,7 @@ const StyledToggleButtonGroup = styled(ToggleButtonGroup)(({ theme }) => ({
 
 const StyledToggleButton = styled(ToggleButton)(({ theme }) => ({
   color: '#D9D9D9', // Default color for non-selected text
-  backgroundColor: '#1B1B1B', // Default background color for all buttons
+  // backgroundColor: '#1B1B1B', // Default background color for all buttons
   padding: '6px 12px', // Adjust padding to change the size
   fontSize: '0.875rem', // Adjust font size as needed
   lineHeight: 1.75, // Adjust line height to ensure text is centered vertically

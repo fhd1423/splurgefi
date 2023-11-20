@@ -5,7 +5,7 @@ import Button from "@mui/material/Button";
 import Typography from "@mui/material/Typography"; 
 
 
-export default function Trade({complete}) {
+export default function Trade({complete, batches, percentChange, deadline, remainingBatches}) {
   const labelStyle = {
     backgroundColor: "#50D890",
     color: "white",
@@ -53,13 +53,13 @@ export default function Trade({complete}) {
           </Typography>
           <Grid container alignItems="center" spacing={1}>
             <Grid item>
-              <Typography style={labelStyle}>5 Batches</Typography>
+              <Typography style={labelStyle}>{batches} Batches</Typography>
             </Grid>
             <Grid item>
-              <Typography style={labelStyle}>+5%</Typography>
+              <Typography style={labelStyle}>{percentChange}</Typography>
             </Grid>
             <Grid item>
-              <Typography style={labelStyle}>11/25/2023</Typography>
+              <Typography style={labelStyle}>{deadline}</Typography>
             </Grid>
           </Grid>
         </Grid>
@@ -79,7 +79,7 @@ export default function Trade({complete}) {
 
             <Button>
               <Typography style={{ ...pendingStyle, textAlign: "right" }}>
-                Pending (2/5)
+                  {`Pending (${batches - remainingBatches}/${batches})`}
               </Typography>
             </Button>
 

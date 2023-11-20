@@ -1,83 +1,89 @@
-import React from "react";
+import React, { useState, useEffect } from "react";
 import Head from "next/head";
 import Trade from "../components/Trade";
 import { Grid } from "@mui/material";
-import { useState, useEffect } from "react";
+import { DynamicContextProvider, DynamicWidget, useDynamicContext } from "@dynamic-labs/sdk-react-core";
+import { EthereumWalletConnectors } from "@dynamic-labs/ethereum";
 import { supabase } from "./client"
+import NavBar from "../components/NavBar";
 
 export default function Trades() {
-
-  const [walletAddress, setWalletAddress] = useState('');
-
-  // Mapping of pairs to status 
+  const [isWalletConnected, setIsWalletConnected] = useState(false);
+  const { setShowAuthFlow, primaryWallet } = useDynamicContext();
   const [userTrades, setUserTrades] = useState(new Map());
 
   useEffect(() => {
-    const address = localStorage.getItem('walletAddress');
-    console.log("ADDRESS IN USE EFFECT:", address); 
-    // console.log("WALLET ADDRESS:", walletAddress); 
+    const fetchTrades = async () => {
+      if (primaryWallet?.address) {
+        const { data, error } = await supabase
+          .from('Trades')
+          .select('id, pair, complete, batches, percent_change, deadline, remainingBatches')
+          .eq('user', primaryWallet.address);
+    
+        if (error) {
+          console.error('Error fetching trades:', error);
+          return;
+        }
+        
+        let newTrades = new Map();
+        data.forEach(trade => {
+          newTrades.set(trade.id, [trade.pair, trade.complete, trade.batches, trade.percent_change, trade.deadline, trade.remainingBatches]);
+        });
+        
+        setUserTrades(newTrades);
+      }
+    };
 
-    if (address !== '') {
-      setWalletAddress(address);
-      tradeStatus(address); 
-    }
-  }, []);
-
-  // Use primary wallet address (verified_credential_address to get verified_credential_id (primary key)
-  // const fetchUserId = async (address) => {
-
-  //   console.log("ADDRES INSIDE TRADES:", address);
-
-  //   const { data, error } = await supabase
-  //     .from('Users')
-  //     .select('verified_credential_id')
-  //     .eq('verified_credential_address', address)
-  
-  //     if (error) {
-  //       console.log('error', error)
-  //     } else {
-
-  //       console.log("User id:", data[0]?.verified_credential_id)
-  //       return data[0]?.verified_credential_id;
-  //     }
-  
-  // };
-
-  const tradeStatus = async (address) => {
-    const { data, error } = await supabase
-      .from('Trades')
-      .select('pair, complete')
-      .eq('user', address);
-  
-    if (error) {
-      console.log('error', error);
-    } else {
-      let newTrades = new Map();
-      data.forEach(trade => {
-        newTrades.set(trade.pair, trade.complete);
-      });
-      setUserTrades(newTrades);
-    }
-  };
+    fetchTrades();
+  }, [primaryWallet?.address]);
 
   return (
-    <div className="h-screen bg-black flex flex-col justify-start items-start pt-12 pl-10">
-      <Head>
-        <title>Trades</title>
-        <link rel="icon" href="/favicon.ico" />
-      </Head>
-  
-      <h1 className="text-4xl text-white mb-6 font-semibold">Trades</h1>
-  
-      {/* <p>Number of trades: {userTrades.size}</p> */}
 
-      <Grid container spacing={3} direction="column">
-        {Array.from(userTrades).map(([pair, complete]) => (
-          <Grid item key={pair}>
-            <Trade complete={complete} />
-          </Grid>
-        ))}
-      </Grid>
+    <div className="h-screen bg-black flex flex-col">
+      <NavBar inTradesPage={true}/>
+      <div className="h-screen bg-black flex flex-col justify-start items-start pt-12 pl-10">
+        <DynamicContextProvider
+          settings={{
+            environmentId: "a8961ac2-2a97-4735-a2b2-253f2485557e",
+            walletConnectors: [EthereumWalletConnectors],
+            siweStatement: "Welcome to Splurge! Signing this gas-free message verifies you as the owner of this wallet."
+          }}
+        >
+          <Head>
+            <title>Trades</title>
+            <link rel="icon" href="/favicon.ico" />
+          </Head>
+
+          <div className="w-full flex justify-between items-center p-4">
+            <h1 className="text-4xl text-white font-semibold">Trades</h1>
+            <DynamicWidget   
+                innerButtonComponent={<button className="h-10">Connect Wallet</button>}
+            />
+          </div>
+
+          {/* <p className="text-white">{userTrades.size}</p> */}
+
+          {userTrades.size > 0 ? 
+            <Grid container spacing={3} direction="column">
+              {Array.from(userTrades).map(([id, [pair, complete, batches, percentChange, deadline, remainingBatches]]) => (
+                <Grid item key={id}>
+                  <Trade 
+                    complete={complete}
+                    batches={batches}
+                    percentChange={percentChange}
+                    deadline={deadline}
+                    remainingBatches={remainingBatches}
+                  />
+                </Grid>
+              ))}
+            </Grid>
+            : 
+            <h3 className="text-white p-4">No trades linked to account. Please make sure you connect your wallet.</h3>
+          }
+        </DynamicContextProvider>
+      </div>
     </div>
+
+    
   );
 }

@@ -19,6 +19,8 @@ import { AdapterDayjs } from "@mui/x-date-pickers/AdapterDayjs";
 import { output } from "@/next.config";
 import { useDynamicContext } from "@dynamic-labs/sdk-react-core";
 import { supabase } from "./client"
+import NavBar from "../components/NavBar";
+
 
 export default function StepOne() {
 
@@ -33,9 +35,7 @@ export default function StepOne() {
     { label: "USDC", value: "USDC"}
   ]
 
-  const wethToJoePath = "0xC02aaA39b223FE8D0A0e5C4F27eAD9083C756Cc2-0x6FC71D805f004EE2B5a2962344cb0703A8Ce2b31"
-
-  
+  const path = "0x046EeE2cc3188071C02BfC1745A6b17c656e3f3d-0xC02aaA39b223FE8D0A0e5C4F27eAD9083C756Cc2"
 
   // State to hold input values
   const [inputTokenValue, setInputTokenValue] = useState("");
@@ -59,51 +59,20 @@ export default function StepOne() {
   const { setShowAuthFlow, primaryWallet } = useDynamicContext();
 
   // State for error messages
-  const [inputTokenError, setInputTokenError] = useState("");
-  const [outputTokenError, setOutputTokenError] = useState("");
-  const [inputTokenValueError, setInputTokenValueError] = useState("");
-  const [tokenSelectionError, setTokenSelectionError] = useState("");
-
+  const [userInputError, setUserInputError] = useState("");
 
   const validateInputs = () => {
     let isValid = true;
-    if (!inputToken) {
-      setInputTokenError("Please select an input token.");
+    if (!inputToken || !outputToken || !inputTokenValue || !percentChange || !batchValue || !selectedTradeAction || !selectedDate) {
+      setUserInputError("Please make sure all inputs are filled.");
       isValid = false;
     } else {
-      setInputTokenError("");
-    }
-
-    if (!outputToken) {
-      setOutputTokenError("Please select an output token.");
-      isValid = false;
-    } else {
-      setOutputTokenError("");
-    }
-
-    if (!inputTokenValue) {
-      setInputTokenValueError("Please enter a value for the input token.");
-      isValid = false;
-    } else {
-      setInputTokenValueError("");
+      setUserInputError("");
     }
 
     return isValid;
   };
 
-  const checkForWETH = () => {
-
-    let selectedWETH = true; 
-
-    if (validateInputs()){
-      if (inputToken !== 'WETH' && outputToken !== 'WETH'){
-        setTokenSelectionError("Please make sure that either your input or output token is WETH.")
-        selectedWETH = false;
-      }
-    }
-
-    return selectedWETH; 
-  }
 
   // Handlers to update the state
   const handleInputTokenChange = (value) => {
@@ -133,11 +102,6 @@ export default function StepOne() {
 
   const handlePercentChange = (event) => {
     setPercentChange(event.target.value);
-  };
-
-  // Store the values locally to pass to step-two
-  const handleContinue = () => {
-    router.push('/trades');  
   };
 
   // Listen for changes in primaryWallet
@@ -238,6 +202,7 @@ export default function StepOne() {
   
           const jsonData = JSON.stringify(orderData); 
           // const pairId = await fetchPairId(wethToJoePath);
+          const intBatches = parseInt(batchValue);
           console.log('WALLET ADDRESS INSIDE FETCH', primaryWallet.address);
   
           // created_at (timestamp), user (referenced to user table), pair (referenced to pair table), SplurgeOrder jsonb, signature - text, ready - bool, ZeroExCalldata - jsonb
@@ -246,11 +211,15 @@ export default function StepOne() {
             .insert([
               { created_at: currentTimestamp, 
                 user: primaryWallet.address, 
-                pair: wethToJoePath, 
+                pair: path, 
                 order: jsonData, 
                 signature: signature, 
                 complete: false, 
-                ready: false
+                ready: false, 
+                batches: intBatches,
+                percent_change: toggleSelection === 'buy' ? "-" + percentChange + "%" : "+" + percentChange + "%",
+                deadline: selectedDate.toISOString(), 
+                remainingBatches: intBatches
               }
             ]);
   
@@ -263,13 +232,11 @@ export default function StepOne() {
       }
   
       uploadData(); 
-      // router.push('/trades');  
+      router.push('/trades');  
 
     } catch (error){
-
       console.error("Error during signature or data upload:", error);
       // setErrorMessage("Signature denied or failed to upload data. Please try again.");
-
     }
 
   }
@@ -277,23 +244,19 @@ export default function StepOne() {
   return (
     <LocalizationProvider dateAdapter={AdapterDayjs}>
 
+      <NavBar inTradesPage={false}/>
+
       <div className="h-screen bg-black flex flex-col justify-center items-center">
         <Head>
           <title>Step One</title>
           <link rel="icon" href="/favicon.ico" />
         </Head>
 
-        <header className="w-full p-3 flex justify-between items-center">
-          <h2 className="text-xl text-white font-bold">SplurgeFi</h2>
-          <button onClick={() => router.push('/trades')} className="text-white text-sm font-semibold py-2 px-4">
-            Log In
-          </button>
-        </header>
-
         <Box
           sx={{
             width: 500, 
             mx: "auto", 
+            marginTop: '-30px', // Adjust this value to move the modal up
           }}
         >
         
@@ -364,7 +327,7 @@ export default function StepOne() {
 
                 <button
                   onClick={handleWalletConnection}
-                  className="bg-green-500 text-white text-xl font-bold rounded-lg shadow-lg hover:bg-green-600 w-96 h-14"
+                  className="bg-green-500 text-white text-xl font-bold rounded-lg shadow-lg hover:bg-green-600 w-96 h-14 mt-[10px]"
                 >
                   Connect Wallet
                 </button>
@@ -372,7 +335,11 @@ export default function StepOne() {
               ) : (
 
                 <button
-                  onClick={uploadConditionalOrder}
+                  onClick={() => {
+                    if (validateInputs()) {
+                      uploadConditionalOrder();
+                    }
+                  }}
                   className="bg-green-500 text-white text-xl font-bold rounded-lg shadow-lg hover:bg-green-600 w-96 h-14"
                 >
                   Start Automation
@@ -385,6 +352,11 @@ export default function StepOne() {
           </Paper>
 
         </Box>
+
+        <div className="text-red-500 mt-2">
+            {userInputError}
+        </div>
+
       </div> 
 
     </LocalizationProvider>
