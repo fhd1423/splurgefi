@@ -67,6 +67,7 @@ const LandingPage = () => {
           <p className="text-2xl mb-10 text-gray-400 tracking-wide">
             Best trading experience ever.
           </p>
+          
           <Link href="/automate" passHref>
             <button className="bg-green-500 text-white text-xl font-bold py-2 px-8 rounded-full shadow-lg hover:bg-green-600">
               Get Started
