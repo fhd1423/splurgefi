@@ -20,6 +20,7 @@ import { output } from '@/next.config';
 import { useDynamicContext } from '@dynamic-labs/sdk-react-core';
 import { supabase } from './client';
 import NavBar from '../components/NavBar';
+import Web3 from 'web3'; 
 
 export default function Automate() {
   // Sample options for testing
@@ -125,6 +126,23 @@ export default function Automate() {
     setShowAuthFlow(true);
     // Additional logic can be added here if needed
   };
+
+  const checkRemainingBatches = () => {
+
+    const contractABI = ['NEED TO ADD ABI']; 
+
+    const contractAddress = 'CONTRACT_ADDRESS';
+    const contract = new web3.eth.Contract(contractABI, contractAddress);
+
+    contract.events.TradeEvent({
+        filter: { _signature: 'WE NEED TO ADD SIGNATURE HER' },
+        fromBlock: 'latest'
+    })
+    .on('data', (event) => {
+        console.log(event);
+    })
+    .on('error', console.error);
+  }
 
   const uploadConditionalOrder = async () => {
     try {

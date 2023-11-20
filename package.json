@@ -17,7 +17,8 @@
     "install": "^0.13.0",
     "node-fetch": "^3.3.2",
     "npm": "^10.2.1",
-    "solc": "^0.8.22"
+    "solc": "^0.8.22",
+    "web3": "^4.2.2"
   },
   "scripts": {
     "prepare": "husky install",
