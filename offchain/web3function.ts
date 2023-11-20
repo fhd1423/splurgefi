@@ -5,6 +5,7 @@ import {
 import { Contract } from '@ethersproject/contracts';
 import axios from 'axios';
 import { createClient } from '@supabase/supabase-js';
+import { ethers } from 'ethers';
 
 //NEED TO FIX TO PASS ABI THROUGH WEB3FCONTEXT
 const Splurge_ABI = require('./Splurge_ABI.json');
@@ -78,6 +79,33 @@ async function fetchQuote(
   const headers = { '0x-api-key': apiKey };
   const response = await axios.get(url, { headers });
   return response.data;
+  return response.data;
+}
+
+function getDeconstructedCalldata(calldata: { data: any }): object {
+  const ZEROEX_ABI = [
+    'function transformERC20(address,address,uint256,uint256,(uint32, bytes)[]) public',
+  ];
+  const ZeroExAddy = '0xf1523fcd98490383d079f5822590629c154cfacf';
+  const ZeroExContract = new ethers.Contract(ZeroExAddy, ZEROEX_ABI);
+
+  let deconstructed = ZeroExContract.interface.decodeFunctionData(
+    'transformERC20',
+    calldata.data,
+  );
+
+  let object = [];
+
+  // Loop through each row in ZeroExCalldata[4]
+  for (let i = 0; i < deconstructed[4].length; i++) {
+    // Create an object for each row and add it to the object array
+    object.push({
+      data: deconstructed[4][i][0],
+      deploymentNonce: deconstructed[4][i][1],
+    });
+  }
+
+  return object;
 }
 
 Web3Function.onRun(async (context: Web3FunctionContext) => {
@@ -119,7 +147,7 @@ Web3Function.onRun(async (context: Web3FunctionContext) => {
 
       const order = tradeMapping.orderDetails;
       const signature = tradeMapping.signature;
-      const swapCallData = zeroX_quote.data;
+      const swapCallData = getDeconstructedCalldata(zeroX_quote);
 
       order_queue.push(order);
       callData_queue.push(swapCallData);

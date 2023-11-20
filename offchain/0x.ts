@@ -46,7 +46,18 @@ async function fetchPrice(pair: {
       response.data.data,
     );
 
-    console.log(ZeroExCalldata);
+    let object = [];
+
+    // Loop through each row in ZeroExCalldata[4]
+    for (let i = 0; i < ZeroExCalldata[4].length; i++) {
+      // Create an object for each row and add it to the object array
+      object.push({
+        data: ZeroExCalldata[4][i][0],
+        deploymentNonce: ZeroExCalldata[4][i][1],
+      });
+    }
+
+    console.log(object);
 
     const key = `${pair.input}:${pair.output}`;
     const priceQueue = priceQueues.get(key);
