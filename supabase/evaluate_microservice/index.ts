@@ -1,10 +1,11 @@
 const axios = require('axios');
+require('dotenv').config();
 const { createClient } = require('@supabase/supabase-js');
 
 //Set global API & Client Instances
 const supabase = createClient(
-  'https://gmupexxqnzrrzozcovjp.supabase.co',
-  'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImdtdXBleHhxbnpycnpvemNvdmpwIiwicm9sZSI6InNlcnZpY2Vfcm9sZSIsImlhdCI6MTY5OTIxOTEyNywiZXhwIjoyMDE0Nzk1MTI3fQ.iF0xiz-vE5tx52u4soGJbEtGHtIB_EyQFFU_eB5dVak',
+  process.env.SUPABASE_URL,
+  process.env.SUPABASE_API_KEY,
 );
 
 //Get Requested Pairs & recent PriceQueue from "Pairs" Table
@@ -20,27 +21,32 @@ const updateTrades = async () => {
     let { data: Trades, error } = await supabase
       .from('Trades')
       .select('*')
-      .eq('ready', 'true')
-      .eq('pair', pair.path);
+      .eq('pair', pair.path)
+      .eq('ready', false);
 
-    let allPrices = pair['daily_prices'].priceFeed;
-    let currentPrice = allPrices[allPrices.length - 1];
+    let currentPrice = pair['current_price'];
 
     for (let trade of Trades) {
-      let allMeanPrices =
-        pair[`${trade.order.avgPrice}min_avg`]['close_prices'];
-      if (!allMeanPrices || allMeanPrices.length == 0) {
-        console.log('hit an error');
+      let allMeanPrices;
+      try {
+        allMeanPrices = pair[`${trade.order.avgPrice}min_avg`]['close_prices'];
+      } catch (e) {
+        console.log(`error with ${pair}`);
         break;
       }
-      // Convert each string to a float and calculate the sum
+      if (!allMeanPrices || allMeanPrices.length == 0) {
+        console.log(`error with ${pair}`);
+        break;
+      }
       let sum = allMeanPrices.reduce((acc: any, val: number) => acc + val, 0);
-      // Calculate the average
       let movingAveragePrice = sum / allMeanPrices.length;
 
       if (trade.order.tradeOption == 'buy') {
         let buyUnder =
           ((100 - trade.order.tradeDelta) / 100) * movingAveragePrice;
+        console.log('buyUnder', buyUnder);
+        console.log('currentPrice', currentPrice);
+        console.log('medianPrice', movingAveragePrice);
         if (currentPrice <= buyUnder) {
           const { data, error } = await supabase
             .from('Trades')

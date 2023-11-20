@@ -17,8 +17,8 @@ splurgeDeployment=$(forge create src/contracts/splurge.sol:Splurge --constructor
 splurgeContract=$(echo "$splurgeDeployment" | awk -F": " '/Deployed to:/ {print $2}')
 
 # deploy two tokens
-outputFirstTokenDeployment=$(forge create src/MockToken.sol:token1 $DeployerTags)
-outputSecondTokenDeployment=$(forge create src/MockToken.sol:token2 $DeployerTags)
+outputFirstTokenDeployment=$(forge create src/contracts/MockTokenOne.sol:TokenOne $DeployerTags)
+outputSecondTokenDeployment=$(forge create src/contracts/MockTokenTwo.sol:TokenTwo $DeployerTags)
 contract1=$(echo "$outputFirstTokenDeployment" | awk -F": " '/Deployed to:/ {print $2}')
 contract2=$(echo "$outputSecondTokenDeployment" | awk -F": " '/Deployed to:/ {print $2}')
 
