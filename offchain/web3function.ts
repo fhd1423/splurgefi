@@ -7,7 +7,6 @@ import axios from 'axios';
 import { createClient } from '@supabase/supabase-js';
 import { ethers } from 'ethers';
 
-
 // const Splurge_ABI = [
 //   'function prepareVerifyTrade((address,address,address,uint256,uint8,uint256,uint8),bytes memory,bytes memory) public',
 // ];
@@ -106,7 +105,8 @@ function getDeconstructedCalldata(calldata: { data: any }): object {
 
 Web3Function.onRun(async (context: Web3FunctionContext) => {
   //Set environment up
-  const Splurge_ABI = 'function verifyExecuteTrade((address,address,address,string,uint256,uint256,uint256,uint256,uint256,bytes),bytes memory,(uint256,(uint32,bytes)) public)';
+  const Splurge_ABI =
+    'function verifyExecuteTrade((address,address,address,string,uint256,uint256,uint256,uint256,uint256,bytes)[],bytes[] memory,(uint256,(uint32,bytes)[])[] public)';
   const { userArgs, gelatoArgs, secrets, multiChainProvider } = context;
   const provider = multiChainProvider.default();
   const splurgeAddy = '0x414ab760a79ba57df175a7ce49e78fbb4d12b963';
