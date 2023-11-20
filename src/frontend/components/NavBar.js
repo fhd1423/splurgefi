@@ -9,7 +9,7 @@ const NavBar = ({inTradesPage}) => {
 
       {(inTradesPage) ? 
 
-        <Link href="/step-one" passHref>
+        <Link href="/automate" passHref>
           <button className="text-white font-medium text-base hover:underline">Create Trade</button>
         </Link>
 
