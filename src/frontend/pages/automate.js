@@ -39,8 +39,7 @@ export default function Automate() {
 
   ];
 
-  const path =
-    '0x046EeE2cc3188071C02BfC1745A6b17c656e3f3d-0xC02aaA39b223FE8D0A0e5C4F27eAD9083C756Cc2';
+  const path = '0x9c3C9283D3e44854697Cd22D3Faa240Cfb032889-0x52C6CCc28C9B5f0f4F37b61316CD4F14C2D4197D';
 
   // State to hold input values
   const [inputTokenValue, setInputTokenValue] = useState('');
@@ -134,14 +133,20 @@ export default function Automate() {
 
   const uploadConditionalOrder = async () => {
     try {
+      // const generateRandomSalt = () => {
+      //   const randomBytes = new Uint8Array(64); // Generating 64 random bytes
+      //   crypto.getRandomValues(randomBytes);
+      //   const salt = Array.from(randomBytes)
+      //     .map((byte) => byte.toString(16).padStart(2, '0'))
+      //     .join('');
+      //   console.log("Salt length:", salt.length);
+      //   return randomBytes;
+      // };
+
       const generateRandomSalt = () => {
         const randomBytes = new Uint8Array(64); // Generating 64 random bytes
         crypto.getRandomValues(randomBytes);
-        const salt = Array.from(randomBytes)
-          .map((byte) => byte.toString(16).padStart(2, '0'))
-          .join('');
-        // console.log("Salt length:", salt.length);
-        return salt;
+        return randomBytes;
       };
 
       const unixTimestamp = selectedDate.unix(); // Unix timestamp in seconds
@@ -149,6 +154,7 @@ export default function Automate() {
       let selectedPercentChange = parseInt(percentChange, 10);
       let selectedPriceAverage = parseInt(selectedTradeAction, 10);
       let selectedAmount = inputTokenValue;
+
 
       // Step 1: Parse the Decimal Value
       const [wholePart, decimalPartRaw] = selectedAmount.includes('.')
@@ -164,6 +170,7 @@ export default function Automate() {
         wholePartBigInt * BigInt(10) ** BigInt(18) + decimalPartBigInt;
 
       const generatedSalt = generateRandomSalt();
+      const intBatches = parseInt(batchValue);
 
       //Sign Payload, send payload and signature to backend
       const signature = await signer.signTypedData({
@@ -213,11 +220,11 @@ export default function Automate() {
             outputTokenAddy: outputToken,
             recipient: primaryWallet.address,
             orderType: toggleSelection,
-            amount: inputTokenValue,
-            tranches: batchValue,
-            percentChange: percentChange,
-            priceAvg: selectedTradeAction,
-            deadline: selectedDate.toISOString(),
+            amount: amountInWei,
+            tranches: intBatches,
+            percentChange: selectedPercentChange,
+            priceAvg: selectedPriceAverage,
+            deadline: unixTimestamp,
             salt: generatedSalt,
           };
 
@@ -235,7 +242,6 @@ export default function Automate() {
 
           // const jsonData = JSON.stringify(orderData);
           // const pairId = await fetchPairId(wethToJoePath);
-          const intBatches = parseInt(batchValue);
           console.log('WALLET ADDRESS INSIDE FETCH', primaryWallet.address);
 
           // created_at (timestamp), user (referenced to user table), pair (referenced to pair table), SplurgeOrder jsonb, signature - text, ready - bool, ZeroExCalldata - jsonb
