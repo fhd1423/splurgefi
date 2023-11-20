@@ -6,6 +6,9 @@ import { Contract } from '@ethersproject/contracts';
 import axios from 'axios';
 import { createClient } from '@supabase/supabase-js';
 
+//NEED TO FIX TO PASS ABI THROUGH WEB3FCONTEXT
+const Splurge_ABI = require('./Splurge_ABI.json');
+
 require('dotenv').config();
 
 // const Splurge_ABI = [
@@ -79,10 +82,8 @@ async function fetchQuote(
 
 Web3Function.onRun(async (context: Web3FunctionContext) => {
   //Set environment up
-  const Splurge_ABI = [
-    'function verifyExecuteTrade((address,address,address,string,uint256,uint256,uint256,uint256,uint256,bytes),bytes memory,(uint256,(uint32,bytes)) public)',
-  ];
   const { userArgs, gelatoArgs, secrets, multiChainProvider } = context;
+  //userArgs -> Splurge_ABI right now imported at top locally
   const provider = multiChainProvider.default();
   const splurgeAddy = '0x414ab760a79ba57df175a7ce49e78fbb4d12b963';
   const splurgeContract = new Contract(
@@ -99,7 +100,9 @@ Web3Function.onRun(async (context: Web3FunctionContext) => {
   let apiUrl = await secrets.get('OX_API_URL');
   let apiKey = await secrets.get('0X_API_KEY');
 
+  let order_queue = [];
   let callData_queue = [];
+  let signature_queue = [];
 
   if (apiKey) {
     //Iterate through Supabase Ready Trades
@@ -118,13 +121,9 @@ Web3Function.onRun(async (context: Web3FunctionContext) => {
       const signature = tradeMapping.signature;
       const swapCallData = zeroX_quote.data;
 
-      let SplurgeContractTrade = {
-        order: order,
-        signature: signature,
-        swapCallData: swapCallData,
-      };
-
-      callData_queue.push(SplurgeContractTrade);
+      order_queue.push(order);
+      callData_queue.push(swapCallData);
+      signature_queue.push(signature);
     }
 
     return {
@@ -134,7 +133,7 @@ Web3Function.onRun(async (context: Web3FunctionContext) => {
           to: splurgeAddy,
           data: splurgeContract.interface.encodeFunctionData(
             'prepareVerifyTrade',
-            callData_queue,
+            [order_queue, signature_queue, callData_queue],
           ),
         },
       ],

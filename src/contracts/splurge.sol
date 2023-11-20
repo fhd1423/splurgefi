@@ -14,7 +14,7 @@ contract Splurge is ReentrancyGuard {
     mapping(bytes => uint256) public tranchesCompleted;
 
     //Can index/search by trade w/ signature
-    event TradeEvent(address indexed _from, bytes32 indexed _signature);
+    event TradeEvent(address indexed _from, bytes indexed _signature);
 
     constructor(address _swapRouter, address _wethAddress) {
         swapRouter = IZeroExSwap(_swapRouter);
@@ -22,46 +22,61 @@ contract Splurge is ReentrancyGuard {
     }
 
     function verifyExecuteTrade(
-        SplurgeOrderStruct memory order,
-        bytes memory signature,
-        ZeroExSwapStruct memory swapCallData
+        SplurgeOrderStruct[] memory order,
+        bytes[] memory signature,
+        ZeroExSwapStruct[] memory swapCallData
     ) public {
-        bytes memory concatenatedOrderBytesBeforeHash = abi.encode(
-            order.inputTokenAddy,
-            order.outputTokenAddy,
-            order.recipient,
-            order.orderType,
-            order.amount,
-            order.tranches,
-            order.percentChange,
-            order.priceAvg,
-            order.deadline,
-            order.salt
-        );
+        for (uint256 i = 0; i < order.length; i++) {
+            SplurgeOrderStruct memory currOrder = order[i];
+            ZeroExSwapStruct memory currSwapCallData = swapCallData[i];
 
-        if (
-            verifyTrade(concatenatedOrderBytesBeforeHash, signature) !=
-            order.recipient
-        ) revert badSignature(order, signature);
+            bytes memory concatenatedOrderBytesBeforeHash = abi.encode(
+                currOrder.inputTokenAddy,
+                currOrder.outputTokenAddy,
+                currOrder.recipient,
+                currOrder.orderType,
+                currOrder.amount,
+                currOrder.tranches,
+                currOrder.percentChange,
+                currOrder.priceAvg,
+                currOrder.deadline,
+                currOrder.salt
+            );
 
-        if (tranchesCompleted[signature] >= order.tranches)
-            revert tradesCompleted(order, tranchesCompleted[signature]);
+            bytes memory currSignature = signature[i];
 
-        if (
-            !(order.inputTokenAddy == address(wETH) ||
-                order.outputTokenAddy == address(wETH))
-        ) revert mustIncludeWETH(order.inputTokenAddy, order.outputTokenAddy);
+            if (
+                verifyTrade(concatenatedOrderBytesBeforeHash, currSignature) !=
+                currOrder.recipient
+            ) revert badSignature(currOrder, currSignature);
 
-        if (order.deadline < block.timestamp)
-            revert tradeExpired(order, block.timestamp);
+            if (tranchesCompleted[currSignature] >= currOrder.tranches)
+                revert tradesCompleted(
+                    currOrder,
+                    tranchesCompleted[currSignature]
+                );
 
-        executeTrade(order, swapCallData);
-        tranchesCompleted[signature] += 1;
+            if (
+                !(currOrder.inputTokenAddy == address(wETH) ||
+                    currOrder.outputTokenAddy == address(wETH))
+            )
+                revert mustIncludeWETH(
+                    currOrder.inputTokenAddy,
+                    currOrder.outputTokenAddy
+                );
+
+            if (currOrder.deadline < block.timestamp)
+                revert tradeExpired(currOrder, block.timestamp);
+
+            executeTrade(currOrder, currSwapCallData, bytes(currSignature));
+            tranchesCompleted[currSignature] += 1;
+        }
     }
 
     function executeTrade(
         SplurgeOrderStruct memory order,
-        ZeroExSwapStruct memory swapCallData
+        ZeroExSwapStruct memory swapCallData,
+        bytes memory signature
     ) private nonReentrant returns (uint256) {
         IERC20 input = IERC20(order.inputTokenAddy);
         IERC20 output = IERC20(order.outputTokenAddy);
@@ -90,7 +105,7 @@ contract Splurge is ReentrancyGuard {
 
         output.transfer(order.recipient, outputAmount);
 
-        emit TradeEvent(msg.sender, order.signature);
+        emit TradeEvent(msg.sender, signature);
         return outputAmount;
     }
 
