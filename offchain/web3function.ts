@@ -100,13 +100,12 @@ function getDeconstructedCalldata(calldata: { data: any }): object {
   // Loop through each row in ZeroExCalldata[4]
   for (let i = 0; i < deconstructed[4].length; i++) {
     // Create an object for each row and add it to the object array
-    object.push({
-      data: deconstructed[4][i][0],
-      deploymentNonce: deconstructed[4][i][1],
-    });
+    object.push([deconstructed[4][i][0], deconstructed[4][i][1]]);
   }
 
-  return object;
+  const ZeroExStruct = [deconstructed[3], object]; // (uint256,(uint32, bytes)[])
+
+  return ZeroExStruct;
 }
 
 Web3Function.onRun(async (context: Web3FunctionContext) => {
