@@ -26,9 +26,6 @@ struct Transformation {
 }
 
 struct ZeroExSwapStruct {
-    address inputToken;
-    address outputToken;
-    uint256 inputTokenAmount;
     uint256 minOutputTokenAmount;
     Transformation[] transformations;
 }
