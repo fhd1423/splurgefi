@@ -5,6 +5,7 @@ import {
 import { Contract } from '@ethersproject/contracts';
 import axios from 'axios';
 import { createClient } from '@supabase/supabase-js';
+import { ethers } from 'ethers';
 
 require('dotenv').config();
 
@@ -75,13 +76,42 @@ async function fetchQuote(
   const headers = { '0x-api-key': apiKey };
   const response = await axios.get(url, { headers });
   return response.data;
+  return response.data;
+}
+
+function getDeconstructedCalldata(calldata: { data: any }): object {
+  const ZEROEX_ABI = [
+    'function transformERC20(address,address,uint256,uint256,(uint32, bytes)[]) public',
+  ];
+  const ZeroExAddy = '0xf1523fcd98490383d079f5822590629c154cfacf';
+  const ZeroExContract = new ethers.Contract(ZeroExAddy, ZEROEX_ABI);
+
+  let deconstructed = ZeroExContract.interface.decodeFunctionData(
+    'transformERC20',
+    calldata.data,
+  );
+
+  let object = [];
+
+  // Loop through each row in ZeroExCalldata[4]
+  for (let i = 0; i < deconstructed[4].length; i++) {
+    // Create an object for each row and add it to the object array
+    object.push({
+      data: deconstructed[4][i][0],
+      deploymentNonce: deconstructed[4][i][1],
+    });
+  }
+
+  return object;
 }
 
 Web3Function.onRun(async (context: Web3FunctionContext) => {
   //Set environment up
   const Splurge_ABI = [
-    'function verifyExecuteTrade((address,address,address,string,uint256,uint256,uint256,uint256,uint256,bytes),bytes memory,(uint256,(uint32,bytes)) public)',
+    'function verifyExecuteTrade((address,address,address,string,uint256,uint256,uint256,uint256,uint256,bytes),bytes memory,(uint256,(uint32, bytes)[]) public)',
   ];
+  //REPLACE: with tokens pairs info from Supabase Trades table
+
   const { userArgs, gelatoArgs, secrets, multiChainProvider } = context;
   const provider = multiChainProvider.default();
   const splurgeAddy = '0x414ab760a79ba57df175a7ce49e78fbb4d12b963';
@@ -116,7 +146,7 @@ Web3Function.onRun(async (context: Web3FunctionContext) => {
 
       const order = tradeMapping.orderDetails;
       const signature = tradeMapping.signature;
-      const swapCallData = zeroX_quote.data;
+      const swapCallData = getDeconstructedCalldata(zeroX_quote);
 
       let SplurgeContractTrade = {
         order: order,
