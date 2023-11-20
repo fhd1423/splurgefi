@@ -1,0 +1,12 @@
+{
+  "dependencies": {
+    "@supabase/supabase-js": "^2.38.4",
+    "axios": "^1.5.1",
+    "dotenv": "^16.3.1",
+    "node-gyp": "^10.0.1",
+    "ts-node": "^10.9.1"
+  },
+  "scripts": {
+    "test": "echo"
+  }
+}
