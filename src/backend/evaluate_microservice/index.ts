@@ -20,13 +20,12 @@ const getContractLogEvents = async (signature: string) => {
   const contract = new Contract(contractAddress, contractABI, provider);
 
   try {
-    const eventFilter = contract.filters.TradeEvent();
+
+    const eventFilter = contract.filters.TradeEvent(null, signature);
     const events = await contract.queryFilter(eventFilter);
-    // below line has an error
-    const filteredEvents = events.filter(
-      (event) => event.args && event.args._signature === signature,
-    );
-    return filteredEvents;
+
+    return events;
+
   } catch (error) {
     console.error('Error fetching contract events:', error);
     throw error;
