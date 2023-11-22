@@ -76,6 +76,7 @@ const updateTimings = async (id: number, timings: Record<string, any>) => {
     .from('Trades')
     .update({
       batch_timings: timings,
+      ready: false, 
     })
     .match({ id: id });
 
@@ -132,7 +133,7 @@ const updateTrades = async () => {
     let { data: Trades, error } = await supabase
       .from('Trades')
       .select('*')
-      .eq('ready', 'true')
+      .eq('ready', 'false')
       .eq('pair', pair.path);
 
     let currentOutput = pair['current_price'];
