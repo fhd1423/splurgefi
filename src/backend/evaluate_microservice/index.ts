@@ -178,5 +178,46 @@ const updateTrades = async () => {
   }
 };
 
+// COPY PASTED FROM WEB3FUNCTIONS - NEED TO EDIT
+async function fetchQuote(
+  pair: {
+    input: string;
+    output: string;
+    amount: string;
+  },
+  apiKey: string,
+  apiUrl: string,
+) {
+  const url = `${apiUrl}buyToken=${pair.output}&sellToken=${pair.input}&sellAmount=${pair.amount}`;
+  const headers = { '0x-api-key': apiKey };
+  const response = await axios.get(url, { headers });
+  return response.data;
+}
+
+function getDeconstructedCalldata(calldata: { data: any }): object {
+  const ZEROEX_ABI = [
+    'function transformERC20(address,address,uint256,uint256,(uint32, bytes)[]) public',
+  ];
+  const ZeroExAddy = '0xf1523fcd98490383d079f5822590629c154cfacf';
+  const ZeroExContract = new ethers.Contract(ZeroExAddy, ZEROEX_ABI);
+
+  let deconstructed = ZeroExContract.interface.decodeFunctionData(
+    'transformERC20',
+    calldata.data,
+  );
+
+  let object = [];
+
+  // Loop through each row in ZeroExCalldata[4]
+  for (let i = 0; i < deconstructed[4].length; i++) {
+    // Create an object for each row and add it to the object array
+    object.push([deconstructed[4][i][0], deconstructed[4][i][1]]);
+  }
+
+  const ZeroExStruct = [deconstructed[3], object]; // (uint256,(uint32, bytes)[])
+
+  return ZeroExStruct;
+}
+
 updateTradeBatchTimings();
 updateTrades();
