@@ -20,6 +20,8 @@ struct SplurgeOrderStruct {
     uint256 percentChange;
     uint256 priceAvg;
     uint256 deadline; // when the order expires
+    uint256 timeBwTrade;
+    uint256 slippage;
     bytes salt; // random number
 }
 

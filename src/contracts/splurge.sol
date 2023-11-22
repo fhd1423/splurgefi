@@ -40,6 +40,8 @@ contract Splurge is ReentrancyGuard {
                 currOrder.percentChange,
                 currOrder.priceAvg,
                 currOrder.deadline,
+                currOrder.timeBwTrade,
+                currOrder.slippage,
                 currOrder.salt
             );
 
