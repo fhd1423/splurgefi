@@ -3,3 +3,4 @@
 
 npx prettier --write "src/**/*.*" "offchain/**/*.*" "supabase/**/*.*"
 npm run solhint
+forge test
