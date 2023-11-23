@@ -20,12 +20,10 @@ const getContractLogEvents = async (signature: string) => {
   const contract = new Contract(contractAddress, contractABI, provider);
 
   try {
-
     const eventFilter = contract.filters.TradeEvent(null, signature);
     const events = await contract.queryFilter(eventFilter);
 
     return events;
-
   } catch (error) {
     console.error('Error fetching contract events:', error);
     throw error;
@@ -76,7 +74,7 @@ const updateTimings = async (id: number, timings: Record<string, any>) => {
     .from('Trades')
     .update({
       batch_timings: timings,
-      ready: false, 
+      ready: false,
     })
     .match({ id: id });
 
