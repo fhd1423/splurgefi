@@ -22,57 +22,43 @@ contract Splurge is ReentrancyGuard {
     }
 
     function verifyExecuteTrade(
-        SplurgeOrderStruct[] memory order,
-        bytes[] memory signature,
-        ZeroExSwapStruct[] memory swapCallData
+        SplurgeOrderStruct memory order,
+        bytes memory signature,
+        ZeroExSwapStruct memory swapCallData
     ) public {
-        for (uint256 i = 0; i < order.length; i++) {
-            SplurgeOrderStruct memory currOrder = order[i];
-            ZeroExSwapStruct memory currSwapCallData = swapCallData[i];
+        bytes memory concatenatedOrderBytesBeforeHash = abi.encode(
+            order.inputTokenAddy,
+            order.outputTokenAddy,
+            order.recipient,
+            order.orderType,
+            order.amount,
+            order.tranches,
+            order.percentChange,
+            order.priceAvg,
+            order.deadline,
+            order.timeBwTrade,
+            order.slippage,
+            order.salt
+        );
 
-            bytes memory concatenatedOrderBytesBeforeHash = abi.encode(
-                currOrder.inputTokenAddy,
-                currOrder.outputTokenAddy,
-                currOrder.recipient,
-                currOrder.orderType,
-                currOrder.amount,
-                currOrder.tranches,
-                currOrder.percentChange,
-                currOrder.priceAvg,
-                currOrder.deadline,
-                currOrder.timeBwTrade,
-                currOrder.slippage,
-                currOrder.salt
-            );
+        if (
+            verifyTrade(concatenatedOrderBytesBeforeHash, signature) !=
+            order.recipient
+        ) revert badSignature(order, signature);
 
-            bytes memory currSignature = signature[i];
+        if (tranchesCompleted[signature] >= order.tranches)
+            revert tradesCompleted(order, tranchesCompleted[signature]);
 
-            if (
-                verifyTrade(concatenatedOrderBytesBeforeHash, currSignature) !=
-                currOrder.recipient
-            ) revert badSignature(currOrder, currSignature);
+        if (
+            !(order.inputTokenAddy == address(wETH) ||
+                order.outputTokenAddy == address(wETH))
+        ) revert mustIncludeWETH(order.inputTokenAddy, order.outputTokenAddy);
 
-            if (tranchesCompleted[currSignature] >= currOrder.tranches)
-                revert tradesCompleted(
-                    currOrder,
-                    tranchesCompleted[currSignature]
-                );
+        if (order.deadline < block.timestamp)
+            revert tradeExpired(order, block.timestamp);
 
-            if (
-                !(currOrder.inputTokenAddy == address(wETH) ||
-                    currOrder.outputTokenAddy == address(wETH))
-            )
-                revert mustIncludeWETH(
-                    currOrder.inputTokenAddy,
-                    currOrder.outputTokenAddy
-                );
-
-            if (currOrder.deadline < block.timestamp)
-                revert tradeExpired(currOrder, block.timestamp);
-
-            executeTrade(currOrder, currSwapCallData, bytes(currSignature));
-            tranchesCompleted[currSignature] += 1;
-        }
+        executeTrade(order, swapCallData, signature);
+        tranchesCompleted[signature] += 1;
     }
 
     function executeTrade(

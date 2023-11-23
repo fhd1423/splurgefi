@@ -1,7 +1,6 @@
 // SPDX-License-Identifier: UNLICENSED
 
 pragma solidity ^0.8.13;
-/*
 
 import { Test } from "forge-std/Test.sol";
 import "../src/contracts/splurge.sol";
@@ -53,20 +52,32 @@ contract splurgeTest is Test {
     }
 
     function testVerifyTradeDetails() public view {
-        address inputTokenAddy = vm.addr(0x11);
-        address outputTokenAddy = vm.addr(0x22);
-        address recipient = vm.addr(0x33);
-        uint amount = 100000;
+        address inputTokenAddy = 0x9c3C9283D3e44854697Cd22D3Faa240Cfb032889; // wmatic
+        address outputTokenAddy = 0xa0a6c157871A9F38253234BBfD2B8D79F9e9FCDC; // token1
+        address recipient = 0x8839278A75dc8249BC0C713A710aaEBD0FEE6750;
+        string memory orderType = "buy";
+        uint amount = 4;
+        uint tranches = 6;
+        uint percentChange = 15;
+        uint priceAvg = 4;
         uint deadline = 1730016559; // date in 2024
-        uint8 salt = 1;
-        uint8 tranches = 6;
+        uint timeBwTrade = 100;
+        uint slippage = 1;
+        bytes
+            memory salt = "a65545659409fc363fbae58a52ef7dd736aaa59461c7c1a80e685c38d271c4de09277e1367631ac53c1e6b5f47017a35ae5daf20f1f011b5d58aa3d511cccc7c";
+
         SplurgeOrderStruct memory order = SplurgeOrderStruct(
             inputTokenAddy,
             outputTokenAddy,
             recipient,
+            orderType,
             amount,
             tranches,
+            percentChange,
+            priceAvg,
             deadline,
+            timeBwTrade,
+            slippage,
             salt
         );
 
@@ -74,26 +85,34 @@ contract splurgeTest is Test {
             order.inputTokenAddy,
             order.outputTokenAddy,
             order.recipient,
+            order.orderType,
             order.amount,
             order.tranches,
+            order.percentChange,
+            order.priceAvg,
             order.deadline,
+            order.timeBwTrade,
+            order.slippage,
             order.salt
         );
 
         (uint8 v, bytes32 r, bytes32 s) = vm.sign(
-            ownerPrivateKey,
+            realPrivateKey,
             keccak256(abi.encodePacked(concatenatedOrderBytesBeforeHash))
         );
 
         bytes memory signature = joinSignature(v, r, s);
+        console.logBytes(signature);
 
         require(
             splurgeContract.verifyTrade(
                 concatenatedOrderBytesBeforeHash,
                 signature
-            ) == owner
+            ) == recipient
         );
     }
+
+    /*
 
     function testPrepareVerifyTrade() public {
         address inputTokenAddy = vm.addr(0x11);
@@ -154,48 +173,7 @@ contract splurgeTest is Test {
         // this will revert since its not a real contract anyways, have to mock it somehow
         splurgeContract.verifyExecuteTrade(order, signature, zeroExSwap);
     }
-
-    // using the test below to generate the data for performing a real tx
-
-    function generateOrderSignature() public {
-        address inputTokenAddy = 0x9c3C9283D3e44854697Cd22D3Faa240Cfb032889; // wmatic
-        address outputTokenAddy = 0xa0a6c157871A9F38253234BBfD2B8D79F9e9FCDC; // token1
-        address recipient = 0x8839278A75dc8249BC0C713A710aaEBD0FEE6750;
-        uint amount = 200000000000000000;
-        uint deadline = 1730016559; // date in 2024
-        uint8 salt = 1;
-        uint8 tranches = 6;
-        SplurgeOrderStruct memory order = SplurgeOrderStruct(
-            inputTokenAddy,
-            outputTokenAddy,
-            recipient,
-            amount,
-            tranches,
-            deadline,
-            salt
-        );
-
-        bytes memory concatenatedOrderBytesBeforeHash = abi.encode(
-            order.inputTokenAddy,
-            order.outputTokenAddy,
-            order.recipient,
-            order.amount,
-            order.tranches,
-            order.deadline,
-            order.salt
-        );
-
-        (uint8 v, bytes32 r, bytes32 s) = vm.sign(
-            realPrivateKey,
-            keccak256(abi.encodePacked(concatenatedOrderBytesBeforeHash))
-        );
-
-        bytes memory signature = joinSignature(v, r, s);
-        console.logBytes(signature);
-
-        vm.expectRevert();
-        // splurgeContract.prepareVerifyTrade(order, signature, "test");
-    }
+    */
 
     function joinSignature(
         uint8 v,
@@ -211,4 +189,3 @@ contract splurgeTest is Test {
         return sig;
     }
 }
-*/
