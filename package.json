@@ -20,7 +20,8 @@
     "node-fetch": "^3.3.2",
     "npm": "^10.2.1",
     "prettier-plugin-solidity": "^1.2.0",
-    "solc": "^0.8.22"
+    "solc": "^0.8.22",
+    "viem": "^1.19.7"
   },
   "scripts": {
     "prepare": "husky install",
