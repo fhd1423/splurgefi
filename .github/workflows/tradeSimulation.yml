@@ -1,6 +1,15 @@
 name: Trade Simulation
 
-on: [push, pull_request]
+on:
+  push:
+    paths:
+      - 'src/**/*.sol'
+      - 'testing/simulations/tradesimulations.ts'
+  pull_request:
+    paths:
+      - 'src/**/*.sol'
+      - 'testing/simulations/tradesimulations.ts'
+
 
 env:
   FOUNDRY_PROFILE: ci
