@@ -48,11 +48,11 @@ contract Splurge is ReentrancyGuard {
         if (tranchesCompleted[signature] >= order.tranches)
             revert tradesCompleted(order, tranchesCompleted[signature]);
 
-        /*if (
+        if (
             !(order.inputTokenAddy == address(wETH) ||
                 order.outputTokenAddy == address(wETH))
         ) revert mustIncludeWETH(order.inputTokenAddy, order.outputTokenAddy);
-        */
+
         if (order.deadline < block.timestamp)
             revert tradeExpired(order, block.timestamp);
 
@@ -70,8 +70,9 @@ contract Splurge is ReentrancyGuard {
 
         uint256 tranche = order.amount / order.tranches;
         input.transferFrom(order.recipient, address(this), tranche);
+
         if (order.inputTokenAddy == address(wETH)) {
-            // tranche = feeToSender();
+            tranche = feeToSender();
         }
 
         // approve infinite only if needed
@@ -87,7 +88,7 @@ contract Splurge is ReentrancyGuard {
         );
 
         if (order.outputTokenAddy == address(wETH)) {
-            // outputAmount = feeToSender();
+            outputAmount = feeToSender();
         }
 
         output.transfer(order.recipient, outputAmount);

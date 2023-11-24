@@ -1,12 +1,23 @@
 import axios from 'axios';
 import * as dotenv from 'dotenv';
-import { Address, encodeFunctionData } from 'viem';
+import { Address, encodeFunctionData, decodeFunctionData } from 'viem';
 import { account } from './config';
 import abi from './abi';
-import { ethers } from 'ethers';
+import ExAbi from './zeroexabi';
 dotenv.config();
 
-const splurgeContract = '0xf50D195fD8dE6ECaE0d015370D3edE1A0d3c2fEf';
+type TransformERC20 = [
+  string, // First address
+  string, // Second address
+  bigint, // First big integer
+  bigint, // Second big integer
+  Array<{
+    deploymentNonce: number;
+    data: string;
+  }>,
+];
+const splurgeContract = '0x8dFe4EdF22b132244d50Ac9c6D0246D733baFC25';
+const WETH = '0x9c3C9283D3e44854697Cd22D3Faa240Cfb032889'; //wmatic for now
 
 const generateSignature = async (data: {
   inputTokenAddress: Address;
@@ -62,30 +73,22 @@ const generateSignature = async (data: {
 };
 
 function getDeconstructedCalldata(calldata: { data: any }): object {
-  const ZEROEX_ABI = [
-    'function transformERC20(address,address,uint256,uint256,(uint32, bytes)[]) public',
-  ];
-  const ZeroExAddy = '0xf1523fcd98490383d079f5822590629c154cfacf';
-  const ZeroExContract = new ethers.Contract(ZeroExAddy, ZEROEX_ABI);
-
-  let deconstructed = ZeroExContract.interface.decodeFunctionData(
-    'transformERC20',
-    calldata.data,
-  );
+  const { args } = decodeFunctionData({
+    abi: ExAbi,
+    data: calldata.data,
+  });
 
   let object = [];
 
-  // Loop through each row in ZeroExCalldata[4]
-  for (let i = 0; i < deconstructed[4].length; i++) {
-    // Create an object for each row and add it to the object array
-    object.push([parseInt(deconstructed[4][i][0]), deconstructed[4][i][1]]);
+  const typedArgs = args as TransformERC20;
+  for (let i = 0; i < typedArgs[4].length; i++) {
+    object.push([typedArgs[4][i].deploymentNonce, typedArgs[4][i].data]);
   }
 
-  const ZeroExStruct = [parseInt(deconstructed[3]), object]; // (uint256,(uint32, bytes)[])
+  const ZeroExStruct = [typedArgs[3], object]; // (uint256,(uint32, bytes)[])
 
   return ZeroExStruct;
 }
-
 async function fetchQuote(
   pair: {
     input: string;
@@ -99,15 +102,18 @@ async function fetchQuote(
   const headers = { '0x-api-key': apiKey };
   const response = await axios.get(url, { headers });
 
-  // console.log(response.data);
   return response.data;
 }
 
-async function generateZeroExStruct(trancheToSell: number) {
+async function generateZeroExStruct(
+  inputTokenAddress: Address,
+  outputTokenAddress: Address,
+  trancheToSell: number,
+) {
   const res = await fetchQuote(
     {
-      input: '0xFD8705a01a0E120fDf17db4e0d68ca22507a541D',
-      output: '0x55741926B49cd1963607f32eA0d883c8cc528c48',
+      input: inputTokenAddress,
+      output: outputTokenAddress,
       amount: String(trancheToSell),
     },
     '0631b1fa-5205-42d3-89ef-c4e8ea3538fe',
@@ -145,11 +151,18 @@ const encodeInput = async (SwapData: {
     BigInt(SwapData.salt), // salt
   ];
 
-  const trancheToSell = Math.floor(SwapData.amount / SwapData.tranches);
-  const zeroExSwapStruct = await generateZeroExStruct(trancheToSell);
+  let trancheToSell = Math.floor(SwapData.amount / SwapData.tranches);
+  if (SwapData.inputTokenAddress == WETH) {
+    trancheToSell = Math.floor(trancheToSell * 0.995);
+  }
+  const zeroExSwapStruct = await generateZeroExStruct(
+    SwapData.inputTokenAddress,
+    SwapData.outputTokenAddress,
+    trancheToSell,
+  );
 
   const signature =
-    '0x395ff962cc396407fcd18e95d6874c5e8961663d69b12beacbdd8fbe692b79b1682e2f24303ecaad055433044d990b88a16557ea61a7d371354b940ee9cef5ab1c';
+    '0x169d7cbb319ee09eb024786018eafd1f7c0ddbb3293de65d31ff7986d4c3fab269d7761b2e4be30929809ba88b8c8144bbac0005bfc90b35c53f4a37bf7475481c';
 
   // TODO: get the real signature working
   /*
@@ -184,8 +197,8 @@ const exectuteTrade = async () => {
   const { TENDERLY_USER, TENDERLY_PROJECT, TENDERLY_ACCESS_KEY } = process.env;
 
   const encodedInput = await encodeInput({
-    inputTokenAddress: '0xFD8705a01a0E120fDf17db4e0d68ca22507a541D', // inputTokenAddy
-    outputTokenAddress: '0x55741926B49cd1963607f32eA0d883c8cc528c48', // outputTokenAddy
+    inputTokenAddress: '0x9c3C9283D3e44854697Cd22D3Faa240Cfb032889', // inputTokenAddy
+    outputTokenAddress: '0xa0a6c157871A9F38253234BBfD2B8D79F9e9FCDC', // outputTokenAddy
     recipient: '0x8839278a75dc8249bc0c713a710aaebd0fee6750', // recipient
     amount: 10000, // amount
     tranches: 6, // tranches

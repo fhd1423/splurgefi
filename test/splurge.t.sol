@@ -52,8 +52,8 @@ contract splurgeTest is Test {
     }
 
     function testVerifyTradeDetails() public view {
-        address inputTokenAddy = 0xFD8705a01a0E120fDf17db4e0d68ca22507a541D; // wmatic
-        address outputTokenAddy = 0x55741926B49cd1963607f32eA0d883c8cc528c48; // token1
+        address inputTokenAddy = 0x9c3C9283D3e44854697Cd22D3Faa240Cfb032889; // wmatic
+        address outputTokenAddy = 0xa0a6c157871A9F38253234BBfD2B8D79F9e9FCDC; // token1
         address recipient = 0x8839278A75dc8249BC0C713A710aaEBD0FEE6750;
         string memory orderType = "buy";
         uint amount = 10000;
