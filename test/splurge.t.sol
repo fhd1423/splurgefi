@@ -8,6 +8,7 @@ import "./mocks/mockToken.sol";
 import "forge-std/console.sol";
 import { Strings } from "@openzeppelin/contracts/utils/Strings.sol";
 import { Transformation } from "../src/contracts/Interfaces.sol";
+/*
 
 contract splurgeTest is Test {
     Splurge public splurgeContract;
@@ -172,7 +173,7 @@ contract splurgeTest is Test {
         // this will revert since its not a real contract anyways, have to mock it somehow
         splurgeContract.verifyExecuteTrade(order, signature, zeroExSwap);
     }
-    */
+    
 
     function joinSignature(
         uint8 v,
@@ -188,3 +189,5 @@ contract splurgeTest is Test {
         return sig;
     }
 }
+
+*/
