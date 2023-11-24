@@ -14,4 +14,4 @@ echo splurge: $splurgeContract
 # trader must approve our contract to trade their weth
 cast send 0x9c3C9283D3e44854697Cd22D3Faa240Cfb032889 "approve(address, uint256)" $splurgeContract 1000000000000000000000 $TraderTags
 
-ts-node testing/simulations/tradesimulations.ts $splurgeContract
+bun testing/simulations/tradesimulations.ts $splurgeContract

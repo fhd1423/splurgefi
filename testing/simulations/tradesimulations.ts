@@ -75,20 +75,6 @@ const generateSignature = async (data: {
   }
 };
 
-function getDeconstructedCalldata(calldata: { data: any }): object {
-  const typedArgs = decodeFunctionData({
-    abi: ExAbi,
-    data: calldata.data,
-  }).args as TransformERC20;
-
-  const object = typedArgs[4].map(({ deploymentNonce, data }) => [
-    deploymentNonce,
-    data,
-  ]);
-
-  return [typedArgs[3], object]; // (uint256,(uint32, bytes)[])
-}
-
 async function fetchQuote(
   pair: {
     input: string;
@@ -120,8 +106,17 @@ async function generateZeroExStruct(
     'https://mumbai.api.0x.org/swap/v1/quote?',
   );
 
-  let result = await getDeconstructedCalldata(res);
-  return result;
+  const typedArgs = decodeFunctionData({
+    abi: ExAbi,
+    data: res.data,
+  }).args as TransformERC20;
+
+  const object = typedArgs[4].map(({ deploymentNonce, data }) => [
+    deploymentNonce,
+    data,
+  ]);
+
+  return [typedArgs[3], object]; // (uint256,(uint32, bytes)[])
 }
 
 const encodeInput = async (SwapData: {
