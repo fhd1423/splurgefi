@@ -223,7 +223,7 @@ const executeTrade = async (
       `Successful transaction: hash: ${transaction.hash} block number: ${transaction.block_number}`,
     );
   else {
-    console.log(`Transaction failed`);
+    throw new Error(`Transaction failed`);
   }
 };
 

@@ -1,0 +1,62 @@
+name: Trade Simulation
+
+on: [push, pull_request]
+
+env:
+  FOUNDRY_PROFILE: ci
+
+jobs:
+  check:
+    runs-on: ubuntu-latest
+    strategy:
+      fail-fast: true
+    name: Foundry project
+
+    env:
+      MATCHA: ${{ secrets.MATCHA }}
+      OX_API_KEY: ${{ secrets.OX_API_KEY }}
+      PRIVATE_KEY: ${{ secrets.PRIVATE_KEY }}
+      PRIVATE_KEY_TRADER: ${{ secrets.PRIVATE_KEY_TRADER }}
+      RPC_URL: ${{ secrets.RPC_URL }}
+      PROVIDER_URLS: ${{ secrets.PROVIDER_URLS }}
+      SUPABASE_API_KEY: ${{ secrets.SUPABASE_API_KEY }}
+      SUPABASE_URL: ${{ secrets.SUPABASE_URL }}
+      TENDERLY_USER: ${{ secrets.TENDERLY_USER }}
+      TENDERLY_PROJECT: ${{ secrets.TENDERLY_PROJECT }}
+      TENDERLY_ACCESS_KEY: ${{ secrets.TENDERLY_ACCESS_KEY }}
+
+    steps:
+      - uses: actions/checkout@v3
+        with:
+          submodules: recursive
+
+      - name: Install Foundry
+        uses: foundry-rs/foundry-toolchain@v1
+        with:
+          version: nightly
+
+      - name: Run Forge build
+        run: |
+          forge --version
+          forge build --sizes
+
+      - name: Run Forge tests
+        run: |
+          forge test -vvv
+
+      - name: Set up Node.js
+        uses: actions/setup-node@v2
+        with:
+          node-version: '20' # Use the latest stable Node.js version
+
+      - name: Install ts-node
+        run: npm install -g ts-node
+
+      - name: Install dependencies
+        run: npm install
+
+      - name: Grant execute permission to script
+        run: chmod +x ./simulate.sh
+
+      - name: Run simulation script
+        run: ./simulate.sh
