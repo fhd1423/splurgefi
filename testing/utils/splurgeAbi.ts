@@ -1,4 +1,4 @@
-const abi = [
+const splurgeAbi = [
   {
     inputs: [
       { internalType: 'address', name: '_swapRouter', type: 'address' },
@@ -218,4 +218,4 @@ const abi = [
   { stateMutability: 'payable', type: 'receive' },
 ];
 
-export default abi;
+export default splurgeAbi;

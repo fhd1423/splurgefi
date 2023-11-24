@@ -1,9 +1,9 @@
 import axios from 'axios';
 import * as dotenv from 'dotenv';
 import { Address, encodeFunctionData, decodeFunctionData } from 'viem';
-import { account } from './config';
-import abi from './abi';
-import ExAbi from './zeroexabi';
+import { account } from '../utils/config';
+import splurgeAbi from '../utils/splurgeAbi';
+import ExAbi from '../utils/zeroexabi';
 dotenv.config();
 
 type TransformERC20 = [
@@ -73,22 +73,19 @@ const generateSignature = async (data: {
 };
 
 function getDeconstructedCalldata(calldata: { data: any }): object {
-  const { args } = decodeFunctionData({
+  const typedArgs = decodeFunctionData({
     abi: ExAbi,
     data: calldata.data,
-  });
+  }).args as TransformERC20;
 
-  let object = [];
+  const object = typedArgs[4].map(({ deploymentNonce, data }) => [
+    deploymentNonce,
+    data,
+  ]);
 
-  const typedArgs = args as TransformERC20;
-  for (let i = 0; i < typedArgs[4].length; i++) {
-    object.push([typedArgs[4][i].deploymentNonce, typedArgs[4][i].data]);
-  }
-
-  const ZeroExStruct = [typedArgs[3], object]; // (uint256,(uint32, bytes)[])
-
-  return ZeroExStruct;
+  return [typedArgs[3], object]; // (uint256,(uint32, bytes)[])
 }
+
 async function fetchQuote(
   pair: {
     input: string;
@@ -182,7 +179,7 @@ const encodeInput = async (SwapData: {
   */
 
   const data = encodeFunctionData({
-    abi,
+    abi: splurgeAbi,
     functionName: 'verifyExecuteTrade',
     args: [splurgeOrderStruct, signature, zeroExSwapStruct],
   });
@@ -190,25 +187,25 @@ const encodeInput = async (SwapData: {
   return data;
 };
 
-const exectuteTrade = async () => {
+const exectuteTrade = async (data: {
+  inputTokenAddress: Address; // inputTokenAddy
+  outputTokenAddress: Address; // outputTokenAddy
+  recipient: Address; // recipient
+  amount: number; // amount
+  tranches: number; // tranches
+  percentChange: number; // percent change
+  priceAvg: number; // priceAvg
+  deadline: number; // deadline
+  timeBwTrade: number; // time between trades
+  slippage: number;
+  salt: number;
+}) => {
   // assuming environment variables TENDERLY_USER, TENDERLY_PROJECT and TENDERLY_ACCESS_KEY are set
   // https://docs.tenderly.co/other/platform-access/how-to-find-the-project-slug-username-and-organization-name
   // https://docs.tenderly.co/other/platform-access/how-to-generate-api-access-tokens
   const { TENDERLY_USER, TENDERLY_PROJECT, TENDERLY_ACCESS_KEY } = process.env;
 
-  const encodedInput = await encodeInput({
-    inputTokenAddress: '0x9c3C9283D3e44854697Cd22D3Faa240Cfb032889', // inputTokenAddy
-    outputTokenAddress: '0xa0a6c157871A9F38253234BBfD2B8D79F9e9FCDC', // outputTokenAddy
-    recipient: '0x8839278a75dc8249bc0c713a710aaebd0fee6750', // recipient
-    amount: 10000, // amount
-    tranches: 6, // tranches
-    percentChange: 15, // percent change
-    priceAvg: 4, // priceAvg
-    deadline: 1730016559, // deadline
-    timeBwTrade: 100, // time between trades
-    slippage: 1,
-    salt: 1,
-  });
+  const encodedInput = await encodeInput(data);
 
   const resp = await axios.post(
     `https://api.tenderly.co/api/v1/account/${TENDERLY_USER}/project/${TENDERLY_PROJECT}/simulate`,
@@ -242,4 +239,16 @@ const exectuteTrade = async () => {
   }
 };
 
-exectuteTrade();
+exectuteTrade({
+  inputTokenAddress: '0x9c3C9283D3e44854697Cd22D3Faa240Cfb032889',
+  outputTokenAddress: '0xa0a6c157871A9F38253234BBfD2B8D79F9e9FCDC',
+  recipient: '0x8839278a75dc8249bc0c713a710aaebd0fee6750', // recipient
+  amount: 10000, // amount
+  tranches: 6, // tranches
+  percentChange: 15, // percent change
+  priceAvg: 4, // priceAvg
+  deadline: 1730016559, // deadline
+  timeBwTrade: 100, // time between trades
+  slippage: 1,
+  salt: 1,
+});

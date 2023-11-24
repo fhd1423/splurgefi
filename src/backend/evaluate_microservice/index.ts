@@ -165,13 +165,16 @@ function getDeconstructedCalldata(calldata: { data: any }): object {
   return ZeroExStruct;
 }
 
-async function getSwapCallData(inputTokenAddress: string, outputTokenAddress: string, amount: string){
-
+async function getSwapCallData(
+  inputTokenAddress: string,
+  outputTokenAddress: string,
+  amount: string,
+) {
   let apiUrl = 'OX_API_URL';
   let apiKey = '0X_API_KEY';
 
   const tokenPair = {
-    input: inputTokenAddress, 
+    input: inputTokenAddress,
     output: outputTokenAddress,
     amount: amount,
   };
@@ -179,11 +182,10 @@ async function getSwapCallData(inputTokenAddress: string, outputTokenAddress: st
   try {
     let zeroX_quote = await fetchQuote(tokenPair, apiKey, apiUrl!);
     const swapCallData = getDeconstructedCalldata(zeroX_quote);
-    return swapCallData; 
-  } catch (error){
+    return swapCallData;
+  } catch (error) {
     console.error('Error in getSwapCallData:', error);
   }
-
 }
 
 const updateTrades = async () => {
@@ -220,8 +222,12 @@ const updateTrades = async () => {
       const lastBatchTime = trade.batch_timings[mostRecentBatch.toString()];
       const timeBetweenBatches = trade.time_bw_batches;
 
-      // Get swap call data 
-      const callData = getSwapCallData(trade.order.inputTokenAddy, trade.order.outputTokenAddy, trade.order.amount); 
+      // Get swap call data
+      const callData = getSwapCallData(
+        trade.order.inputTokenAddy,
+        trade.order.outputTokenAddy,
+        trade.order.amount,
+      );
 
       // Only mark trade as ready if time between batches is satisfied
       if (timeBetweenBatches >= current_time - lastBatchTime) {
@@ -231,9 +237,9 @@ const updateTrades = async () => {
         if (currentOutput >= buyOutputOver) {
           const { data, error } = await supabase
             .from('Trades')
-            .update({ 
-              ready: true, 
-              zero_x_call_data: callData
+            .update({
+              ready: true,
+              zero_x_call_data: callData,
             })
             .eq('id', trade.id)
             .select();
