@@ -46,6 +46,6 @@ Web3Function.onRun(async (context: Web3FunctionContext) => {
 
   return {
     canExec: false,
-    message: `api key not provided`,
+    message: `no trades to execute currently`,
   };
 });
