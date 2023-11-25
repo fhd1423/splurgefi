@@ -254,10 +254,9 @@ const updateTrades = async () => {
         console.log(`error with ${pair}`);
         break;
       }
-      // Convert each string to a float and calculate the sum
-      let sum = allMeanPrices.reduce((acc: any, val: number) => acc + val, 0);
-      // Calculate the average
-      let movingAveragePrice = sum / allMeanPrices.length;
+      let movingAveragePrice =
+        allMeanPrices.reduce((acc: any, val: any) => acc + Number(val), 0) /
+        allMeanPrices.length;
 
       const current_time = new Date().getTime(); // UNIX timestamp
       const mostRecentBatch = Object.keys(trade.batch_timings).length;
