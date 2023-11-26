@@ -17,3 +17,5 @@
 *.code-workspace
 
 .dockerignore
+
+*.lockb
