@@ -26,25 +26,8 @@ contract Splurge is ReentrancyGuard {
         bytes memory signature,
         ZeroExSwapStruct memory swapCallData
     ) public {
-        bytes memory concatenatedOrderBytesBeforeHash = abi.encode(
-            order.inputTokenAddy,
-            order.outputTokenAddy,
-            order.recipient,
-            order.orderType,
-            order.amount,
-            order.tranches,
-            order.percentChange,
-            order.priceAvg,
-            order.deadline,
-            order.timeBwTrade,
-            order.slippage,
-            order.salt
-        );
-
-        if (
-            verifyTrade(concatenatedOrderBytesBeforeHash, signature) !=
-            order.recipient
-        ) revert badSignature(order, signature);
+        if (getSigner(order, signature) != order.recipient)
+            revert badSignature(order, signature);
 
         if (tranchesCompleted[signature] >= order.tranches)
             revert tradesCompleted(order, tranchesCompleted[signature]);
@@ -71,6 +54,7 @@ contract Splurge is ReentrancyGuard {
 
         uint256 tranche = order.amount / order.tranches;
         input.transferFrom(order.recipient, address(this), tranche);
+
         if (order.inputTokenAddy == address(wETH)) {
             tranche = feeToSender();
         }
@@ -97,14 +81,6 @@ contract Splurge is ReentrancyGuard {
         return outputAmount;
     }
 
-    function verifyTrade(
-        bytes memory message,
-        bytes memory signature
-    ) public pure returns (address) {
-        bytes32 hashedMessage = keccak256(abi.encodePacked(message));
-        return ECDSA.recover(hashedMessage, signature);
-    }
-
     function feeToSender() private returns (uint256) {
         uint256 balance = wETH.balanceOf(address(this));
 
@@ -114,6 +90,46 @@ contract Splurge is ReentrancyGuard {
         (bool success, ) = payable(msg.sender).call{ value: fee }("");
         if (!success) revert feeTransferFailed(balance, fee);
         return balance - fee;
+    }
+
+    function getSigner(
+        SplurgeOrderStruct memory order,
+        bytes memory _signature
+    ) public pure returns (address) {
+        // EIP721 domain type
+        string memory name = "Splurge Finance";
+        string memory version = "1";
+        uint256 chainId = 1;
+        address verifyingContract = 0xCcCCccccCCCCcCCCCCCcCcCccCcCCCcCcccccccC; // address(this);
+
+        // stringified types
+        string
+            memory domainType = "EIP712Domain(string name,string version,uint256 chainId,address verifyingContract)";
+        string
+            memory messageType = "conditionalOrder(address inputTokenAddress,address outputTokenAddress,address recipient,uint256 amount,uint256 tranches,uint256 percentChange,uint256 priceAvg,uint256 deadline,uint256 timeBwTrade,uint256 slippage,uint256 salt)";
+
+        // hash to prevent signature collision
+        bytes32 domainSeperator = keccak256(
+            abi.encode(
+                keccak256(abi.encodePacked(domainType)),
+                keccak256(abi.encodePacked(name)),
+                keccak256(abi.encodePacked(version)),
+                chainId,
+                verifyingContract
+            )
+        );
+
+        // hash typed data
+        bytes32 hash = keccak256(
+            abi.encodePacked(
+                "\x19\x01", // backslash is needed to escape the character
+                domainSeperator,
+                keccak256(
+                    abi.encode(keccak256(abi.encodePacked(messageType)), order)
+                )
+            )
+        );
+        return ECDSA.recover(hash, _signature);
     }
 
     receive() external payable {}

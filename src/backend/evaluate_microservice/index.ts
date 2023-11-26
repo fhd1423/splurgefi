@@ -1,12 +1,118 @@
 const axios = require('axios');
 const { createClient } = require('@supabase/supabase-js');
 import { ethers, JsonRpcProvider, Contract } from 'ethers';
+import { Address, decodeFunctionData, encodeFunctionData } from 'viem';
+import ExAbi from './zeroexabi';
+import splurgeAbi from './splurgeAbi';
 
 //Set global API & Client Instances
 const supabase = createClient(
   'https://gmupexxqnzrrzozcovjp.supabase.co',
   'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImdtdXBleHhxbnpycnpvemNvdmpwIiwicm9sZSI6InNlcnZpY2Vfcm9sZSIsImlhdCI6MTY5OTIxOTEyNywiZXhwIjoyMDE0Nzk1MTI3fQ.iF0xiz-vE5tx52u4soGJbEtGHtIB_EyQFFU_eB5dVak',
 );
+const WETH = '0x9c3C9283D3e44854697Cd22D3Faa240Cfb032889'; //wmatic for now
+
+type TransformERC20 = [
+  string, // First address
+  string, // Second address
+  bigint, // First big integer
+  bigint, // Second big integer
+  Array<{
+    deploymentNonce: number;
+    data: string;
+  }>,
+];
+
+type SwapDataStruct = {
+  inputTokenAddress: Address;
+  outputTokenAddress: Address;
+  recipient: Address;
+  amount: number;
+  tranches: number;
+  percentChange: number;
+  priceAvg: number;
+  deadline: number;
+  timeBwTrade: number;
+  slippage: number;
+  salt: number;
+};
+async function fetchQuote(
+  pair: {
+    input: string;
+    output: string;
+    amount: string;
+  },
+  apiKey: string,
+  apiUrl: string,
+) {
+  const url = `${apiUrl}buyToken=${pair.output}&sellToken=${pair.input}&sellAmount=${pair.amount}`;
+  const headers = { '0x-api-key': apiKey };
+  const response = await axios.get(url, { headers });
+
+  return response.data;
+}
+
+async function generateZeroExStruct(
+  inputTokenAddress: Address,
+  outputTokenAddress: Address,
+  trancheToSell: number,
+) {
+  const res = await fetchQuote(
+    {
+      input: inputTokenAddress,
+      output: outputTokenAddress,
+      amount: String(trancheToSell),
+    },
+    '0631b1fa-5205-42d3-89ef-c4e8ea3538fe',
+    'https://mumbai.api.0x.org/swap/v1/quote?',
+  );
+
+  const typedArgs = decodeFunctionData({
+    abi: ExAbi,
+    data: res.data,
+  }).args as TransformERC20;
+
+  const object = typedArgs[4].map(({ deploymentNonce, data }) => [
+    deploymentNonce,
+    data,
+  ]);
+
+  return [typedArgs[3], object]; // (uint256,(uint32, bytes)[])
+}
+
+const encodeInput = async (SwapData: SwapDataStruct, signature: string) => {
+  const splurgeOrderStruct = [
+    SwapData.inputTokenAddress, // inputTokenAddy
+    SwapData.outputTokenAddress, // outputTokenAddy
+    SwapData.recipient, // recipient
+    BigInt(SwapData.amount), // amount
+    BigInt(SwapData.tranches), // tranches
+    BigInt(SwapData.percentChange), // percent change
+    BigInt(SwapData.priceAvg), // priceAvg
+    BigInt(SwapData.deadline), // deadline
+    BigInt(SwapData.timeBwTrade), // time between trades
+    BigInt(SwapData.slippage), // slippage
+    BigInt(SwapData.salt), // salt
+  ];
+
+  let trancheToSell = Math.floor(SwapData.amount / SwapData.tranches);
+  if (SwapData.inputTokenAddress == WETH) {
+    trancheToSell = Math.floor(trancheToSell * 0.995);
+  }
+  const zeroExSwapStruct = await generateZeroExStruct(
+    SwapData.inputTokenAddress,
+    SwapData.outputTokenAddress,
+    trancheToSell,
+  );
+
+  const data = encodeFunctionData({
+    abi: splurgeAbi,
+    functionName: 'verifyExecuteTrade',
+    args: [splurgeOrderStruct, signature, zeroExSwapStruct],
+  });
+
+  return data;
+};
 
 // Fetch all events based on signature
 const getContractLogEvents = async (signature: string) => {
@@ -212,10 +318,9 @@ const updateTrades = async () => {
         console.log(`error with ${pair}`);
         break;
       }
-      // Convert each string to a float and calculate the sum
-      let sum = allMeanPrices.reduce((acc: any, val: number) => acc + val, 0);
-      // Calculate the average
-      let movingAveragePrice = sum / allMeanPrices.length;
+      let movingAveragePrice =
+        allMeanPrices.reduce((acc: any, val: any) => acc + Number(val), 0) /
+        allMeanPrices.length;
 
       const current_time = new Date().getTime(); // UNIX timestamp
       const mostRecentBatch = Object.keys(trade.batch_timings).length;
@@ -223,10 +328,9 @@ const updateTrades = async () => {
       const timeBetweenBatches = trade.time_bw_batches;
 
       // Get swap call data
-      const callData = getSwapCallData(
-        trade.order.inputTokenAddy,
-        trade.order.outputTokenAddy,
-        trade.order.amount,
+      const callData = await encodeInput(
+        trade.order as SwapDataStruct,
+        trade.signature,
       );
 
       // Only mark trade as ready if time between batches is satisfied
