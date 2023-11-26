@@ -20,6 +20,7 @@ import { useDynamicContext } from '@dynamic-labs/sdk-react-core';
 import { supabase } from '../components/client';
 import NavBar from '../components/NavBar';
 import LineChart from '@/components/LineChart';
+import Alert from '@mui/material/Alert';
 import { useSignTypedData } from 'wagmi';
 
 export default function Automate() {
@@ -239,7 +240,7 @@ export default function Automate() {
                 />
               </Grid>
               <Grid item xs={4}>
-                <TradeSelector title='Trade based on' />
+                <TradeSelector title='Moving Avg.' />
               </Grid>
               <Grid item xs={4}>
                 <CustomDatePicker
@@ -299,9 +300,10 @@ export default function Automate() {
               </Grid>
             </Grid>
           </Paper>
-          <LineChart />
+          {/* <LineChart /> */}
         </Box>
-        <div className='text-red-500 mt-2'>{userInputError}</div>
+        {/* <div className='text-red-500 mt-2'>{userInputError}</div> */}
+        {userInputError && <Alert severity='error'>{userInputError}</Alert>}
       </div>
     </LocalizationProvider>
   );

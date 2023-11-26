@@ -9,10 +9,10 @@
     "lint": "next lint"
   },
   "dependencies": {
-    "@dynamic-labs/wagmi-connector": "^0.19.3",
     "@dynamic-labs/ethereum": "^0.19.0",
     "@dynamic-labs/ethers-v5": "^0.19.0",
     "@dynamic-labs/sdk-react-core": "^0.19.0",
+    "@dynamic-labs/wagmi-connector": "^0.19.3",
     "@dynamic-labs/wallet-book": "^0.19.0",
     "@emotion/cache": "^11.11.0",
     "@emotion/react": "^11.11.1",
