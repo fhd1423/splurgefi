@@ -12,8 +12,8 @@ import Typography from '@mui/material/Typography';
 const CustomFormControl = styled(FormControl)({
   backgroundColor: '#1B1B1B',
   borderRadius: '10px',
-  width: '340px',
-  height: '90px',
+  width: '130px',
+  height: '55px',
   display: 'flex',
   flexDirection: 'row',
   alignItems: 'center',
@@ -28,7 +28,7 @@ const CustomSelect = styled(Select)({
     lineHeight: '80px', // Center the text vertically
     paddingLeft: '10px', // Give some space from the left side
     paddingRight: '32px', // Make room for the icon
-    fontSize: '1.25rem',
+    fontSize: '1.2rem',
   },
   '& .MuiSelect-icon': {
     display: 'none', // Hide the default icon
@@ -41,12 +41,9 @@ const CustomSelect = styled(Select)({
 export default function TradeSelector({
   selectedTradeAction,
   onTradeActionChange,
+  title,
 }) {
   const [open, setOpen] = useState(false);
-
-  const handleChange = (event) => {
-    onTradeActionChange(event.target.value); // This should call the handler passed from step-two.js
-  };
 
   // Function to toggle the select dropdown
   const toggleDropdown = () => {
@@ -58,33 +55,34 @@ export default function TradeSelector({
       <Typography
         variant='subtitle1'
         color='white'
-        fontWeight='600'
+        fontWeight='500'
         gutterBottom
-        style={{ marginBottom: '8px', textAlign: 'left' }}
+        style={{ marginBottom: '3px', fontSize: '1rem', textAlign: 'left' }}
       >
-        Trade
+        {title}
       </Typography>
       <CustomFormControl fullWidth>
         <CustomSelect
           open={open}
           value={selectedTradeAction}
-          onChange={handleChange}
           onClose={() => setOpen(false)}
           onOpen={() => setOpen(true)}
           displayEmpty
           IconComponent={KeyboardArrowDownIcon}
         >
-          <MenuItem value={'Buy output token'}>Buy output token</MenuItem>
-          <MenuItem value={'Sell input token'}>Sell input token</MenuItem>
+          <MenuItem value={15}>15 min</MenuItem>
+          <MenuItem value={240}>4 hr</MenuItem>
+          <MenuItem value={480}>8 hr</MenuItem>
+          <MenuItem value={1440}>24 hr</MenuItem>
         </CustomSelect>
         <IconButton
-          onClick={toggleDropdown} // Use the function to toggle dropdown
+          onClick={toggleDropdown}
           sx={{
             position: 'absolute',
             top: '50%',
             right: 10,
             transform: 'translateY(-50%)',
-            color: '#27ae60', // Green color for the icon
+            color: '#FFFFFF',
             backgroundColor: 'transparent',
           }}
         >

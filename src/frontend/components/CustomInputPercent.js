@@ -1,53 +1,30 @@
 import React from 'react';
 import { styled } from '@mui/system';
 import InputBase from '@mui/material/InputBase';
-import Typography from '@mui/material/Typography';
-import Select from '@mui/material/Select';
-import MenuItem from '@mui/material/MenuItem';
-import KeyboardArrowDownIcon from '@mui/icons-material/KeyboardArrowDown';
+import ArrowDropUpIcon from '@mui/icons-material/ArrowDropUp';
+import ArrowDropDownIcon from '@mui/icons-material/ArrowDropDown';
+import { Typography } from '@mui/material';
 
-// Custom styles for the input container
+// Entire input container (includes icon and textfield)
 const CustomInputContainer = styled('div')({
   display: 'flex',
   alignItems: 'center',
   backgroundColor: '#1B1B1B',
   borderRadius: '10px',
-  width: '160px',
-  height: '90px',
+  width: '130px',
+  height: '55px',
 });
 
-// Custom styles for the input component
+// Custom styles for textfield component
 const CustomInput = styled(InputBase)({
   color: 'white',
-  fontSize: '1rem', // Adjust the font size if necessary
+  fontSize: '1.75rem',
   '& .MuiInputBase-input': {
     textAlign: 'center',
-    padding: '0 10px', // Padding for spacing
-    width: 'calc(100% - 40px)', // Adjust width to make room for select
+    padding: '0 10px',
+    width: 'calc(100% - 35px)', // Adjust the width as necessary
     height: '100%',
   },
-});
-
-// Custom styles for the select component
-const CustomSelect = styled(Select)({
-  color: 'white',
-  '& .MuiSelect-select': {
-    paddingRight: '8px', // Reduced padding
-    paddingLeft: '8px', // Reduced padding
-    minWidth: '40px', // Set a minimum width for the selector
-    height: '100%', // Match the height of the input
-    fontSize: '1rem', // Keep the font size consistent with the input
-  },
-  '& .MuiSelect-icon': {
-    color: 'white', // White color for the dropdown icon
-    top: '50%',
-    transform: 'translateY(-50%)',
-  },
-  '& .MuiOutlinedInput-notchedOutline': {
-    border: 'none', // Remove the outline
-  },
-  margin: '0', // Remove margins
-  borderRadius: '0 10px 10px 0', // Only round the right corners
 });
 
 export default function CustomInputPercent({
@@ -55,30 +32,25 @@ export default function CustomInputPercent({
   placeHolder,
   value,
   onValueChange,
-  onSelectorChange, // New prop for handling changes in the selector
-  selectorValue, // New prop for the value of the selector
+  isUpSelected, // Boolean variable to determine the icon state
 }) {
   return (
     <div>
       <Typography
         variant='subtitle1'
         color='white'
-        fontWeight='600'
+        fontWeight='500'
         gutterBottom
-        style={{ marginBottom: '8px', textAlign: 'left' }}
+        style={{ marginBottom: '3px', fontSize: '1rem', textAlign: 'left' }}
       >
         {title}
       </Typography>
       <CustomInputContainer>
-        <CustomSelect
-          value={selectorValue}
-          onChange={onSelectorChange}
-          displayEmpty
-          IconComponent={KeyboardArrowDownIcon} // Make sure to import this
-        >
-          <MenuItem value='+'>+</MenuItem>
-          <MenuItem value='-'>-</MenuItem>
-        </CustomSelect>
+        {isUpSelected ? (
+          <ArrowDropUpIcon fontSize='large' style={{ color: 'white' }} />
+        ) : (
+          <ArrowDropDownIcon fontSize='large' style={{ color: 'white' }} />
+        )}
         <CustomInput
           placeholder={placeHolder}
           value={value}

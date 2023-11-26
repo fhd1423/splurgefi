@@ -20,12 +20,17 @@ const customDatePickerTheme = createTheme({
         root: {
           input: {
             color: '#ffffff',
-            height: '70px',
-            padding: '10px 14px',
-            fontSize: '1.25rem', // Adjust the font size as needed
+            height: '35px',
+            width: '80px',
+            padding: '10px 14px 10px 0',
+            fontSize: '1rem', // Adjust the font size as needed
           },
           '& .MuiInputLabel-root': {
             color: '#ffffff',
+          },
+          '& .MuiInputBase-input': {
+            paddingRight: '0px', // Reduces padding on the right side of the input
+            paddingLeft: '10px',
           },
           '& .MuiOutlinedInput-root': {
             backgroundColor: '#1B1B1B',
@@ -34,6 +39,17 @@ const customDatePickerTheme = createTheme({
               borderColor: 'transparent',
             },
           },
+        },
+      },
+    },
+    MuiInputAdornment: {
+      styleOverrides: {
+        // positionStart: {
+        //   marginRight: "-12px", // Adjust this value to bring the icon closer to the text
+        // },
+        root: {
+          marginLeft: '0px', // Reduces the default margin on the left side of the adornment
+          marginRight: '0px', // Optionally, reduces the margin on the right side if needed
         },
       },
     },
@@ -53,11 +69,11 @@ const CustomDatePicker = ({ selectedDate, setSelectedDate }) => {
       <Typography
         variant='subtitle1'
         color='white'
-        fontWeight='600'
+        fontWeight='500'
         gutterBottom
-        style={{ marginBottom: '8px', textAlign: 'left' }}
+        style={{ marginBottom: '3px', textAlign: 'left' }}
       >
-        Automation Deadline
+        Deadline
       </Typography>
       <DatePicker
         value={selectedDate}

@@ -79,7 +79,7 @@ const CustomMenuItem = styled(MenuItem)({
   },
 });
 
-export default function CustomInputToken({
+export default function TokenSelector({
   title,
   options,
   onValueChange,
@@ -88,21 +88,21 @@ export default function CustomInputToken({
   // Local state for the input's value
   const [value, setValue] = useState('');
 
-  // ADD THIS LINE: Local state for the selected token's value
+  // Local state for the selected token's value
   const [selectedValue, setSelectedValue] = useState('');
 
   // Update local state and lift up the value when it changes
   const handleInputChange = (event) => {
     const newValue = event.target.value;
     setValue(newValue);
-    onValueChange(newValue); // Lift up the new value
+    onValueChange(newValue); // Send to parent view
   };
 
   // Lift up the selected token when it changes
   const handleSelectChange = (event) => {
     const newToken = event.target.value;
     setSelectedValue(newToken);
-    onSelectChange(newToken); // Lift up the selected token
+    onSelectChange(newToken); // Send to parent view
   };
 
   return (
@@ -117,11 +117,7 @@ export default function CustomInputToken({
         {title}
       </Typography>
       <CustomInputContainer>
-        <CustomInput
-          placeholder='0'
-          value={value}
-          onChange={handleInputChange}
-        />
+        <CustomInput placeholder='Token' value={selectedValue} />
         <CustomFormControl variant='standard'>
           <CustomSelect
             value={selectedValue}

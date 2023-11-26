@@ -9,6 +9,7 @@ import {
   DynamicContextProvider,
   DynamicWidget,
 } from '@dynamic-labs/sdk-react-core';
+import { DynamicWagmiConnector } from '@dynamic-labs/wagmi-connector';
 import { EthereumWalletConnectors } from '@dynamic-labs/ethereum';
 const cache = createEmotionCache();
 
@@ -26,8 +27,10 @@ function MyApp({ Component, pageProps }) {
               'Welcome to Splurge! Signing this gas-free message verifies you as the owner of this wallet. In no way does this give Splurge to do anything on your behalf. We will reach out to you soon!',
           }}
         >
-          <CssBaseline />
-          <Component {...pageProps} />
+          <DynamicWagmiConnector>
+            <CssBaseline />
+            <Component {...pageProps} />
+          </DynamicWagmiConnector>
         </DynamicContextProvider>
       </ThemeProvider>
     </CacheProvider>
