@@ -99,7 +99,14 @@ export default function TradeSelector({
         disableRestoreFocus
       >
         {/* <Typography sx={{ p: 1 }}>I use Popover.</Typography> */}
-        <LineChart />
+        <div
+          style={{
+            width: '500px',
+            height: '300px',
+          }}
+        >
+          <LineChart />
+        </div>
       </Popover>
       <CustomFormControl fullWidth>
         <CustomSelect
