@@ -21,7 +21,7 @@ const customDatePickerTheme = createTheme({
           input: {
             color: '#ffffff',
             height: '35px',
-            width: '80px',
+            width: '160px',
             padding: '10px 14px 10px 0',
             fontSize: '1rem', // Adjust the font size as needed
           },

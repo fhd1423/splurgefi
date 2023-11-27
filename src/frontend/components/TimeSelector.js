@@ -7,14 +7,12 @@ import { styled } from '@mui/system';
 import IconButton from '@mui/material/IconButton';
 import KeyboardArrowDownIcon from '@mui/icons-material/KeyboardArrowDown';
 import Typography from '@mui/material/Typography';
-import Popover from '@mui/material/Popover';
-import LineChart from './LineChart';
 
 // Custom styles for the form control
 const CustomFormControl = styled(FormControl)({
   backgroundColor: '#1B1B1B',
   borderRadius: '10px',
-  width: '130px',
+  width: '205px',
   height: '55px',
   display: 'flex',
   flexDirection: 'row',
@@ -27,40 +25,29 @@ const CustomFormControl = styled(FormControl)({
 const CustomSelect = styled(Select)({
   '& .MuiSelect-select': {
     color: 'white',
-    lineHeight: '80px',
-    paddingLeft: '10px',
-    paddingRight: '32px',
+    lineHeight: '80px', // Center the text vertically
+    paddingLeft: '10px', // Give some space from the left side
+    paddingRight: '32px', // Make room for the icon
     fontSize: '1.2rem',
   },
   '& .MuiSelect-icon': {
-    display: 'none',
+    display: 'none', // Hide the default icon
   },
   '& .MuiOutlinedInput-notchedOutline': {
     border: 'none',
   },
 });
 
-export default function TradeSelector({
+export default function TimeSelector({
   selectedTradeAction,
   onTradeActionChange,
   title,
 }) {
-  const [anchorEl, setAnchorEl] = useState(null);
-  const [selectOpen, setSelectOpen] = useState(false);
-
-  const handlePopoverOpen = (event) => {
-    setAnchorEl(event.currentTarget);
-  };
-
-  const handlePopoverClose = () => {
-    setAnchorEl(null);
-  };
-
-  const popoverOpen = Boolean(anchorEl);
+  const [open, setOpen] = useState(false);
 
   // Function to toggle the select dropdown
   const toggleDropdown = () => {
-    setSelectOpen((prev) => !prev);
+    setOpen((prev) => !prev);
   };
 
   return (
@@ -71,50 +58,23 @@ export default function TradeSelector({
         fontWeight='500'
         gutterBottom
         style={{ marginBottom: '3px', fontSize: '1rem', textAlign: 'left' }}
-        aria-owns={popoverOpen ? 'mouse-over-popover' : undefined}
-        aria-haspopup='true'
-        onMouseEnter={handlePopoverOpen}
-        onMouseLeave={handlePopoverClose}
       >
         {title}
       </Typography>
-      <Popover
-        id='mouse-over-popover'
-        sx={{
-          pointerEvents: 'none',
-          width: '500px',
-          height: '500px',
-        }}
-        open={popoverOpen}
-        anchorEl={anchorEl}
-        anchorOrigin={{
-          vertical: 'bottom',
-          horizontal: 'left',
-        }}
-        transformOrigin={{
-          vertical: 'top',
-          horizontal: 'left',
-        }}
-        onClose={handlePopoverClose}
-        disableRestoreFocus
-      >
-        {/* <Typography sx={{ p: 1 }}>I use Popover.</Typography> */}
-        <LineChart />
-      </Popover>
       <CustomFormControl fullWidth>
         <CustomSelect
-          open={selectOpen}
+          open={open}
           value={selectedTradeAction}
-          onClose={() => setSelectOpen(false)}
-          onOpen={() => setSelectOpen(true)}
+          onClose={() => setOpen(false)}
+          onOpen={() => setOpen(true)}
           displayEmpty
           IconComponent={KeyboardArrowDownIcon}
           onChange={(event) => onTradeActionChange(event.target.value)}
         >
-          <MenuItem value={15}>15 min</MenuItem>
-          <MenuItem value={240}>4 hr</MenuItem>
-          <MenuItem value={480}>8 hr</MenuItem>
-          <MenuItem value={1440}>24 hr</MenuItem>
+          <MenuItem value={15}>15 mins</MenuItem>
+          <MenuItem value={240}>4 hrs</MenuItem>
+          <MenuItem value={480}>8 hrs</MenuItem>
+          <MenuItem value={1440}>24 hrs</MenuItem>
         </CustomSelect>
         <IconButton
           onClick={toggleDropdown}

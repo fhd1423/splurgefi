@@ -1,85 +1,31 @@
 'use client';
 
 import React, { useState, useEffect } from 'react';
+import { Box, Grid, Paper, Typography, Alert } from '@mui/material';
 import Head from 'next/head';
+import dayjs from 'dayjs';
+import router from 'next/router';
+
+// MUI Date Picker Imports
+import { LocalizationProvider } from '@mui/x-date-pickers/LocalizationProvider';
+import { AdapterDayjs } from '@mui/x-date-pickers/AdapterDayjs';
+
+// Custom Component Imports
 import CustomInputToken from '../components/CustomInputToken';
 import TokenSelector from '../components/TokenSelector';
 import CustomToggle from '../components/CustomToggle';
-import { Typography, Box } from '@mui/material';
-import router from 'next/router';
-import Paper from '@mui/material/Paper';
-import Grid from '@mui/material/Grid';
 import CustomInputPercent from '../components/CustomInputPercent';
 import CustomInputBatches from '../components/CustomInputBatches';
 import TradeSelector from '../components/TradeSelector';
-import dayjs from 'dayjs';
 import CustomDatePicker from '@/components/CustomDatePicker';
-import { LocalizationProvider } from '@mui/x-date-pickers/LocalizationProvider';
-import { AdapterDayjs } from '@mui/x-date-pickers/AdapterDayjs';
+import TimeSelector from '@/components/TimeSelector';
+import NavBar from '../components/NavBar';
+
+// SDK & Client Imports
 import { useDynamicContext } from '@dynamic-labs/sdk-react-core';
 import { supabase } from '../components/client';
-import NavBar from '../components/NavBar';
-import LineChart from '@/components/LineChart';
-import Alert from '@mui/material/Alert';
-import { useSignTypedData } from 'wagmi';
 
 export default function Automate() {
-  const [message, setMessage] = useState({
-    inputTokenAddress: '0x9c3C9283D3e44854697Cd22D3Faa240Cfb032889', // WETH
-    outputTokenAddress: '0x52C6CCc28C9B5f0f4F37b61316CD4F14C2D4197D', // GROK
-    recipient: '0xBb6AeaBdf61Ca96e80Aa239bA8cC7e436862E596',
-    amount: 1, // Input token scaled(18 decimal places)
-    tranches: 1,
-    percentChange: 1,
-    priceAvg: 1,
-    deadline: 1,
-    timeBwTrade: 1,
-    slippage: 1,
-    salt: 1,
-  });
-
-  const { data, isError, isLoading, isSuccess, signTypedData } =
-    useSignTypedData({
-      domain: {
-        name: 'Splurge Finance',
-        version: '1',
-        chainId: 1,
-        verifyingContract: '0xCcCCccccCCCCcCCCCCCcCcCccCcCCCcCcccccccC', //CHANGE: to Splurge Addy
-      },
-      types: {
-        conditionalOrder: [
-          { name: 'inputTokenAddress', type: 'address' },
-          { name: 'outputTokenAddress', type: 'address' },
-          { name: 'recipient', type: 'address' },
-          { name: 'amount', type: 'uint256' },
-          { name: 'tranches', type: 'uint256' },
-          { name: 'percentChange', type: 'uint256' },
-          { name: 'priceAvg', type: 'uint256' },
-          { name: 'deadline', type: 'uint256' },
-          { name: 'timeBwTrade', type: 'uint256' },
-          { name: 'slippage', type: 'uint256' },
-          { name: 'salt', type: 'uint256' },
-        ],
-      },
-      primaryType: 'conditionalOrder',
-      message,
-
-      async onSuccess(data, err) {
-        await supabase.from('Trades').insert([
-          {
-            user: primaryWallet.address,
-            pair: path,
-            order: message,
-            signature: data,
-          },
-        ]);
-      },
-
-      onError(data, error) {
-        console.log('Error', { data, error });
-      },
-    });
-
   // Sample options for testing
   const outputOptions = [
     { label: 'GROK', value: '0x8390a1DA07E376ef7aDd4Be859BA74Fb83aA02D5' },
@@ -97,9 +43,24 @@ export default function Automate() {
   const path =
     '0x9c3C9283D3e44854697Cd22D3Faa240Cfb032889-0x52C6CCc28C9B5f0f4F37b61316CD4F14C2D4197D';
 
-  const [toggleSelection, setToggleSelection] = useState('buy');
+  // State to hold input values
+  const [inputTokenValue, setInputTokenValue] = useState('');
+  const [outputTokenValue, setOutputTokenValue] = useState('');
+  const [selectedTradeAction, setSelectedTradeAction] = useState('');
+  const [selectedTimeBwTrade, setSelectedTimeBwTrade] = useState('');
+
+  const [batchValue, setBatchValue] = useState('');
+  const [slippageValue, setSlippageValue] = useState('');
   const [selectedDate, setSelectedDate] = useState(dayjs());
 
+  // State to hold selected tokens
+  const [inputToken, setInputToken] = useState('');
+  const [outputToken, setOutputToken] = useState('');
+
+  const [toggleSelection, setToggleSelection] = useState('buy');
+
+  // States for percent change and selected value
+  const [percentChange, setPercentChange] = useState('');
   const [isWalletConnected, setIsWalletConnected] = useState(false);
 
   // Access setShowAuthFlow and primaryWallet from useDynamicContext
@@ -108,35 +69,66 @@ export default function Automate() {
   // State for error messages
   const [userInputError, setUserInputError] = useState('');
 
-  // Generic handler for message state updates
-  const handleMessageChange = (field, value) => {
-    setMessage((prevMessage) => ({
-      ...prevMessage,
-      [field]: value,
-    }));
+  const validateInputs = () => {
+    let isValid = true;
+    if (
+      !inputToken ||
+      !outputToken ||
+      !inputTokenValue ||
+      !percentChange ||
+      !batchValue ||
+      !selectedTradeAction ||
+      !selectedDate ||
+      !selectedTimeBwTrade ||
+      !slippageValue
+    ) {
+      setUserInputError('Please make sure all inputs are filled.');
+      isValid = false;
+    } else {
+      setUserInputError('');
+    }
+
+    return isValid;
   };
 
-  // Example of how to use handleMessageChange
-  // handleMessageChange('inputTokenAddress', 'newAddress');
+  // Input token addy - Rollbit
+  const inputTokenAddy = '0x046EeE2cc3188071C02BfC1745A6b17c656e3f3d';
+  const outputTokenAddy = '0xC02aaA39b223FE8D0A0e5C4F27eAD9083C756Cc2';
 
-  // Validation function
-  const validateInputs = () => {
-    const fields = [
-      'inputTokenAddress',
-      'outputTokenAddress',
-      'recipient',
-      'amount',
-      'tranches',
-      'percentChange',
-      'priceAvg',
-      'deadline',
-      'timeBwTrade',
-      'slippage',
-      'salt',
-    ];
-    const isValid = fields.every((field) => message[field]);
-    setUserInputError(isValid ? '' : 'Please make sure all inputs are filled.');
-    return isValid;
+  // Handlers to update the state
+  const handleInputTokenChange = (value) => {
+    console.log('Input Token Value:', value);
+    setInputTokenValue(value);
+  };
+
+  const handleOutputTokenChange = (value) => {
+    console.log('Output Token Value:', value);
+    setOutputTokenValue(value);
+  };
+
+  const handleInputTokenSelect = (token) => {
+    console.log('Input Token Selected:', token);
+    setInputToken(token);
+  };
+
+  const handleOutputTokenSelect = (token) => {
+    console.log('Output Token Selected:', token);
+    setOutputToken(token);
+  };
+
+  const handleTradeActionChange = (action) => {
+    console.log('Selected Trade:', action);
+    setSelectedTradeAction(action);
+  };
+
+  const handleTimeBwTradeChange = (action) => {
+    console.log('Selected time bw trades:', action);
+    setSelectedTimeBwTrade(action);
+  };
+
+  const handlePercentChange = (event) => {
+    console.log('Selected percent change:', event);
+    setPercentChange(event.target.value);
   };
 
   // Listen for changes in primaryWallet
@@ -151,6 +143,133 @@ export default function Automate() {
     // Additional logic can be added here if needed
   };
 
+  const uploadConditionalOrder = async () => {
+    try {
+      const generateRandomSalt = () => {
+        const randomBytes = new Uint8Array(64); // Generating 64 random bytes
+        crypto.getRandomValues(randomBytes);
+        return randomBytes;
+      };
+
+      const unixTimestamp = selectedDate.unix(); // Unix timestamp in seconds
+      const signer = await primaryWallet.connector.getSigner();
+      let selectedPercentChange = parseInt(percentChange, 10);
+      let selectedPriceAverage = parseInt(selectedTradeAction, 10);
+      let selectedAmount = inputTokenValue;
+
+      // Step 1: Parse the Decimal Value
+      const [wholePart, decimalPartRaw] = selectedAmount.includes('.')
+        ? selectedAmount.split('.')
+        : [selectedAmount, ''];
+      // Step 2: Normalize Decimal Part
+      const decimalPart = decimalPartRaw.padEnd(18, '0'); // Add trailing zeros to make it 18 decimal places
+      // Step 3: Convert to Integer
+      const wholePartBigInt = BigInt(wholePart);
+      const decimalPartBigInt = BigInt(decimalPart);
+      // Step 4: Scale to Blockchain Format
+      let amountInWei =
+        wholePartBigInt * BigInt(10) ** BigInt(18) + decimalPartBigInt;
+
+      const generatedSalt = generateRandomSalt();
+      const intBatches = parseInt(batchValue, 10);
+      const intTimeBwTrade = parseInt(selectedTimeBwTrade, 10);
+      const intSlippage = parseInt(slippageValue, 10);
+
+      //Sign Payload, send payload and signature to backend
+      const signature = await signer.signTypedData({
+        account: primaryWallet.address,
+        domain: {
+          name: 'Splurge Finance',
+          version: '1',
+          chainId: 1,
+          verifyingContract: '0xCcCCccccCCCCcCCCCCCcCcCccCcCCCcCcccccccC', //CHANGE: to Splurge Addy
+        },
+        types: {
+          conditionalOrder: [
+            { name: 'inputTokenAddress', type: 'address' },
+            { name: 'outputTokenAddress', type: 'address' },
+            { name: 'recipient', type: 'address' },
+            { name: 'orderType', type: 'string' },
+            { name: 'amount', type: 'uint256' },
+            { name: 'tranches', type: 'uint256' },
+            { name: 'percentChange', type: 'uint256' },
+            { name: 'priceAvg', type: 'uint256' },
+            { name: 'deadline', type: 'uint256' },
+            { name: 'timeBwTrade', type: 'uint256' },
+            { name: 'slippage', type: 'uint256' },
+            { name: 'salt', type: 'bytes' },
+          ],
+        },
+        primaryType: 'conditionalOrder',
+        message: {
+          inputTokenAddress: '0xC02aaA39b223FE8D0A0e5C4F27eAD9083C756Cc2', // WETH
+          outputTokenAddress: '0x8390a1DA07E376ef7aDd4Be859BA74Fb83aA02D5', // GROK
+          recipient: '0xBb6AeaBdf61Ca96e80Aa239bA8cC7e436862E596',
+          orderType: toggleSelection,
+          amount: amountInWei, // Input token scaled(18 decimal places)
+          tranches: intBatches,
+          percentChange: selectedPercentChange,
+          priceAvg: selectedPriceAverage,
+          deadline: unixTimestamp,
+          timeBwTrade: intTimeBwTrade,
+          slippage: intSlippage,
+          salt: generatedSalt,
+        },
+      });
+
+      async function uploadData() {
+        try {
+          // Retrieve and store data to be uploaded to database
+          const currentTimestamp = new Date().toISOString();
+          const orderData = {
+            inputTokenAddy: inputToken,
+            outputTokenAddy: outputToken,
+            recipient: primaryWallet.address,
+            orderType: toggleSelection,
+            amount: amountInWei,
+            tranches: intBatches,
+            percentChange: selectedPercentChange,
+            priceAvg: selectedPriceAverage,
+            deadline: unixTimestamp,
+            timeBwTrade: intTimeBwTrade,
+            slippage: intSlippage,
+            salt: generatedSalt,
+          };
+
+          console.log('Order Data:', orderData);
+
+          const { data, error } = await supabase.from('Trades').insert([
+            {
+              created_at: currentTimestamp,
+              user: primaryWallet.address,
+              pair: path,
+              order: orderData,
+              signature: signature,
+              complete: false,
+              ready: false,
+              batches: intBatches,
+              percent_change:
+                toggleSelection === 'buy'
+                  ? '-' + percentChange + '%'
+                  : '+' + percentChange + '%',
+              deadline: selectedDate.toISOString(),
+              remainingBatches: intBatches,
+              time_bw_batches: intTimeBwTrade,
+              slippage: intSlippage,
+            },
+          ]);
+        } catch (error) {
+          console.error('Error uploading data to Supabase:', error);
+        }
+      }
+      uploadData();
+      router.push('/trades');
+    } catch (error) {
+      console.error('Error during signature or data upload:', error);
+      // setErrorMessage("Signature denied or failed to upload data. Please try again.");
+    }
+  };
+
   return (
     <LocalizationProvider dateAdapter={AdapterDayjs}>
       <NavBar inTradesPage={false} />
@@ -160,7 +279,6 @@ export default function Automate() {
           <title>Step One</title>
           <link rel='icon' href='/favicon.ico' />
         </Head>
-
         <Box
           sx={{
             width: 500,
@@ -194,7 +312,8 @@ export default function Automate() {
                   options={
                     toggleSelection === 'buy' ? inputOptions : outputOptions
                   }
-                  onValueChange={(e) => handleMessageChange('amount', e)}
+                  onValueChange={handleInputTokenChange}
+                  onSelectChange={handleInputTokenSelect}
                 />
               </Grid>
               <Grid item xs={12}>
@@ -203,19 +322,16 @@ export default function Automate() {
                   options={
                     toggleSelection === 'buy' ? outputOptions : inputOptions
                   }
-                  onValueChange={(e) =>
-                    handleMessageChange('outputTokenAddress', e.target.value)
-                  }
+                  onValueChange={handleOutputTokenChange}
+                  onSelectChange={handleOutputTokenSelect}
                 />
               </Grid>
               <Grid item xs={4}>
                 {toggleSelection === 'buy' ? (
                   <CustomInputPercent
                     title='Percent Change'
-                    value={message.percentChange}
-                    onValueChange={(e) =>
-                      handleMessageChange('percentChange', e.target.value)
-                    }
+                    value={percentChange}
+                    onValueChange={handlePercentChange}
                     isUpSelected={false} // Pass the derived state to the component
                     placeHolder={'0%'}
                   />
@@ -233,40 +349,29 @@ export default function Automate() {
                 <CustomInputBatches
                   title='Batches'
                   placeHolder={'5'}
-                  value={message.tranches}
-                  onValueChange={(e) =>
-                    handleMessageChange('tranches', e.target.value)
-                  }
+                  value={batchValue}
+                  onValueChange={(e) => setBatchValue(e.target.value)}
                 />
               </Grid>
               <Grid item xs={4}>
-                <TradeSelector title='Moving Avg.' />
+                <TradeSelector
+                  selectedTradeAction={selectedTradeAction}
+                  onTradeActionChange={handleTradeActionChange}
+                  title='Trade based on'
+                />
               </Grid>
-              <Grid item xs={4}>
+              <Grid item xs={6}>
                 <CustomDatePicker
                   selectedDate={selectedDate}
                   setSelectedDate={setSelectedDate}
                 />
               </Grid>
 
-              <Grid item xs={4}>
-                <TradeSelector
-                  selectedTradeAction={message.timeBwTrade}
-                  onTradeActionChange={(e) =>
-                    handleMessageChange('timeBwTrades', e.target.value)
-                  }
+              <Grid item xs={6}>
+                <TimeSelector
+                  selectedTradeAction={selectedTimeBwTrade}
+                  onTradeActionChange={handleTimeBwTradeChange}
                   title='Time bw trades'
-                />
-              </Grid>
-
-              <Grid item xs={4}>
-                <CustomInputBatches
-                  title='Slippage'
-                  placeHolder={'5'}
-                  value={message.slippage}
-                  onValueChange={(e) =>
-                    handleMessageChange('slippage', e.target.value)
-                  }
                 />
               </Grid>
 
@@ -290,7 +395,9 @@ export default function Automate() {
                 ) : (
                   <button
                     onClick={() => {
-                      signTypedData();
+                      if (validateInputs()) {
+                        uploadConditionalOrder();
+                      }
                     }}
                     className='bg-green-500 text-white text-xl font-bold rounded-lg shadow-lg hover:bg-green-600 w-96 h-14 mt-[10px]'
                   >
@@ -300,9 +407,7 @@ export default function Automate() {
               </Grid>
             </Grid>
           </Paper>
-          {/* <LineChart /> */}
         </Box>
-        {/* <div className='text-red-500 mt-2'>{userInputError}</div> */}
         {userInputError && <Alert severity='error'>{userInputError}</Alert>}
       </div>
     </LocalizationProvider>
