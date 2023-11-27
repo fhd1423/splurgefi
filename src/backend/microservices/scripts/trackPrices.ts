@@ -1,6 +1,5 @@
 import { config } from 'dotenv';
 import axios, { AxiosResponse } from 'axios';
-import { createClient } from '@supabase/supabase-js';
 import { supabase } from '../utils/client';
 
 config();
