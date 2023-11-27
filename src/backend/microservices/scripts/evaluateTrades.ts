@@ -1,6 +1,4 @@
 const axios = require('axios');
-import { createClient, SupabaseClient } from '@supabase/supabase-js';
-import { ethers, JsonRpcProvider, Contract } from 'ethers';
 import { Address, decodeFunctionData, encodeFunctionData } from 'viem';
 import ExAbi from '../utils/zeroexabi';
 import splurgeAbi from '../utils/splurgeAbi';
@@ -179,4 +177,5 @@ const updateTrades = async () => {
   }
 };
 
-updateTrades();
+console.log('Continuous evaluation loop started');
+setInterval(updateTrades, 15000);
