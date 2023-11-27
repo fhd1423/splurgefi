@@ -1,27 +1,19 @@
-#Base image for node runtime environment
-FROM node:alpine 
-
-ENV PYTHON=/Library/Frameworks/Python.framework/Versions/3.11/bin/python3
+FROM node:alpine
 
 WORKDIR /app
 
-#Copy/Move package.json dependencies to working directory /app
-COPY package.json .
+# Install Python and other build dependencies
+RUN apk add --update python3 make g++ 
 
-# Install dependencies including TypeScript and build tools
-RUN apk --no-cache add \
-    python3 \
-    make \
-    g++ \
-  && npm install \
-  && npm install -g typescript \
-  && npm install -g concurrently
+# Copy package.json and package-lock.json (if available)
+COPY package*.json ./
 
-# Copy the whole project
+# Install dependencies
+RUN npm install && npm install -g concurrently
+
+
+# Copy the rest of your application
 COPY . .
 
-# Compile TypeScript to JavaScript
-RUN tsc
-
-# Start the application
-CMD ["concurrently", "npm:evalute", "npm:prices"]
+# Set the entrypoint to use concurrently
+ENTRYPOINT ["concurrently", "\"npm:docker-*\""]

@@ -2,15 +2,14 @@
   "dependencies": {
     "@supabase/supabase-js": "^2.38.4",
     "axios": "^1.5.1",
-    "ethers": "^6.8.1",
     "dotenv": "^16.3.1",
-    "node-gyp": "^10.0.1",
-    "ts-node": "^10.9.1"
+    "ethers": "^6.8.1",
+    "ts-node": "^10.9.1",
+    "viem": "^1.19.9"
   },
   "scripts": {
-    "test": "echo",
-    "evaluate": "cd scripts && ts-node evaluateTrades.ts",
-    "update": "cd scripts && ts-node updateTrades.ts",
-    "prices": "cd scripts && ts-node trackPrices.ts"
+    "docker-evaluate": "cd scripts && ts-node evaluateTrades.ts",
+    "WIP-docker-update": "cd scripts && ts-node updateTrades.ts",
+    "docker-prices": "cd scripts && ts-node trackPrices.ts"
   }
 }

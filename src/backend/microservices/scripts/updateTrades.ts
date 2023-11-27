@@ -1,5 +1,4 @@
 const axios = require('axios');
-import { createClient, SupabaseClient } from '@supabase/supabase-js';
 import { ethers, JsonRpcProvider, Contract } from 'ethers';
 import { Address, decodeFunctionData, encodeFunctionData } from 'viem';
 import { supabase } from '../utils/client';
