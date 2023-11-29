@@ -5,11 +5,12 @@ on:
     paths:
       - 'src/**/*.sol'
       - 'testing/simulations/tradesimulations.ts'
+      - 'src/backend/microservices/scripts/evaluateTrades.ts'
   pull_request:
     paths:
       - 'src/**/*.sol'
       - 'testing/simulations/tradesimulations.ts'
-
+      - 'src/backend/microservices/scripts/evaluateTrades.ts'
 
 env:
   FOUNDRY_PROFILE: ci
