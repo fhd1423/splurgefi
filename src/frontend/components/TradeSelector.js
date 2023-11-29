@@ -9,7 +9,8 @@ import KeyboardArrowDownIcon from '@mui/icons-material/KeyboardArrowDown';
 import Typography from '@mui/material/Typography';
 import Popover from '@mui/material/Popover';
 import LineChart from './LineChart';
-
+import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
+import { faInfo } from '@fortawesome/free-solid-svg-icons';
 // Custom styles for the form control
 const CustomFormControl = styled(FormControl)({
   backgroundColor: '#1B1B1B',
@@ -44,19 +45,21 @@ export default function TradeSelector({
   selectedTradeAction,
   onTradeActionChange,
   title,
+  tokenAddy,
 }) {
   const [anchorEl, setAnchorEl] = useState(null);
   const [selectOpen, setSelectOpen] = useState(false);
 
-  const handlePopoverOpen = (event) => {
+  const handleClick = (event) => {
     setAnchorEl(event.currentTarget);
   };
 
-  const handlePopoverClose = () => {
+  const handleClose = () => {
     setAnchorEl(null);
   };
 
-  const popoverOpen = Boolean(anchorEl);
+  const open = Boolean(anchorEl);
+  const id = open ? 'simple-popover' : undefined;
 
   // Function to toggle the select dropdown
   const toggleDropdown = () => {
@@ -65,48 +68,82 @@ export default function TradeSelector({
 
   return (
     <Box sx={{ minWidth: 120 }}>
-      <Typography
-        variant='subtitle1'
-        color='white'
-        fontWeight='500'
-        gutterBottom
-        style={{ marginBottom: '3px', fontSize: '1rem', textAlign: 'left' }}
-        aria-owns={popoverOpen ? 'mouse-over-popover' : undefined}
-        aria-haspopup='true'
-        onMouseEnter={handlePopoverOpen}
-        onMouseLeave={handlePopoverClose}
-      >
-        {title}
-      </Typography>
+      <div style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
+        <Typography
+          variant='subtitle1'
+          color='white'
+          fontWeight='500'
+          gutterBottom
+          style={{ marginBottom: '3px', fontSize: '1rem', textAlign: 'left' }}
+        >
+          {title}
+        </Typography>
+
+        <div
+          style={{
+            display: 'flex',
+            justifyContent: 'center',
+            alignItems: 'center',
+            width: '20px',
+            height: '20px',
+            backgroundColor: '#50d890',
+            borderRadius: '50%',
+            alignSelf: 'center',
+          }}
+          aria-describedby={id}
+          variant='contained'
+          onClick={handleClick}
+        >
+          <FontAwesomeIcon
+            icon={faInfo}
+            style={{
+              color: 'white',
+              fontSize: '0.8rem',
+              marginBottom: '3px',
+            }}
+          />
+        </div>
+      </div>
+
       <Popover
-        id='mouse-over-popover'
-        sx={{
-          pointerEvents: 'none',
-          width: '500px',
-          height: '500px',
-        }}
-        open={popoverOpen}
+        id={id}
+        open={open}
         anchorEl={anchorEl}
+        onClose={handleClose}
         anchorOrigin={{
           vertical: 'bottom',
           horizontal: 'left',
         }}
-        transformOrigin={{
-          vertical: 'top',
-          horizontal: 'left',
-        }}
-        onClose={handlePopoverClose}
-        disableRestoreFocus
       >
-        {/* <Typography sx={{ p: 1 }}>I use Popover.</Typography> */}
-        <div
+        <Typography
+          variant='subtitle1'
+          color='black'
+          fontWeight='500'
+          gutterBottom
           style={{
-            width: '500px',
-            height: '300px',
+            marginBottom: '3px',
+            fontSize: '1rem',
+            textAlign: 'left',
+            padding: '5px',
           }}
         >
-          <LineChart />
-        </div>
+          Use this
+          <a
+            href={`https://dexscreener.com/ethereum/${tokenAddy}`}
+            target='_blank'
+            rel='noopener noreferrer'
+            style={{
+              color: '#50d890',
+              textDecoration: 'none',
+              fontWeight: 'bold',
+              marginLeft: '4px',
+              marginRight: '4px',
+            }}
+          >
+            link
+          </a>
+          to visualize the moving average for this token on DEX Screener.
+        </Typography>
       </Popover>
       <CustomFormControl fullWidth>
         <CustomSelect

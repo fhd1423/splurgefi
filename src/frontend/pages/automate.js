@@ -357,7 +357,8 @@ export default function Automate() {
                 <TradeSelector
                   selectedTradeAction={selectedTradeAction}
                   onTradeActionChange={handleTradeActionChange}
-                  title='Trade based on'
+                  title='Moving Avg.'
+                  tokenAddy={outputToken}
                 />
               </Grid>
               <Grid item xs={6}>
