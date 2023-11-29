@@ -75,7 +75,10 @@ async function generateZeroExStruct(
   return [typedArgs[3], object]; // (uint256,(uint32, bytes)[])
 }
 
-const encodeInput = async (SwapData: SwapDataStruct, signature: string) => {
+export const encodeInput = async (
+  SwapData: SwapDataStruct,
+  signature: string,
+) => {
   const splurgeOrderStruct = [
     SwapData.inputTokenAddress, // inputTokenAddy
     SwapData.outputTokenAddress, // outputTokenAddy
@@ -129,9 +132,9 @@ const updateTrades = async () => {
     let currentOutput = pair['current_price'];
 
     for (let trade of Trades) {
-      let xChangeRate_modifier = 1
-      if (trade.order.outputTokenAddress == WETH){
-        xChangeRate_modifier = -1
+      let xChangeRate_modifier = 1;
+      if (trade.order.outputTokenAddress == WETH) {
+        xChangeRate_modifier = -1;
       }
       let allMeanPrices;
       try {
@@ -145,8 +148,11 @@ const updateTrades = async () => {
         break;
       }
       let movingAveragePrice =
-        allMeanPrices.reduce((acc: any, val: any) => acc + Number(Math.pow(val,xChangeRate_modifier)), 0) /
-        allMeanPrices.length;
+        allMeanPrices.reduce(
+          (acc: any, val: any) =>
+            acc + Number(Math.pow(val, xChangeRate_modifier)),
+          0,
+        ) / allMeanPrices.length;
 
       /*
       const current_time = new Date().getTime(); // UNIX timestamp
@@ -183,4 +189,4 @@ const updateTrades = async () => {
 
 console.log('Continuous evaluation loop started');
 // setInterval(updateTrades, 15000);
-updateTrades()
+if (process.argv[2]) updateTrades();

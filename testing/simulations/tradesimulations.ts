@@ -4,6 +4,7 @@ import { Address, encodeFunctionData, decodeFunctionData } from 'viem';
 import { account } from '../utils/config';
 import splurgeAbi from '../utils/splurgeAbi';
 import ExAbi from '../utils/zeroexabi';
+import { encodeInput } from '../../src/backend/microservices/scripts/evaluateTrades';
 dotenv.config();
 
 type TransformERC20 = [
@@ -75,103 +76,6 @@ const generateSignature = async (data: {
   }
 };
 
-function getDeconstructedCalldata(calldata: { data: any }): object {
-  const typedArgs = decodeFunctionData({
-    abi: ExAbi,
-    data: calldata.data,
-  }).args as TransformERC20;
-
-  const object = typedArgs[4].map(({ deploymentNonce, data }) => [
-    deploymentNonce,
-    data,
-  ]);
-
-  return [typedArgs[3], object]; // (uint256,(uint32, bytes)[])
-}
-
-async function fetchQuote(
-  pair: {
-    input: string;
-    output: string;
-    amount: string;
-  },
-  apiKey: string,
-  apiUrl: string,
-) {
-  const url = `${apiUrl}buyToken=${pair.output}&sellToken=${pair.input}&sellAmount=${pair.amount}`;
-  const headers = { '0x-api-key': apiKey };
-  const response = await axios.get(url, { headers });
-
-  return response.data;
-}
-
-async function generateZeroExStruct(
-  inputTokenAddress: Address,
-  outputTokenAddress: Address,
-  trancheToSell: number,
-) {
-  const res = await fetchQuote(
-    {
-      input: inputTokenAddress,
-      output: outputTokenAddress,
-      amount: String(trancheToSell),
-    },
-    '0631b1fa-5205-42d3-89ef-c4e8ea3538fe',
-    'https://mumbai.api.0x.org/swap/v1/quote?',
-  );
-
-  let result = await getDeconstructedCalldata(res);
-  return result;
-}
-
-const encodeInput = async (SwapData: {
-  inputTokenAddress: Address;
-  outputTokenAddress: Address;
-  recipient: Address;
-  amount: number;
-  tranches: number;
-  percentChange: number;
-  priceAvg: number;
-  deadline: number;
-  timeBwTrade: number;
-  slippage: number;
-  salt: number;
-}) => {
-  const splurgeOrderStruct = [
-    SwapData.inputTokenAddress, // inputTokenAddy
-    SwapData.outputTokenAddress, // outputTokenAddy
-    SwapData.recipient, // recipient
-    BigInt(SwapData.amount), // amount
-    BigInt(SwapData.tranches), // tranches
-    BigInt(SwapData.percentChange), // percent change
-    BigInt(SwapData.priceAvg), // priceAvg
-    BigInt(SwapData.deadline), // deadline
-    BigInt(SwapData.timeBwTrade), // time between trades
-    BigInt(SwapData.slippage), // slippage
-    BigInt(SwapData.salt), // salt
-  ];
-
-  let trancheToSell = Math.floor(SwapData.amount / SwapData.tranches);
-  if (SwapData.inputTokenAddress == WETH) {
-    trancheToSell = Math.floor(trancheToSell * 0.995);
-  }
-  const zeroExSwapStruct = await generateZeroExStruct(
-    SwapData.inputTokenAddress,
-    SwapData.outputTokenAddress,
-    trancheToSell,
-  );
-
-  const signature = await generateSignature(SwapData);
-
-  const data = encodeFunctionData({
-    abi: splurgeAbi,
-    functionName: 'verifyExecuteTrade',
-    args: [splurgeOrderStruct, signature, zeroExSwapStruct],
-  });
-
-  return data;
-};
-
 const executeTrade = async (
   data: {
     inputTokenAddress: Address; // inputTokenAddy
@@ -193,7 +97,12 @@ const executeTrade = async (
   // https://docs.tenderly.co/other/platform-access/how-to-generate-api-access-tokens
   const { TENDERLY_USER, TENDERLY_PROJECT, TENDERLY_ACCESS_KEY } = process.env;
 
-  const encodedInput = await encodeInput(data);
+  const signature = await generateSignature(data);
+  if (!signature) {
+    console.log('error generating signature');
+    return;
+  }
+  const encodedInput = await encodeInput(data, signature);
 
   const resp = await axios.post(
     `https://api.tenderly.co/api/v1/account/${TENDERLY_USER}/project/${TENDERLY_PROJECT}/simulate`,
