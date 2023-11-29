@@ -409,6 +409,7 @@ export default function Automate() {
             </Grid>
           </Paper>
         </Box>
+
         {userInputError && <Alert severity='error'>{userInputError}</Alert>}
       </div>
     </LocalizationProvider>
