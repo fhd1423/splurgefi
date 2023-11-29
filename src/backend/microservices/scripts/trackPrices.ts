@@ -4,8 +4,8 @@ import { supabase } from '../utils/client';
 
 config();
 
-const apiUrl: string = process.env.API_URL || '';
-const apiKey: string = process.env.API_KEY || '';
+const apiUrl: string = 'https://mumbai.api.0x.org/swap/v1/quote?';
+const apiKey: string = process.env.OX_API_KEY || '';
 
 const headers = {
   '0x-api-key': apiKey,
