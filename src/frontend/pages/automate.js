@@ -274,141 +274,156 @@ export default function Automate() {
     <LocalizationProvider dateAdapter={AdapterDayjs}>
       <NavBar inTradesPage={false} />
 
-      <div className='h-screen bg-black flex flex-col justify-center items-center'>
-        <Head>
-          <title>Step One</title>
-          <link rel='icon' href='/favicon.ico' />
-        </Head>
-        <Box
-          sx={{
-            width: 500,
-            mx: 'auto',
-            marginTop: '-30px', // Adjust this value to move the modal up
-          }}
-        >
-          <Paper
-            elevation={3}
+      <Head>
+        <title>Step One</title>
+        <link rel='icon' href='/favicon.ico' />
+      </Head>
+      <div className='flex h-screen'>
+        {/* Left Container for Chart */}
+        <div className='flex-1 flex justify-center items-center bg-black'>
+          <div
+            className='relative w-full m-10'
+            style={{ paddingBottom: '75%' }}
+          >
+            <iframe
+              className='absolute w-full h-full top-0 left-0 border-0'
+              src='https://dexscreener.com/ethereum/0x510100D5143e011Db24E2aa38abE85d73D5B2177?embed=1&theme=dark&trades=0&info=0'
+            ></iframe>
+          </div>
+        </div>
+        <div className='flex-1 bg-black flex flex-col justify-center items-center'>
+          <Box
             sx={{
-              backgroundColor: '#2B2B2B',
-              padding: 2,
-              color: 'text.primary',
-              maxWidth: '100%',
+              width: 500,
               mx: 'auto',
-              borderRadius: '16px',
-              // Applying a white glow effect:
-              boxShadow: '0 0 15px 5px rgba(255, 255, 255, 0.3)',
+              marginTop: '-30px', // Adjust this value to move the modal up
             }}
           >
-            <Grid container spacing={1.25}>
-              <Grid item xs={12}>
-                <CustomToggle
-                  selection={toggleSelection}
-                  setSelection={setToggleSelection}
-                />
-              </Grid>
-              <Grid item xs={12}>
-                <CustomInputToken
-                  title='Input Token'
-                  options={
-                    toggleSelection === 'buy' ? inputOptions : outputOptions
-                  }
-                  onValueChange={handleInputTokenChange}
-                  onSelectChange={handleInputTokenSelect}
-                />
-              </Grid>
-              <Grid item xs={12}>
-                <TokenSelector
-                  title='Output Token'
-                  options={
-                    toggleSelection === 'buy' ? outputOptions : inputOptions
-                  }
-                  onValueChange={handleOutputTokenChange}
-                  onSelectChange={handleOutputTokenSelect}
-                />
-              </Grid>
-              <Grid item xs={4}>
-                {toggleSelection === 'buy' ? (
-                  <CustomInputPercent
-                    title='Percent Change'
-                    value={percentChange}
-                    onValueChange={handlePercentChange}
-                    isUpSelected={false} // Pass the derived state to the component
-                    placeHolder={'0%'}
+            <Paper
+              elevation={3}
+              sx={{
+                backgroundColor: '#2B2B2B',
+                padding: 2,
+                color: 'text.primary',
+                maxWidth: '100%',
+                mx: 'auto',
+                borderRadius: '16px',
+                // Applying a white glow effect:
+                boxShadow: '0 0 15px 5px rgba(255, 255, 255, 0.3)',
+              }}
+            >
+              <Grid container spacing={1.25}>
+                <Grid item xs={12}>
+                  <CustomToggle
+                    selection={toggleSelection}
+                    setSelection={setToggleSelection}
                   />
-                ) : (
-                  <CustomInputPercent
-                    title='Percent Change'
-                    value={percentChange}
-                    onValueChange={handlePercentChange}
-                    isUpSelected={true} // Pass the derived state to the component
-                    placeHolder={'0%'}
+                </Grid>
+                <Grid item xs={12}>
+                  <CustomInputToken
+                    title='Input Token'
+                    options={
+                      toggleSelection === 'buy' ? inputOptions : outputOptions
+                    }
+                    onValueChange={handleInputTokenChange}
+                    onSelectChange={handleInputTokenSelect}
                   />
-                )}
-              </Grid>
-              <Grid item xs={4}>
-                <CustomInputBatches
-                  title='Batches'
-                  placeHolder={'5'}
-                  value={batchValue}
-                  onValueChange={(e) => setBatchValue(e.target.value)}
-                />
-              </Grid>
-              <Grid item xs={4}>
-                <TradeSelector
-                  selectedTradeAction={selectedTradeAction}
-                  onTradeActionChange={handleTradeActionChange}
-                  title='Trade based on'
-                />
-              </Grid>
-              <Grid item xs={6}>
-                <CustomDatePicker
-                  selectedDate={selectedDate}
-                  setSelectedDate={setSelectedDate}
-                />
-              </Grid>
+                </Grid>
+                <Grid item xs={12}>
+                  <TokenSelector
+                    title='Output Token'
+                    options={
+                      toggleSelection === 'buy' ? outputOptions : inputOptions
+                    }
+                    onValueChange={handleOutputTokenChange}
+                    onSelectChange={handleOutputTokenSelect}
+                  />
+                </Grid>
+                <Grid item xs={4}>
+                  {toggleSelection === 'buy' ? (
+                    <CustomInputPercent
+                      title='Percent Change'
+                      value={percentChange}
+                      onValueChange={handlePercentChange}
+                      isUpSelected={false} // Pass the derived state to the component
+                      placeHolder={'0%'}
+                    />
+                  ) : (
+                    <CustomInputPercent
+                      title='Percent Change'
+                      value={percentChange}
+                      onValueChange={handlePercentChange}
+                      isUpSelected={true} // Pass the derived state to the component
+                      placeHolder={'0%'}
+                    />
+                  )}
+                </Grid>
+                <Grid item xs={4}>
+                  <CustomInputBatches
+                    title='Batches'
+                    placeHolder={'5'}
+                    value={batchValue}
+                    onValueChange={(e) => setBatchValue(e.target.value)}
+                  />
+                </Grid>
+                <Grid item xs={4}>
+                  <TradeSelector
+                    selectedTradeAction={selectedTradeAction}
+                    onTradeActionChange={handleTradeActionChange}
+                    title='Trade based on'
+                  />
+                </Grid>
+                <Grid item xs={6}>
+                  <CustomDatePicker
+                    selectedDate={selectedDate}
+                    setSelectedDate={setSelectedDate}
+                  />
+                </Grid>
 
-              <Grid item xs={6}>
-                <TimeSelector
-                  selectedTradeAction={selectedTimeBwTrade}
-                  onTradeActionChange={handleTimeBwTradeChange}
-                  title='Time bw trades'
-                />
-              </Grid>
+                <Grid item xs={6}>
+                  <TimeSelector
+                    selectedTradeAction={selectedTimeBwTrade}
+                    onTradeActionChange={handleTimeBwTradeChange}
+                    title='Time bw trades'
+                  />
+                </Grid>
 
-              <Grid
-                item
-                xs={12}
-                sx={{
-                  display: 'flex',
-                  justifyContent: 'center',
-                  alignItems: 'center',
-                  pt: 4,
-                }}
-              >
-                {!isWalletConnected ? (
-                  <button
-                    onClick={handleWalletConnection}
-                    className='bg-green-500 text-white text-xl font-bold rounded-lg shadow-lg hover:bg-green-600 w-96 h-14 mt-[10px]'
-                  >
-                    Connect Wallet
-                  </button>
-                ) : (
-                  <button
-                    onClick={() => {
-                      if (validateInputs()) {
-                        uploadConditionalOrder();
-                      }
-                    }}
-                    className='bg-green-500 text-white text-xl font-bold rounded-lg shadow-lg hover:bg-green-600 w-96 h-14 mt-[10px]'
-                  >
-                    Start Automation
-                  </button>
-                )}
+                <Grid
+                  item
+                  xs={12}
+                  sx={{
+                    display: 'flex',
+                    justifyContent: 'center',
+                    alignItems: 'center',
+                    pt: 4,
+                  }}
+                >
+                  {!isWalletConnected ? (
+                    <button
+                      onClick={handleWalletConnection}
+                      className='bg-green-500 text-white text-xl font-bold rounded-lg shadow-lg hover:bg-green-600 w-96 h-14 mt-[10px]'
+                    >
+                      Connect Wallet
+                    </button>
+                  ) : (
+                    <button
+                      onClick={() => {
+                        if (validateInputs()) {
+                          uploadConditionalOrder();
+                        }
+                      }}
+                      className='bg-green-500 text-white text-xl font-bold rounded-lg shadow-lg hover:bg-green-600 w-96 h-14 mt-[10px]'
+                    >
+                      Start Automation
+                    </button>
+                  )}
+                </Grid>
               </Grid>
-            </Grid>
-          </Paper>
-        </Box>
-        {userInputError && <Alert severity='error'>{userInputError}</Alert>}
+            </Paper>
+          </Box>
+
+          {userInputError && <Alert severity='error'>{userInputError}</Alert>}
+        </div>
       </div>
     </LocalizationProvider>
   );
