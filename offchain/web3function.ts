@@ -16,7 +16,7 @@ async function fetchReadyTrades(supabaseUrl: string, supabaseKey: string) {
     console.error('Error fetching data:', error);
     return;
   }
-  if (Trades[0]) return Trades[0].zero_x_call_data.replace(/['"]+/g, '');
+  if (Trades[0]) return Trades[0].zero_x_call_data;
   return null;
 }
 
