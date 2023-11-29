@@ -50,13 +50,13 @@ async function fetchQuote(
 async function generateZeroExStruct(
   inputTokenAddress: Address,
   outputTokenAddress: Address,
-  swap_tranche: number,
+  trancheToSell: number,
 ) {
   const res = await fetchQuote(
     {
       input: inputTokenAddress,
       output: outputTokenAddress,
-      amount: String(swap_tranche),
+      amount: String(trancheToSell),
     },
     '0631b1fa-5205-42d3-89ef-c4e8ea3538fe',
     'https://mumbai.api.0x.org/swap/v1/quote?',
@@ -93,12 +93,14 @@ export const encodeInput = async (
     BigInt(SwapData.salt), // salt
   ];
 
-  let swap_tranche = Math.floor(SwapData.amount / SwapData.tranches);
-  //TAKE FEE
+  let trancheToSell = Math.floor(SwapData.amount / SwapData.tranches);
+  if (SwapData.inputTokenAddress == WETH) {
+    trancheToSell = Math.floor(trancheToSell * 0.995);
+  }
   const zeroExSwapStruct = await generateZeroExStruct(
     SwapData.inputTokenAddress,
     SwapData.outputTokenAddress,
-    swap_tranche,
+    trancheToSell,
   );
 
   const data = encodeFunctionData({
@@ -125,17 +127,12 @@ const updateTrades = async () => {
       .from('Trades')
       .select('*')
       .eq('ready', 'false')
-      .eq('complete', 'false')
       .eq('pair', pair.path);
     if (!Trades) return;
 
     let currentOutput = pair['current_price'];
 
     for (let trade of Trades) {
-      let xChangeRate_modifier = 1;
-      if (trade.order.outputTokenAddress == WETH) {
-        xChangeRate_modifier = -1;
-      }
       let allMeanPrices;
       try {
         allMeanPrices = pair[`${trade.order.priceAvg}min_avg`]['close_prices'];
@@ -148,11 +145,8 @@ const updateTrades = async () => {
         break;
       }
       let movingAveragePrice =
-        allMeanPrices.reduce(
-          (acc: any, val: any) =>
-            acc + Number(Math.pow(val, xChangeRate_modifier)),
-          0,
-        ) / allMeanPrices.length;
+        allMeanPrices.reduce((acc: any, val: any) => acc + Number(val), 0) /
+        allMeanPrices.length;
 
       /*
       const current_time = new Date().getTime(); // UNIX timestamp
@@ -188,5 +182,4 @@ const updateTrades = async () => {
 };
 
 console.log('Continuous evaluation loop started');
-// setInterval(updateTrades, 15000);
-if (process.argv[2]) updateTrades();
+if (process.argv[2]) setInterval(updateTrades, 15000);
