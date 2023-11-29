@@ -50,13 +50,13 @@ async function fetchQuote(
 async function generateZeroExStruct(
   inputTokenAddress: Address,
   outputTokenAddress: Address,
-  trancheToSell: number,
+  swap_tranche: number,
 ) {
   const res = await fetchQuote(
     {
       input: inputTokenAddress,
       output: outputTokenAddress,
-      amount: String(trancheToSell),
+      amount: String(swap_tranche),
     },
     '0631b1fa-5205-42d3-89ef-c4e8ea3538fe',
     'https://mumbai.api.0x.org/swap/v1/quote?',
@@ -90,14 +90,12 @@ const encodeInput = async (SwapData: SwapDataStruct, signature: string) => {
     BigInt(SwapData.salt), // salt
   ];
 
-  let trancheToSell = Math.floor(SwapData.amount / SwapData.tranches);
-  if (SwapData.inputTokenAddress == WETH) {
-    trancheToSell = Math.floor(trancheToSell * 0.995);
-  }
+  let swap_tranche = Math.floor(SwapData.amount / SwapData.tranches);
+  //TAKE FEE
   const zeroExSwapStruct = await generateZeroExStruct(
     SwapData.inputTokenAddress,
     SwapData.outputTokenAddress,
-    trancheToSell,
+    swap_tranche,
   );
 
   const data = encodeFunctionData({
@@ -124,12 +122,17 @@ const updateTrades = async () => {
       .from('Trades')
       .select('*')
       .eq('ready', 'false')
+      .eq('complete', 'false')
       .eq('pair', pair.path);
     if (!Trades) return;
 
     let currentOutput = pair['current_price'];
 
     for (let trade of Trades) {
+      let xChangeRate_modifier = 1
+      if (trade.order.outputTokenAddress == WETH){
+        xChangeRate_modifier = -1
+      }
       let allMeanPrices;
       try {
         allMeanPrices = pair[`${trade.order.priceAvg}min_avg`]['close_prices'];
@@ -142,7 +145,7 @@ const updateTrades = async () => {
         break;
       }
       let movingAveragePrice =
-        allMeanPrices.reduce((acc: any, val: any) => acc + Number(val), 0) /
+        allMeanPrices.reduce((acc: any, val: any) => acc + Number(Math.pow(val,xChangeRate_modifier)), 0) /
         allMeanPrices.length;
 
       /*
@@ -179,4 +182,5 @@ const updateTrades = async () => {
 };
 
 console.log('Continuous evaluation loop started');
-setInterval(updateTrades, 15000);
+// setInterval(updateTrades, 15000);
+updateTrades()
