@@ -1,23 +1,9 @@
 import axios from 'axios';
 import * as dotenv from 'dotenv';
-import { Address, encodeFunctionData, decodeFunctionData } from 'viem';
+import { Address } from 'viem';
 import { account } from '../utils/config';
-import splurgeAbi from '../utils/splurgeAbi';
-import ExAbi from '../utils/zeroexabi';
 import { encodeInput } from '../../src/backend/microservices/scripts/evaluateTrades';
 dotenv.config();
-
-type TransformERC20 = [
-  string, // First address
-  string, // Second address
-  bigint, // First big integer
-  bigint, // Second big integer
-  Array<{
-    deploymentNonce: number;
-    data: string;
-  }>,
-];
-const WETH = '0x9c3C9283D3e44854697Cd22D3Faa240Cfb032889'; //wmatic for now
 
 const generateSignature = async (data: {
   inputTokenAddress: Address;
