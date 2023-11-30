@@ -129,16 +129,29 @@ export default function Automate() {
     setPercentChange(event.target.value);
   };
 
-  // const uploadUserData = async (userData) => {
-  //   const { data, error } = await supabase.from('users').insert([userData]);
+  const uploadUserData = async (publicAddress, metadata) => {
+    const userData = {
+      verified_credential_address: publicAddress,
+      created_at: new Date().toISOString(),
+      metadata: metadata,
+    };
 
-  //   if (error) {
-  //     console.error('Error uploading user data to Supabase', error);
-  //     return;
-  //   }
+    try {
+      // Perform an upsert operation
+      const { data, error } = await supabase.from('users').upsert(userData, {
+        onConflict: 'verified_credential_address',
+        ignoreDuplicates: true, // Ensure it doesn't update existing records
+      });
 
-  //   console.log('User data successfully uploaded to Supabase', data);
-  // };
+      if (error) {
+        console.error('Error uploading user data to Supabase', error);
+        return;
+      }
+      console.log('User data successfully uploaded to Supabase', data);
+    } catch (error) {
+      console.error('Error in uploadUserData function', error);
+    }
+  };
 
   // const authenticateUserWithSupabase = async (token) => {
   //   const { user, error } = await supabase.auth.signIn({ accessToken: token });
@@ -152,15 +165,38 @@ export default function Automate() {
   //   // Here you can call a function to upload user data to the 'users' table
   // };
 
+  function parseJwt(token) {
+    try {
+      const base64Url = token.split('.')[1];
+      const base64 = base64Url.replace(/-/g, '+').replace(/_/g, '/');
+      const jsonPayload = decodeURIComponent(
+        atob(base64)
+          .split('')
+          .map(function (c) {
+            return '%' + ('00' + c.charCodeAt(0).toString(16)).slice(-2);
+          })
+          .join(''),
+      );
+
+      return JSON.parse(jsonPayload);
+    } catch (e) {
+      console.error('Error decoding JWT', e);
+      return null;
+    }
+  }
+
   // Listen for changes in primaryWallet
   useEffect(() => {
-    // if (primaryWallet?.address && authToken) {
-    //   // authenticateUserWithSupabase(authToken);
-    // }
+    if (primaryWallet?.address && authToken) {
+      // authenticateUserWithSupabase(authToken);
+      const jwtData = parseJwt(authToken);
+
+      uploadUserData(primaryWallet?.address, jwtData);
+    }
     if (primaryWallet?.address) {
       setIsWalletConnected(true);
     }
-  }, [primaryWallet?.address]);
+  }, [primaryWallet?.address, authToken]);
 
   const handleWalletConnection = () => {
     setShowAuthFlow(true);
@@ -299,7 +335,6 @@ export default function Automate() {
           <link rel='icon' href='/favicon.ico' />
         </Head>
 
-        {/* <p>{authToken}</p> */}
         <Box
           sx={{
             width: 500,

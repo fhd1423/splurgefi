@@ -1,5 +1,4 @@
 import { createClient } from '@supabase/supabase-js';
-const dotenv = require('dotenv');
 
 export const supabase = createClient(
   'https://gmupexxqnzrrzozcovjp.supabase.co',
