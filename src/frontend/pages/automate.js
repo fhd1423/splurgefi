@@ -45,12 +45,11 @@ export default function Automate() {
 
   // State to hold input values
   const [inputTokenValue, setInputTokenValue] = useState('');
-  const [outputTokenValue, setOutputTokenValue] = useState('');
+  // const [outputTokenValue, setOutputTokenValue] = useState('');
   const [selectedTradeAction, setSelectedTradeAction] = useState('');
   const [selectedTimeBwTrade, setSelectedTimeBwTrade] = useState('');
 
   const [batchValue, setBatchValue] = useState('');
-  const [slippageValue, setSlippageValue] = useState('');
   const [selectedDate, setSelectedDate] = useState(dayjs());
 
   // State to hold selected tokens
@@ -64,7 +63,7 @@ export default function Automate() {
   const [isWalletConnected, setIsWalletConnected] = useState(false);
 
   // Access setShowAuthFlow and primaryWallet from useDynamicContext
-  const { setShowAuthFlow, primaryWallet } = useDynamicContext();
+  const { setShowAuthFlow, authToken, primaryWallet } = useDynamicContext();
 
   // State for error messages
   const [userInputError, setUserInputError] = useState('');
@@ -79,8 +78,7 @@ export default function Automate() {
       !batchValue ||
       !selectedTradeAction ||
       !selectedDate ||
-      !selectedTimeBwTrade ||
-      !slippageValue
+      !selectedTimeBwTrade
     ) {
       setUserInputError('Please make sure all inputs are filled.');
       isValid = false;
@@ -131,8 +129,34 @@ export default function Automate() {
     setPercentChange(event.target.value);
   };
 
+  // const uploadUserData = async (userData) => {
+  //   const { data, error } = await supabase.from('users').insert([userData]);
+
+  //   if (error) {
+  //     console.error('Error uploading user data to Supabase', error);
+  //     return;
+  //   }
+
+  //   console.log('User data successfully uploaded to Supabase', data);
+  // };
+
+  // const authenticateUserWithSupabase = async (token) => {
+  //   const { user, error } = await supabase.auth.signIn({ accessToken: token });
+
+  //   if (error) {
+  //     console.error('Error during Supabase authentication', error);
+  //     return;
+  //   }
+
+  //   console.log('User successfully authenticated with Supabase', user);
+  //   // Here you can call a function to upload user data to the 'users' table
+  // };
+
   // Listen for changes in primaryWallet
   useEffect(() => {
+    // if (primaryWallet?.address && authToken) {
+    //   // authenticateUserWithSupabase(authToken);
+    // }
     if (primaryWallet?.address) {
       setIsWalletConnected(true);
     }
@@ -173,7 +197,6 @@ export default function Automate() {
       const generatedSalt = generateRandomSalt();
       const intBatches = parseInt(batchValue, 10);
       const intTimeBwTrade = parseInt(selectedTimeBwTrade, 10);
-      const intSlippage = parseInt(slippageValue, 10);
 
       //Sign Payload, send payload and signature to backend
       const signature = await signer.signTypedData({
@@ -196,7 +219,6 @@ export default function Automate() {
             { name: 'priceAvg', type: 'uint256' },
             { name: 'deadline', type: 'uint256' },
             { name: 'timeBwTrade', type: 'uint256' },
-            { name: 'slippage', type: 'uint256' },
             { name: 'salt', type: 'bytes' },
           ],
         },
@@ -212,7 +234,6 @@ export default function Automate() {
           priceAvg: selectedPriceAverage,
           deadline: unixTimestamp,
           timeBwTrade: intTimeBwTrade,
-          slippage: intSlippage,
           salt: generatedSalt,
         },
       });
@@ -232,7 +253,6 @@ export default function Automate() {
             priceAvg: selectedPriceAverage,
             deadline: unixTimestamp,
             timeBwTrade: intTimeBwTrade,
-            slippage: intSlippage,
             salt: generatedSalt,
           };
 
@@ -255,7 +275,6 @@ export default function Automate() {
               deadline: selectedDate.toISOString(),
               remainingBatches: intBatches,
               time_bw_batches: intTimeBwTrade,
-              slippage: intSlippage,
             },
           ]);
         } catch (error) {
@@ -279,6 +298,8 @@ export default function Automate() {
           <title>Step One</title>
           <link rel='icon' href='/favicon.ico' />
         </Head>
+
+        {/* <p>{authToken}</p> */}
         <Box
           sx={{
             width: 500,
