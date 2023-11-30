@@ -154,12 +154,11 @@ const updateTrades = async () => {
           0,
         ) / allMeanPrices.length;
 
-      /*
+      
       const current_time = new Date().getTime(); // UNIX timestamp
       const mostRecentBatch = Object.keys(trade.batch_timings).length;
       const lastBatchTime = trade.batch_timings[mostRecentBatch.toString()];
       const timeBetweenBatches = trade.time_bw_batches;
-      */
 
       // Get swap call data
       const callData = await encodeInput(
@@ -168,7 +167,7 @@ const updateTrades = async () => {
       );
 
       // Only mark trade as ready if time between batches is satisfied
-      //if (timeBetweenBatches >= current_time - lastBatchTime) {
+    if (timeBetweenBatches >= current_time - lastBatchTime) {
       let buyOutputOver =
         ((100 + Number(trade.order.percentChange)) / 100) * movingAveragePrice;
       if (currentOutput >= buyOutputOver) {
@@ -182,7 +181,7 @@ const updateTrades = async () => {
           .select();
         console.log(data || error);
       }
-      //}
+    }
     }
   }
 };
