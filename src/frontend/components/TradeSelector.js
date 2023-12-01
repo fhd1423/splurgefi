@@ -126,7 +126,7 @@ export default function TradeSelector({
           variant='contained'
           onClick={handleClick}
         >
-          <InfoIcon icon={faInfo} />
+          <InfoIcon icon={faInfo} size='xs' />
         </IconContainer>
       </div>
 
