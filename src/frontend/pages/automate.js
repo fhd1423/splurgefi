@@ -45,53 +45,40 @@ export default function Automate() {
 
   // State to hold input values
   const [inputTokenValue, setInputTokenValue] = useState('');
-  // const [outputTokenValue, setOutputTokenValue] = useState('');
   const [selectedTradeAction, setSelectedTradeAction] = useState('');
   const [selectedTimeBwTrade, setSelectedTimeBwTrade] = useState('');
-
   const [batchValue, setBatchValue] = useState('');
   const [selectedDate, setSelectedDate] = useState(dayjs());
-
-  // State to hold selected tokens
   const [inputToken, setInputToken] = useState('');
   const [outputToken, setOutputToken] = useState('');
-
   const [toggleSelection, setToggleSelection] = useState('buy');
-
-  // States for percent change and selected value
   const [percentChange, setPercentChange] = useState('');
   const [isWalletConnected, setIsWalletConnected] = useState(false);
-
-  // Access setShowAuthFlow and primaryWallet from useDynamicContext
-  const { setShowAuthFlow, authToken, primaryWallet } = useDynamicContext();
-
-  // State for error messages
   const [userInputError, setUserInputError] = useState('');
 
+  const { setShowAuthFlow, authToken, primaryWallet } = useDynamicContext();
+
   const validateInputs = () => {
-    let isValid = true;
-    if (
-      !inputToken ||
-      !outputToken ||
-      !inputTokenValue ||
-      !percentChange ||
-      !batchValue ||
-      !selectedTradeAction ||
-      !selectedDate ||
-      !selectedTimeBwTrade
-    ) {
+    const fields = [
+      inputToken,
+      outputToken,
+      inputTokenValue,
+      percentChange,
+      batchValue,
+      selectedTradeAction,
+      selectedDate,
+      selectedTimeBwTrade,
+    ];
+    const isAnyFieldEmpty = fields.some((field) => !field);
+
+    if (isAnyFieldEmpty) {
       setUserInputError('Please make sure all inputs are filled.');
-      isValid = false;
+      return false;
     } else {
       setUserInputError('');
+      return true;
     }
-
-    return isValid;
   };
-
-  // Input token addy - Rollbit
-  const inputTokenAddy = '0x046EeE2cc3188071C02BfC1745A6b17c656e3f3d';
-  const outputTokenAddy = '0xC02aaA39b223FE8D0A0e5C4F27eAD9083C756Cc2';
 
   // Handlers to update the state
   const handleInputTokenChange = (value) => {
@@ -127,6 +114,10 @@ export default function Automate() {
   const handlePercentChange = (event) => {
     console.log('Selected percent change:', event);
     setPercentChange(event.target.value);
+  };
+
+  const handleWalletConnection = () => {
+    setShowAuthFlow(true);
   };
 
   const uploadUserData = async (publicAddress, metadata) => {
@@ -186,61 +177,83 @@ export default function Automate() {
     }
   }, [primaryWallet?.address, authToken]);
 
-  const handleWalletConnection = () => {
-    setShowAuthFlow(true);
-    // Additional logic can be added here if needed
-  };
+  // Utility function to generate random salt
+  function generateRandomSalt() {
+    const randomBytes = new Uint8Array(64); // Generating 64 random bytes
+    crypto.getRandomValues(randomBytes);
+    return (
+      '0x' +
+      Array.from(randomBytes)
+        .map((b) => b.toString(16).padStart(2, '0'))
+        .join('')
+    );
+  }
+
+  // Function to convert token amount to Wei
+  function toWei(amount) {
+    const [whole, decimal = ''] = amount.toString().split('.');
+    const wholeBigInt = BigInt(whole);
+    const decimalBigInt = BigInt(decimal.padEnd(18, '0'));
+    return wholeBigInt * BigInt(10) ** BigInt(18) + decimalBigInt;
+  }
+
+  // Function to upload data
+  async function uploadData(primaryWallet, signature, orderData, router) {
+    try {
+      const currentTimestamp = new Date().toISOString();
+      const { data, error } = await supabase.from('Trades').insert([
+        {
+          created_at: currentTimestamp,
+          user: primaryWallet?.address,
+          pair: path,
+          order: orderData,
+          signature: signature,
+          complete: false,
+          ready: false,
+          batches: parseInt(batchValue, 10),
+          percent_change:
+            orderData.orderType === 'buy'
+              ? '-' + orderData.percentChange + '%'
+              : '+' + orderData.percentChange + '%',
+          deadline: selectedDate.toISOString(),
+          remainingBatches: parseInt(batchValue, 10),
+          time_bw_batches: parseInt(selectedTimeBwTrade, 10),
+        },
+      ]);
+      router.push('/trades');
+    } catch (error) {
+      console.error('Error uploading data to Supabase:', error);
+    }
+  }
 
   const uploadConditionalOrder = async () => {
     try {
-      // const generateRandomSalt = () => {
-      //   const randomBytes = new Uint8Array(64); // Generating 64 random bytes
-      //   crypto.getRandomValues(randomBytes);
-      //   return randomBytes;
-      // };
-
-      function generateRandomSalt() {
-        const randomBytes = new Uint8Array(64); // Generating 64 random bytes
-        crypto.getRandomValues(randomBytes);
-        return (
-          '0x' +
-          Array.from(randomBytes)
-            .map((b) => b.toString(16).padStart(2, '0'))
-            .join('')
-        );
-      }
-
-      const unixTimestamp = selectedDate.unix(); // Unix timestamp in seconds
+      const unixTimestamp = selectedDate.unix();
       const signer = await primaryWallet.connector.getSigner();
-      let selectedPercentChange = parseInt(percentChange, 10);
-      let selectedPriceAverage = parseInt(selectedTradeAction, 10);
-      let selectedAmount = inputTokenValue;
 
-      // Step 1: Parse the Decimal Value
-      const [wholePart, decimalPartRaw] = selectedAmount.includes('.')
-        ? selectedAmount.split('.')
-        : [selectedAmount, ''];
-      // Step 2: Normalize Decimal Part
-      const decimalPart = decimalPartRaw.padEnd(18, '0'); // Add trailing zeros to make it 18 decimal places
-      // Step 3: Convert to Integer
-      const wholePartBigInt = BigInt(wholePart);
-      const decimalPartBigInt = BigInt(decimalPart);
-      // Step 4: Scale to Blockchain Format
-      let amountInWei =
-        wholePartBigInt * BigInt(10) ** BigInt(18) + decimalPartBigInt;
+      // Prepare order data
+      const orderData = {
+        inputTokenAddress: inputToken,
+        outputTokenAddress: outputToken,
+        recipient: primaryWallet.address,
+        orderType: toggleSelection,
+        amount: toWei(inputTokenValue).toString(),
+        tranches: parseInt(batchValue, 10),
+        percentChange: parseInt(percentChange, 10),
+        priceAvg: parseInt(selectedTradeAction, 10),
+        deadline: unixTimestamp,
+        timeBwTrade: parseInt(selectedTimeBwTrade, 10),
+        salt: generateRandomSalt(),
+      };
 
-      const generatedSalt = generateRandomSalt();
-      const intBatches = parseInt(batchValue, 10);
-      const intTimeBwTrade = parseInt(selectedTimeBwTrade, 10);
-
-      //Sign Payload, send payload and signature to backend
+      // Sign the data
       const signature = await signer.signTypedData({
         account: primaryWallet.address,
         domain: {
           name: 'Splurge Finance',
           version: '1',
           chainId: 1,
-          verifyingContract: '0xCcCCccccCCCCcCCCCCCcCcCccCcCCCcCcccccccC', //CHANGE: to Splurge Addy
+          verifyingContract: '0xCcCCccccCCCCcCCCCCCcCcCccCcCCCcCcccccccC', // Change as needed
         },
         types: {
           conditionalOrder: [
@@ -258,71 +271,13 @@ export default function Automate() {
           ],
         },
         primaryType: 'conditionalOrder',
-        message: {
-          inputTokenAddress: '0xC02aaA39b223FE8D0A0e5C4F27eAD9083C756Cc2', // WETH
-          outputTokenAddress: '0x8390a1DA07E376ef7aDd4Be859BA74Fb83aA02D5', // GROK
-          recipient: '0xBb6AeaBdf61Ca96e80Aa239bA8cC7e436862E596',
-          orderType: toggleSelection,
-          amount: amountInWei, // Input token scaled(18 decimal places)
-          tranches: intBatches,
-          percentChange: selectedPercentChange,
-          priceAvg: selectedPriceAverage,
-          deadline: unixTimestamp,
-          timeBwTrade: intTimeBwTrade,
-          salt: generatedSalt,
-        },
+        message: orderData,
       });
 
-      async function uploadData() {
-        console.log('UPLOAD CALLED');
-        try {
-          console.log('WALLET ADDRESS:', primaryWallet.address);
-          // Retrieve and store data to be uploaded to database
-          const currentTimestamp = new Date().toISOString();
-          const orderData = {
-            inputTokenAddy: inputToken,
-            outputTokenAddy: outputToken,
-            recipient: primaryWallet.address,
-            orderType: toggleSelection,
-            amount: amountInWei.toString(),
-            tranches: intBatches,
-            percentChange: selectedPercentChange,
-            priceAvg: selectedPriceAverage,
-            deadline: unixTimestamp,
-            timeBwTrade: intTimeBwTrade,
-            salt: generatedSalt,
-          };
-
-          console.log('Order Data:', orderData);
-
-          const { data, error } = await supabase.from('Trades').insert([
-            {
-              created_at: currentTimestamp,
-              user: primaryWallet?.address,
-              pair: path,
-              order: orderData,
-              signature: signature,
-              complete: false,
-              ready: false,
-              batches: intBatches,
-              percent_change:
-                toggleSelection === 'buy'
-                  ? '-' + percentChange + '%'
-                  : '+' + percentChange + '%',
-              deadline: selectedDate.toISOString(),
-              remainingBatches: intBatches,
-              time_bw_batches: intTimeBwTrade,
-            },
-          ]);
-        } catch (error) {
-          console.error('Error uploading data to Supabase:', error);
-        }
-      }
-      uploadData();
-      router.push('/trades');
+      // Upload data
+      await uploadData(primaryWallet, signature, orderData, router);
     } catch (error) {
       console.error('Error during signature or data upload:', error);
-      // setErrorMessage("Signature denied or failed to upload data. Please try again.");
     }
   };
 

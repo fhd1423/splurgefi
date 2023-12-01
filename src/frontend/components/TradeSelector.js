@@ -11,6 +11,23 @@ import Popover from '@mui/material/Popover';
 import LineChart from './LineChart';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { faInfo } from '@fortawesome/free-solid-svg-icons';
+
+const IconContainer = styled('div')({
+  display: 'flex',
+  justifyContent: 'center',
+  alignItems: 'center',
+  width: '20px',
+  height: '20px',
+  backgroundColor: '#50d890',
+  borderRadius: '50%',
+  alignSelf: 'center',
+});
+
+const InfoIcon = styled(FontAwesomeIcon)({
+  color: 'white',
+  fontSize: '0.8rem', // adjust this as needed
+});
+
 // Custom styles for the form control
 const CustomFormControl = styled(FormControl)({
   backgroundColor: '#1B1B1B',
@@ -79,7 +96,7 @@ export default function TradeSelector({
           {title}
         </Typography>
 
-        <div
+        {/* <div
           style={{
             display: 'flex',
             justifyContent: 'center',
@@ -102,7 +119,15 @@ export default function TradeSelector({
               marginBottom: '3px',
             }}
           />
-        </div>
+        </div> */}
+
+        <IconContainer
+          aria-describedby={id}
+          variant='contained'
+          onClick={handleClick}
+        >
+          <InfoIcon icon={faInfo} />
+        </IconContainer>
       </div>
 
       <Popover
