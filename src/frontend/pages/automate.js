@@ -138,7 +138,7 @@ export default function Automate() {
 
     try {
       // Perform an upsert operation
-      const { data, error } = await supabase.from('users').upsert(userData, {
+      const { data, error } = await supabase.from('Users').upsert(userData, {
         onConflict: 'verified_credential_address',
         ignoreDuplicates: true, // Ensure it doesn't update existing records
       });
@@ -152,18 +152,6 @@ export default function Automate() {
       console.error('Error in uploadUserData function', error);
     }
   };
-
-  // const authenticateUserWithSupabase = async (token) => {
-  //   const { user, error } = await supabase.auth.signIn({ accessToken: token });
-
-  //   if (error) {
-  //     console.error('Error during Supabase authentication', error);
-  //     return;
-  //   }
-
-  //   console.log('User successfully authenticated with Supabase', user);
-  //   // Here you can call a function to upload user data to the 'users' table
-  // };
 
   function parseJwt(token) {
     try {
@@ -205,11 +193,22 @@ export default function Automate() {
 
   const uploadConditionalOrder = async () => {
     try {
-      const generateRandomSalt = () => {
+      // const generateRandomSalt = () => {
+      //   const randomBytes = new Uint8Array(64); // Generating 64 random bytes
+      //   crypto.getRandomValues(randomBytes);
+      //   return randomBytes;
+      // };
+
+      function generateRandomSalt() {
         const randomBytes = new Uint8Array(64); // Generating 64 random bytes
         crypto.getRandomValues(randomBytes);
-        return randomBytes;
-      };
+        return (
+          '0x' +
+          Array.from(randomBytes)
+            .map((b) => b.toString(16).padStart(2, '0'))
+            .join('')
+        );
+      }
 
       const unixTimestamp = selectedDate.unix(); // Unix timestamp in seconds
       const signer = await primaryWallet.connector.getSigner();
@@ -275,7 +274,9 @@ export default function Automate() {
       });
 
       async function uploadData() {
+        console.log('UPLOAD CALLED');
         try {
+          console.log('WALLET ADDRESS:', primaryWallet.address);
           // Retrieve and store data to be uploaded to database
           const currentTimestamp = new Date().toISOString();
           const orderData = {
@@ -283,7 +284,7 @@ export default function Automate() {
             outputTokenAddy: outputToken,
             recipient: primaryWallet.address,
             orderType: toggleSelection,
-            amount: amountInWei,
+            amount: amountInWei.toString(),
             tranches: intBatches,
             percentChange: selectedPercentChange,
             priceAvg: selectedPriceAverage,
@@ -297,7 +298,7 @@ export default function Automate() {
           const { data, error } = await supabase.from('Trades').insert([
             {
               created_at: currentTimestamp,
-              user: primaryWallet.address,
+              user: primaryWallet?.address,
               pair: path,
               order: orderData,
               signature: signature,
@@ -452,6 +453,7 @@ export default function Automate() {
                 ) : (
                   <button
                     onClick={() => {
+                      console.log('Button clicked');
                       if (validateInputs()) {
                         uploadConditionalOrder();
                       }
