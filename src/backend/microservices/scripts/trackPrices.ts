@@ -3,7 +3,6 @@ import axios, { AxiosResponse } from 'axios';
 import { createClient, SupabaseClient } from '@supabase/supabase-js';
 import { supabase } from '../utils/client';
 
-
 config();
 
 const apiUrl: string = 'https://mumbai.api.0x.org/swap/v1/quote?';
@@ -12,7 +11,7 @@ const apiKey: string = process.env.OX_API_KEY || '';
 const headers = {
   '0x-api-key': apiKey,
 };
- 
+
 // Get Requested Pairs & recent PriceQueue from "Pairs" Table
 const getPairs = async () => {
   const { data: Pairs, error } = await supabase.from('Pairs').select('*');
@@ -34,7 +33,7 @@ const updatePriceData = async () => {
 
       let input_decimals = pair.input_decimals;
 
-      if(!input_decimals){
+      if (!input_decimals) {
         input_decimals = 18;
       }
 
@@ -51,10 +50,10 @@ const updatePriceData = async () => {
 
       for (let i = 0; i < intervals.length; i++) {
         const interval = intervals[i];
-      
+
         if (isTimeInterval(interval)) {
           interval_columnName = `${interval}min_avg`;
-          break; 
+          break;
         }
       }
 
@@ -63,7 +62,7 @@ const updatePriceData = async () => {
           params,
           headers,
         });
-        const current_price= response.data.price;
+        const current_price = response.data.price;
         console.log(current_price);
 
         if (interval_columnName != null) {
@@ -110,9 +109,9 @@ const sleep = (delay: number): Promise<void> =>
 // Margin of error is 1 minute
 const isTimeInterval = (intervalInMinutes: number): boolean => {
   const now = new Date();
-  console.log(now)
+  console.log(now);
   const minutes = now.getMinutes();
-  console.log(minutes)
+  console.log(minutes);
   // const minutes = 15;
   return minutes % intervalInMinutes === 0;
 };

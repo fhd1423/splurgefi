@@ -77,19 +77,19 @@ const updateTradeBatchTimings = async () => {
   if (!trades) return;
 
   for (let trade of trades) {
-    // let events = await getContractLogEvents(trade.signature); 
-    // const numberOfEvents = events.length; 
-    let numberOfEvents = 3; 
-    let remainingBatches = trade.batches - numberOfEvents; 
+    // let events = await getContractLogEvents(trade.signature);
+    // const numberOfEvents = events.length;
+    let numberOfEvents = 3;
+    let remainingBatches = trade.batches - numberOfEvents;
 
-    // Only update remaining batches if the value in the db is not up to date 
-    if (trade.remainingBatches != remainingBatches){
+    // Only update remaining batches if the value in the db is not up to date
+    if (trade.remainingBatches != remainingBatches) {
       updateRemainingBatches(trade.id, remainingBatches);
     }
 
     // Check if batch_timings data exists (i.e. not null)
     if (trade.batch_timings) {
-      const numberOfExecutedBatches = Object.keys(trade.batch_timings).length; 
+      const numberOfExecutedBatches = Object.keys(trade.batch_timings).length;
 
       // Update most recent executed batch
       if (numberOfExecutedBatches + 1 == numberOfEvents) {
@@ -101,7 +101,7 @@ const updateTradeBatchTimings = async () => {
       }
     } else {
       // Data doesn't exist yet - first batch execution
-      if (numberOfEvents == 1){
+      if (numberOfEvents == 1) {
         const current_time = new Date();
         const timestamp = current_time.getTime(); // UNIX timestamp
 
@@ -110,15 +110,14 @@ const updateTradeBatchTimings = async () => {
         };
         updateTimings(trade.id, batch_timings);
       }
-
     }
 
     // Update trade as complete if batches are over
     if (trade.batches == numberOfEvents) {
       markTradeAsComplete(trade.id);
-    } 
-    
+    }
   }
 };
 
-updateTradeBatchTimings();
+console.log('starting to update trades');
+setInterval(updateTradeBatchTimings, 15000);
