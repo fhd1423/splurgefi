@@ -9,7 +9,7 @@
     "viem": "^1.19.9"
   },
   "scripts": {
-    "docker-evaluate": "cd scripts && ts-node evaluateTrades.ts not-a-test",
+    "docker-evaluate": "cd scripts && ts-node evaluateTrades.ts",
     "docker-update": "cd scripts && ts-node updateTrades.ts",
     "docker-prices": "cd scripts && ts-node trackPrices.ts",
     "docker-server": "cd scripts && ts-node index.ts"

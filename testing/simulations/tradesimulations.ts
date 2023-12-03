@@ -2,7 +2,7 @@ import axios from 'axios';
 import * as dotenv from 'dotenv';
 import { Address } from 'viem';
 import { account } from '../utils/config';
-import { encodeInput } from '../../src/backend/microservices/scripts/evaluateTrades';
+import { encodeInput } from '../../src/backend/microservices/utils/encodingFunctions';
 dotenv.config();
 
 const generateSignature = async (data: {
