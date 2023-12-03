@@ -59,7 +59,7 @@ const CustomSelect = styled(Select)({
 });
 
 export default function TradeSelector({
-  selectedTradeAction,
+  currentMovAvg,
   onTradeActionChange,
   title,
   tokenAddy,
@@ -173,12 +173,14 @@ export default function TradeSelector({
       <CustomFormControl fullWidth>
         <CustomSelect
           open={selectOpen}
-          value={selectedTradeAction}
+          value={currentMovAvg}
           onClose={() => setSelectOpen(false)}
           onOpen={() => setSelectOpen(true)}
           displayEmpty
           IconComponent={KeyboardArrowDownIcon}
-          onChange={(event) => onTradeActionChange(event.target.value)}
+          onChange={(event) =>
+            onTradeActionChange('priceAvg', event.target.value)
+          }
         >
           <MenuItem value={15}>15 min</MenuItem>
           <MenuItem value={240}>4 hr</MenuItem>

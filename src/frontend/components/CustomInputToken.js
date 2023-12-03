@@ -95,14 +95,14 @@ export default function CustomInputToken({
   const handleInputChange = (event) => {
     const newValue = event.target.value;
     setValue(newValue);
-    onValueChange(newValue); // Lift up the new value
+    onValueChange('amount', newValue); // Lift up the new value
   };
 
   // Lift up the selected token when it changes
   const handleSelectChange = (event) => {
     const newToken = event.target.value;
     setSelectedValue(newToken);
-    onSelectChange(newToken); // Lift up the selected token
+    onSelectChange('inputTokenAddress', newToken); // Lift up the selected token
   };
 
   return (

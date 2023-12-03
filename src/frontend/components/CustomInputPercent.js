@@ -54,7 +54,7 @@ export default function CustomInputPercent({
         <CustomInput
           placeholder={placeHolder}
           value={value}
-          onChange={onValueChange}
+          onChange={(e) => onValueChange('percentChange', e.target.value)}
         />
       </CustomInputContainer>
     </div>
