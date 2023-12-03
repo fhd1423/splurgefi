@@ -77,7 +77,7 @@ const CustomDatePicker = ({ selectedDate, setSelectedDate }) => {
       </Typography>
       <DatePicker
         value={selectedDate}
-        onChange={setSelectedDate}
+        onChange={(e) => setSelectedDate('deadline', e.unix())}
         renderInput={(params) => <TextField {...params} />}
       />
     </ThemeProvider>

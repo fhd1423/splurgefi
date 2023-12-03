@@ -95,14 +95,14 @@ export default function TokenSelector({
   const handleInputChange = (event) => {
     const newValue = event.target.value;
     setValue(newValue);
-    onValueChange(newValue); // Send to parent view
+    onValueChange('outputTokenAmount', newValue); // Send to parent view
   };
 
   // Lift up the selected token when it changes
   const handleSelectChange = (event) => {
     const newToken = event.target.value;
     setSelectedValue(newToken);
-    onSelectChange(newToken); // Send to parent view
+    onSelectChange('outputTokenAddress', newToken); // Send to parent view
   };
 
   return (

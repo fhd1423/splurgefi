@@ -69,7 +69,9 @@ export default function TimeSelector({
           onOpen={() => setOpen(true)}
           displayEmpty
           IconComponent={KeyboardArrowDownIcon}
-          onChange={(event) => onTradeActionChange(event.target.value)}
+          onChange={(event) =>
+            onTradeActionChange('timeBwTrades', event.target.value)
+          }
         >
           <MenuItem value={15}>15 mins</MenuItem>
           <MenuItem value={240}>4 hrs</MenuItem>
