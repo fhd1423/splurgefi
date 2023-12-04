@@ -1,5 +1,5 @@
 import { supabase } from '@/components/client';
-import * as crypto from 'crypto';
+require('crypto');
 import { bytesToHex } from 'viem';
 
 // Utility function to generate random salt

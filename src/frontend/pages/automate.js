@@ -33,17 +33,34 @@ import {
 } from '@/helpers/utils';
 
 export default function Automate() {
-  // Sample options for testing
-  const outputOptions = [
-    { label: 'GROK', value: '0x8390a1DA07E376ef7aDd4Be859BA74Fb83aA02D5' },
-    { label: 'JOE', value: '0x76e222b07C53D28b89b0bAc18602810Fc22B49A8' },
-    { label: 'ROLBIT', value: '0x046EeE2cc3188071C02BfC1745A6b17c656e3f3d' },
-    { label: 'LINK', value: '0x514910771AF9Ca656af840dff83E8264EcF986CA' },
-    { label: 'YUNKI', value: '0x52C6CCc28C9B5f0f4F37b61316CD4F14C2D4197D' },
-  ];
+  // Define a function to handle the asynchronous Supabase call
+  function fetchPairsData() {
+    return supabase.from('Pairs').select('*');
+  }
+
+  useEffect(() => {
+    fetchPairsData().then((response) => {
+      const { data: pairs, error } = response;
+
+      if (error) {
+        console.error('Error fetching pairs data:', error);
+        return;
+      }
+
+      const newOutputOptions = pairs.map((pair) => ({
+        label: pair.tokenName,
+        value:
+          pair.path.split('-')[0] ===
+          '0x9c3C9283D3e44854697Cd22D3Faa240Cfb032889' // if its WETH
+            ? pair.path.split('-')[1] // Use the second part if the first part matches the specific string
+            : pair.path.split('-')[0], // Otherwise, use the first part
+      }));
+
+      setOutputOptions(newOutputOptions);
+    });
+  }, []);
 
   const inputOptions = [
-    { label: 'WETH', value: '0xC02aaA39b223FE8D0A0e5C4F27eAD9083C756Cc2' },
     { label: 'WMATIC', value: '0x9c3C9283D3e44854697Cd22D3Faa240Cfb032889' },
   ];
 
@@ -66,6 +83,7 @@ export default function Automate() {
   const [toggleSelection, setToggleSelection] = useState('buy');
   const [isWalletConnected, setIsWalletConnected] = useState(false);
   const [userInputError, setUserInputError] = useState('');
+  const [outputOptions, setOutputOptions] = useState([]);
 
   const { setShowAuthFlow, authToken, primaryWallet } = useDynamicContext();
 
@@ -137,7 +155,7 @@ export default function Automate() {
           { name: 'priceAvg', type: 'uint256' },
           { name: 'deadline', type: 'uint256' },
           { name: 'timeBwTrade', type: 'uint256' },
-          { name: 'salt', type: 'uint256' },
+          { name: 'salt', type: 'bytes32' },
         ],
       },
       primaryType: 'conditionalOrder',
@@ -296,9 +314,7 @@ export default function Automate() {
                   <button
                     onClick={() => {
                       console.log('Button clicked');
-                      if (validateInputs()) {
-                        signTypedData();
-                      }
+                      signTypedData();
                     }}
                     className='bg-green-500 text-white text-xl font-bold rounded-lg shadow-lg hover:bg-green-600 w-96 h-14 mt-[10px]'
                   >
