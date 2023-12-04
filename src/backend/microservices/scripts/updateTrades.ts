@@ -54,9 +54,6 @@ const updateTradeBatchTimings = async (signature: string) => {
     console.log('no matching signature');
     return;
   }
-  if (trades.length > 1) {
-    console.log('multiple matching signature');
-  }
   const trade = trades[0]; // as TradeOrder
 
   updateRemainingBatches(trade.id, trade.remainingBatches - 1);

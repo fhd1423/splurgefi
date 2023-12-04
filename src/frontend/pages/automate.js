@@ -3,7 +3,6 @@
 import React, { useState, useEffect } from 'react';
 import { Box, Grid, Paper, Typography, Alert } from '@mui/material';
 import Head from 'next/head';
-import dayjs from 'dayjs';
 import router from 'next/router';
 
 // MUI Date Picker Imports
@@ -59,9 +58,6 @@ export default function Automate() {
     { label: 'WMATIC', value: '0x9c3C9283D3e44854697Cd22D3Faa240Cfb032889' },
   ];
 
-  const path =
-    '0x9c3C9283D3e44854697Cd22D3Faa240Cfb032889-0x52C6CCc28C9B5f0f4F37b61316CD4F14C2D4197D';
-
   const [message, setMessage] = useState({
     inputTokenAddress: null, // WETH
     outputTokenAddress: null, // GROK
@@ -107,7 +103,6 @@ export default function Automate() {
   };
 
   const handleMessageChange = (field, value) => {
-    // console.log(value);
     setMessage((prevMessage) => ({
       ...prevMessage,
       [field]: value,
