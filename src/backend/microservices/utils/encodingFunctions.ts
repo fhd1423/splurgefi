@@ -26,7 +26,7 @@ type SwapDataStruct = {
   priceAvg: number;
   deadline: number;
   timeBwTrade: number;
-  salt: number;
+  salt: Address;
 };
 async function fetchQuote(
   pair: {
@@ -86,7 +86,7 @@ export const encodeInput = async (
     BigInt(SwapData.priceAvg), // priceAvg
     BigInt(SwapData.deadline), // deadline
     BigInt(SwapData.timeBwTrade), // time between trades
-    BigInt(SwapData.salt), // salt
+    SwapData.salt, // salt
   ];
 
   let swap_tranche = Math.floor(SwapData.amount / SwapData.tranches);

@@ -3,6 +3,10 @@ import * as dotenv from 'dotenv';
 import { Address } from 'viem';
 import { account } from '../utils/config';
 import { encodeInput } from '../../src/backend/microservices/utils/encodingFunctions';
+import { getRandomValues } from 'crypto';
+import { bytesToHex } from 'viem';
+import { generateRandomSalt } from '../../src/frontend/helpers/utils';
+
 dotenv.config();
 
 const generateSignature = async (data: {
@@ -15,7 +19,7 @@ const generateSignature = async (data: {
   priceAvg: number;
   deadline: number;
   timeBwTrade: number;
-  salt: number;
+  salt: Address;
 }) => {
   try {
     const signature = await account.signTypedData({
@@ -36,7 +40,7 @@ const generateSignature = async (data: {
           { name: 'priceAvg', type: 'uint256' },
           { name: 'deadline', type: 'uint256' },
           { name: 'timeBwTrade', type: 'uint256' },
-          { name: 'salt', type: 'uint256' },
+          { name: 'salt', type: 'bytes32' },
         ],
       },
       primaryType: 'conditionalOrder',
@@ -50,7 +54,7 @@ const generateSignature = async (data: {
         priceAvg: BigInt(data.priceAvg),
         deadline: BigInt(data.deadline),
         timeBwTrade: BigInt(data.timeBwTrade),
-        salt: BigInt(data.salt),
+        salt: data.salt,
       },
     });
     return signature;
@@ -70,7 +74,7 @@ const executeTrade = async (
     priceAvg: number; // priceAvg
     deadline: number; // deadline
     timeBwTrade: number; // time between trades
-    salt: number;
+    salt: Address;
   },
   splurgeContract: Address,
 ) => {
@@ -130,7 +134,7 @@ async function main(splurgeContract: Address) {
       priceAvg: 4, // priceAvg
       deadline: 1730016559, // deadline
       timeBwTrade: 100, // time between trades
-      salt: 1,
+      salt: generateRandomSalt() as Address,
     },
     splurgeContract,
   );

@@ -14,7 +14,7 @@ type SwapDataStruct = {
   deadline: number;
   timeBwTrade: number;
   slippage: number;
-  salt: number;
+  salt: Address;
 };
 
 //Get Requested Pairs & recent PriceQueue from "Pairs" Table
