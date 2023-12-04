@@ -25,6 +25,12 @@ import { useSignTypedData } from 'wagmi';
 // SDK & Client Imports
 import { useDynamicContext } from '@dynamic-labs/sdk-react-core';
 import { supabase } from '../components/client';
+import {
+  uploadUserData,
+  generateRandomSalt,
+  toWei,
+  parseJwt,
+} from '@/helpers/utils';
 
 export default function Automate() {
   // Sample options for testing
@@ -54,7 +60,7 @@ export default function Automate() {
     priceAvg: null,
     deadline: null,
     timeBwTrade: 100,
-    salt: 1,
+    salt: generateRandomSalt(),
   });
 
   const [toggleSelection, setToggleSelection] = useState('buy');
@@ -74,7 +80,6 @@ export default function Automate() {
       'priceAvg',
       'deadline',
       'timeBwTrade',
-      'slippage',
       'salt',
     ];
     const isAnyFieldEmpty = fields.every((field) => message[field]);
@@ -100,45 +105,6 @@ export default function Automate() {
     setShowAuthFlow(true);
   };
 
-  const uploadUserData = async (publicAddress, metadata) => {
-    const userData = {
-      verified_credential_address: publicAddress,
-      created_at: new Date().toISOString(),
-      metadata: metadata,
-    };
-    // Perform an upsert operation
-    const { data, error } = await supabase.from('Users').upsert(userData, {
-      onConflict: 'verified_credential_address',
-      ignoreDuplicates: true, // Ensure it doesn't update existing records
-    });
-
-    if (error) {
-      console.error('Error uploading user data to Supabase', error);
-      return;
-    }
-    console.log('User data successfully uploaded to Supabase', data);
-  };
-
-  function parseJwt(token) {
-    try {
-      const base64Url = token.split('.')[1];
-      const base64 = base64Url.replace(/-/g, '+').replace(/_/g, '/');
-      const jsonPayload = decodeURIComponent(
-        atob(base64)
-          .split('')
-          .map(function (c) {
-            return '%' + ('00' + c.charCodeAt(0).toString(16)).slice(-2);
-          })
-          .join(''),
-      );
-
-      return JSON.parse(jsonPayload);
-    } catch (e) {
-      console.error('Error decoding JWT', e);
-      return null;
-    }
-  }
-
   // Listen for changes in primaryWallet
   useEffect(() => {
     if (primaryWallet?.address && authToken) {
@@ -151,26 +117,6 @@ export default function Automate() {
       setIsWalletConnected(true);
     }
   }, [primaryWallet?.address, authToken]);
-
-  // Utility function to generate random salt
-  function generateRandomSalt() {
-    const randomBytes = new Uint8Array(64); // Generating 64 random bytes
-    crypto.getRandomValues(randomBytes);
-    return (
-      '0x' +
-      Array.from(randomBytes)
-        .map((b) => b.toString(16).padStart(2, '0'))
-        .join('')
-    );
-  }
-
-  // Function to convert token amount to Wei
-  function toWei(amount) {
-    const [whole, decimal = ''] = amount.toString().split('.');
-    const wholeBigInt = BigInt(whole);
-    const decimalBigInt = BigInt(decimal.padEnd(18, '0'));
-    return wholeBigInt * BigInt(10) ** BigInt(18) + decimalBigInt;
-  }
 
   const { data, isError, isLoading, isSuccess, signTypedData } =
     useSignTypedData({
