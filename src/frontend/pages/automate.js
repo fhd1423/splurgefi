@@ -70,7 +70,7 @@ export default function Automate() {
   const [message, setMessage] = useState({
     inputTokenAddress: null, // WETH
     outputTokenAddress: null, // GROK
-    recipient: '0x8390a1DA07E376ef7aDd4Be859BA74Fb83aA02D5',
+    recipient: null,
     amount: null, // Input token scaled(18 decimal places)
     tranches: null,
     percentChange: null,
@@ -130,6 +130,7 @@ export default function Automate() {
       const jwtData = parseJwt(authToken);
 
       uploadUserData(primaryWallet?.address, jwtData);
+      handleMessageChange('recipient', primaryWallet?.address);
     }
     if (primaryWallet?.address) {
       setIsWalletConnected(true);
