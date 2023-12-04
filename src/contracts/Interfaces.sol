@@ -21,7 +21,6 @@ struct SplurgeOrderStruct {
     uint256 priceAvg;
     uint256 deadline; // when the order expires
     uint256 timeBwTrade;
-    uint256 slippage;
     uint256 salt; // random number
 }
 

@@ -15,7 +15,6 @@ const generateSignature = async (data: {
   priceAvg: number;
   deadline: number;
   timeBwTrade: number;
-  slippage: number;
   salt: number;
 }) => {
   try {
@@ -37,7 +36,6 @@ const generateSignature = async (data: {
           { name: 'priceAvg', type: 'uint256' },
           { name: 'deadline', type: 'uint256' },
           { name: 'timeBwTrade', type: 'uint256' },
-          { name: 'slippage', type: 'uint256' },
           { name: 'salt', type: 'uint256' },
         ],
       },
@@ -52,7 +50,6 @@ const generateSignature = async (data: {
         priceAvg: BigInt(data.priceAvg),
         deadline: BigInt(data.deadline),
         timeBwTrade: BigInt(data.timeBwTrade),
-        slippage: BigInt(data.slippage),
         salt: BigInt(data.salt),
       },
     });
@@ -73,7 +70,6 @@ const executeTrade = async (
     priceAvg: number; // priceAvg
     deadline: number; // deadline
     timeBwTrade: number; // time between trades
-    slippage: number;
     salt: number;
   },
   splurgeContract: Address,
@@ -134,7 +130,6 @@ async function main(splurgeContract: Address) {
       priceAvg: 4, // priceAvg
       deadline: 1730016559, // deadline
       timeBwTrade: 100, // time between trades
-      slippage: 1,
       salt: 1,
     },
     splurgeContract,

@@ -117,17 +117,6 @@ const isTimeInterval = (intervalInMinutes: number): boolean => {
 };
 
 // Execution
-const runContinuousUpdate = async () => {
-  console.log('Continuous update loop started.');
-  while (true) {
-    await updatePriceData();
-  }
-};
+console.log('Continuous evaluation loop started');
 
-runContinuousUpdate();
-
-// Handling
-process.on('SIGINT', async () => {
-  console.log('Received SIGINT. Stopping the script gracefully.');
-  process.exit(0);
-});
+setInterval(updatePriceData, 15000);

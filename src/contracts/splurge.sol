@@ -106,7 +106,7 @@ contract Splurge is ReentrancyGuard {
         string
             memory domainType = "EIP712Domain(string name,string version,uint256 chainId,address verifyingContract)";
         string
-            memory messageType = "conditionalOrder(address inputTokenAddress,address outputTokenAddress,address recipient,uint256 amount,uint256 tranches,uint256 percentChange,uint256 priceAvg,uint256 deadline,uint256 timeBwTrade,uint256 slippage,uint256 salt)";
+            memory messageType = "conditionalOrder(address inputTokenAddress,address outputTokenAddress,address recipient,uint256 amount,uint256 tranches,uint256 percentChange,uint256 priceAvg,uint256 deadline,uint256 timeBwTrade,uint256 salt)";
 
         // hash to prevent signature collision
         bytes32 domainSeperator = keccak256(

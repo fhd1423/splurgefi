@@ -2,18 +2,6 @@ import { Address } from 'viem';
 
 import { supabase } from '../utils/client';
 import { encodeInput } from '../utils/encodingFunctions';
-const WETH = '0x9c3C9283D3e44854697Cd22D3Faa240Cfb032889'; //wmatic for now
-
-type TransformERC20 = [
-  string, // First address
-  string, // Second address
-  bigint, // First big integer
-  bigint, // Second big integer
-  Array<{
-    deploymentNonce: number;
-    data: string;
-  }>,
-];
 
 type SwapDataStruct = {
   inputTokenAddress: Address;
@@ -40,13 +28,33 @@ const updateTrades = async () => {
   if (!pairs) return;
 
   for (let pair of pairs) {
-    let { data: Trades, error } = await supabase
+    let Trades;
+    // check regular pair
+    let { data, error } = await supabase
       .from('Trades')
       .select('*')
       .eq('ready', 'false')
       .eq('complete', 'false')
       .eq('pair', pair.path);
-    if (!Trades) return;
+
+    Trades = data;
+
+    if (!Trades || Trades.length == 0) {
+      // check inverse of pair
+      pair = `${pair.path.split('-')[1]}-${pair.path.split('-')[0]}`;
+      let { data, error } = await supabase
+        .from('Trades')
+        .select('*')
+        .eq('ready', 'false')
+        .eq('complete', 'false')
+        .eq('pair', pair);
+
+      if (!data || data.length == 0) {
+        console.log('no trades to execute');
+        return;
+      }
+      Trades = data;
+    }
 
     let currentOutput = pair['current_price'];
 
@@ -78,11 +86,13 @@ const updateTrades = async () => {
       );
 
       // Only mark trade as ready if time between batches is satisfied
-      if (timeBetweenBatches >= current_time - lastBatchTime) {
+      if (timeBetweenBatches <= current_time - lastBatchTime) {
+        console.log('time between trade is satisfied');
         let buyOutputOver =
           ((100 + Number(trade.order.percentChange)) / 100) *
           movingAveragePrice;
         if (currentOutput >= buyOutputOver) {
+          console.log('percent change satisfied');
           const { data, error } = await supabase
             .from('Trades')
             .update({
