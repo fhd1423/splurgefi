@@ -6,6 +6,7 @@ import GradientText from './GradientText';
 import Link from 'next/link';
 import { useRouter } from 'next/navigation';
 import NavBar from './NavBar';
+import TradeSummaryDropdown from './TradeSummaryDropdown';
 
 const LandingPage = () => {
   const router = useRouter();
@@ -65,6 +66,8 @@ const LandingPage = () => {
           <p className='text-2xl mb-10 text-gray-400 tracking-wide'>
             Best trading experience ever.
           </p>
+
+          <TradeSummaryDropdown />
 
           <Link href='/automate' passHref>
             <button className='bg-green-500 text-white text-xl font-semibold rounded-lg shadow-lg hover:bg-green-600 w-64 h-14'>
