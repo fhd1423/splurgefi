@@ -1,4 +1,4 @@
-import { supabase } from '@/components/client';
+import { supabase } from '../components/client';
 require('crypto');
 import { bytesToHex } from 'viem';
 
