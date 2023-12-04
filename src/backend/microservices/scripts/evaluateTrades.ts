@@ -51,10 +51,6 @@ const updateTrades = async () => {
     let currentOutput = pair['current_price'];
 
     for (let trade of Trades) {
-      let xChangeRate_modifier = 1;
-      if (trade.order.outputTokenAddress == WETH) {
-        xChangeRate_modifier = -1;
-      }
       let allMeanPrices;
       try {
         allMeanPrices = pair[`${trade.order.priceAvg}min_avg`]['close_prices'];
@@ -67,11 +63,8 @@ const updateTrades = async () => {
         break;
       }
       let movingAveragePrice =
-        allMeanPrices.reduce(
-          (acc: any, val: any) =>
-            acc + Number(Math.pow(val, xChangeRate_modifier)),
-          0,
-        ) / allMeanPrices.length;
+        allMeanPrices.reduce((acc: any, val: any) => acc + Number(val), 0) /
+        allMeanPrices.length;
 
       const current_time = new Date().getTime(); // UNIX timestamp
       const mostRecentBatch = Object.keys(trade.batch_timings).length;
