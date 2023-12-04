@@ -70,13 +70,13 @@ export default function TimeSelector({
           displayEmpty
           IconComponent={KeyboardArrowDownIcon}
           onChange={(event) =>
-            onTradeActionChange('timeBwTrades', event.target.value)
+            onTradeActionChange('timeBwTrade', event.target.value)
           }
         >
-          <MenuItem value={15}>15 mins</MenuItem>
-          <MenuItem value={240}>4 hrs</MenuItem>
-          <MenuItem value={480}>8 hrs</MenuItem>
-          <MenuItem value={1440}>24 hrs</MenuItem>
+          <MenuItem value={900}>15 mins</MenuItem>
+          <MenuItem value={14400}>4 hrs</MenuItem>
+          <MenuItem value={28800}>8 hrs</MenuItem>
+          <MenuItem value={86400}>24 hrs</MenuItem>
         </CustomSelect>
         <IconButton
           onClick={toggleDropdown}

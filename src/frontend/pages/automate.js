@@ -25,12 +25,7 @@ import { useSignTypedData } from 'wagmi';
 // SDK & Client Imports
 import { useDynamicContext } from '@dynamic-labs/sdk-react-core';
 import { supabase } from '../components/client';
-import {
-  uploadUserData,
-  generateRandomSalt,
-  toWei,
-  parseJwt,
-} from '@/helpers/utils';
+import { uploadUserData, generateRandomSalt, parseJwt } from '@/helpers/utils';
 
 export default function Automate() {
   // Define a function to handle the asynchronous Supabase call
@@ -76,7 +71,7 @@ export default function Automate() {
     percentChange: null,
     priceAvg: null,
     deadline: null,
-    timeBwTrade: 100,
+    timeBwTrade: null,
     salt: generateRandomSalt(),
   });
 
@@ -167,7 +162,7 @@ export default function Automate() {
         await supabase.from('Trades').insert([
           {
             user: primaryWallet.address,
-            pair: path,
+            pair: `${message.inputTokenAddress}-${message.outputTokenAddress}`,
             order: message,
             signature: data,
             complete: false,
@@ -290,7 +285,7 @@ export default function Automate() {
                 <TimeSelector
                   // selectedTradeAction={selectedTimeBwTrade}
                   onTradeActionChange={handleMessageChange}
-                  title='Time bw trades'
+                  title='Execution Interval'
                 />
               </Grid>
 

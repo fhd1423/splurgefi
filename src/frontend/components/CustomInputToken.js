@@ -1,6 +1,7 @@
 import { styled } from '@mui/system';
 import React, { useState } from 'react';
 import OutlinedInput from '@mui/material/OutlinedInput';
+import { parseEther } from 'viem';
 
 import {
   Typography,
@@ -95,7 +96,7 @@ export default function CustomInputToken({
   const handleInputChange = (event) => {
     const newValue = event.target.value;
     setValue(newValue);
-    onValueChange('amount', newValue); // Lift up the new value
+    onValueChange('amount', String(parseEther(newValue))); // put wei value in order to sign
   };
 
   // Lift up the selected token when it changes

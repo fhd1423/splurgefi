@@ -8,14 +8,6 @@ export function generateRandomSalt() {
   return bytesToHex(randomBytes);
 }
 
-// Function to convert token amount to Wei
-export function toWei(amount: any) {
-  const [whole, decimal = ''] = amount.toString().split('.');
-  const wholeBigInt = BigInt(whole);
-  const decimalBigInt = BigInt(decimal.padEnd(18, '0'));
-  return wholeBigInt * BigInt(10) ** BigInt(18) + decimalBigInt;
-}
-
 export const uploadUserData = async (publicAddress: any, metadata: any) => {
   const userData = {
     verified_credential_address: publicAddress,
