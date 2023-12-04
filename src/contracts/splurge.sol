@@ -5,12 +5,12 @@ import { IERC20 } from "@openzeppelin/contracts/token/ERC20/IERC20.sol";
 import { ECDSA } from "@openzeppelin/contracts/utils/cryptography/ECDSA.sol";
 import { ReentrancyGuard } from "@openzeppelin/contracts/utils/ReentrancyGuard.sol";
 //NotEnoughBalanceToWithdraw removed for husky
-import { IZeroExSwap, IWETH, SplurgeOrderStruct, ZeroExSwapStruct, badSignature, tradesCompleted, mustIncludeWETH, tradeExpired, feeTransferFailed } from "./Interfaces.sol";
+import { IZeroExSwap, IWETH, SplurgeOrderStruct, ZeroExSwapStruct, badSignature, tradesCompleted, mustIncludeWETH, tradeExpired, feeTransferFailed, timeNotSatisfied } from "./Interfaces.sol";
 
 contract Splurge is ReentrancyGuard {
     IZeroExSwap public swapRouter;
     IWETH internal wETH;
-    mapping(address => mapping(address => uint256)) public tokenBalances;
+    mapping(bytes => uint256) public lastCompletedTrade;
     mapping(bytes => uint256) public tranchesCompleted;
 
     //Can index/search by trade w/ signature
@@ -40,8 +40,12 @@ contract Splurge is ReentrancyGuard {
         if (order.deadline < block.timestamp)
             revert tradeExpired(order, block.timestamp);
 
+        if (order.timeBwTrade > block.timestamp - lastCompletedTrade[signature])
+            revert timeNotSatisfied(order, block.timestamp);
+
         executeTrade(order, swapCallData, signature);
         tranchesCompleted[signature] += 1;
+        lastCompletedTrade[signature] = block.timestamp;
     }
 
     function executeTrade(
