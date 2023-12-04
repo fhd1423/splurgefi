@@ -14,7 +14,7 @@ contract Splurge is ReentrancyGuard {
     mapping(bytes => uint256) public tranchesCompleted;
 
     //Can index/search by trade w/ signature
-    event TradeEvent(address indexed _from, bytes indexed _signature);
+    event TradeEvent(bytes indexed _signature);
 
     constructor(address _swapRouter, address _wethAddress) {
         swapRouter = IZeroExSwap(_swapRouter);
@@ -81,7 +81,7 @@ contract Splurge is ReentrancyGuard {
 
         output.transfer(order.recipient, outputAmount);
 
-        emit TradeEvent(msg.sender, signature);
+        emit TradeEvent(signature);
         return outputAmount;
     }
 
