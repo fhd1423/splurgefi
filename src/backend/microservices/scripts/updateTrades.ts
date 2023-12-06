@@ -17,11 +17,11 @@ const markTradeAsComplete = async (id: number) => {
   }
 };
 
-const updateRemainingBatches = async (id: number, batches_left: number) => {
+const updateRemainingBatches = async (id: number, remainingBatches: number) => {
   const { data, error } = await supabase
     .from('Trades')
     .update({
-      remainingBatches: batches_left,
+      remainingBatches,
     })
     .match({ id: id });
 
@@ -30,11 +30,11 @@ const updateRemainingBatches = async (id: number, batches_left: number) => {
   }
 };
 
-const updateTimings = async (id: number, timings: Record<string, any>) => {
+const updateTimings = async (id: number, lastExecuted: number) => {
   const { data, error } = await supabase
     .from('Trades')
     .update({
-      batch_timings: timings,
+      lastExecuted,
       ready: false,
     })
     .match({ id: id });
@@ -54,30 +54,14 @@ const updateTradeBatchTimings = async (signature: string) => {
     console.log('no matching signature');
     return;
   }
-  const trade = trades[0]; // as TradeOrder
+  const trade = trades[0];
 
   updateRemainingBatches(trade.id, trade.remainingBatches - 1);
 
-  // Check if batch_timings data exists (i.e. not null)
-  if (trade.batch_timings) {
-    const numberOfExecutedBatches = Object.keys(trade.batch_timings).length;
-    const newBatchNumber = numberOfExecutedBatches + 1;
-    const newBatchTimestamp = new Date().getTime(); // Get current unix timestamp
-    trade.batch_timings[newBatchNumber.toString()] = newBatchTimestamp;
+  const justExecuted = new Date().getTime();
 
-    updateTimings(trade.id, trade.batch_timings);
-  } else {
-    // Data doesn't exist yet - first batch execution
-    const current_time = new Date();
-    const timestamp = current_time.getTime(); // UNIX timestamp
+  updateTimings(trade.id, justExecuted);
 
-    const batch_timings = {
-      '1': timestamp,
-    };
-    updateTimings(trade.id, batch_timings);
-  }
-
-  // Update trade as complete if batches are over
   if (trade.remainingBatches == 0) {
     markTradeAsComplete(trade.id);
   }

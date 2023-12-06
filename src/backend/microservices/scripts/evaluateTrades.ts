@@ -75,9 +75,8 @@ const updateTrades = async () => {
         allMeanPrices.length;
 
       const current_time = new Date().getTime(); // UNIX timestamp
-      const mostRecentBatch = Object.keys(trade.batch_timings).length;
-      const lastBatchTime = trade.batch_timings[mostRecentBatch.toString()];
-      const timeBetweenBatches = trade.time_bw_batches;
+      const lastBatchTime = trade.lastExecuted;
+      const timeBetweenBatches = trade.order.timeBwTrade;
 
       // Get swap call data
       const callData = await encodeInput(
