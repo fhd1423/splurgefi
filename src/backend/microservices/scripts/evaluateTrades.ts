@@ -29,6 +29,7 @@ const updateTrades = async () => {
 
   for (let pair of pairs) {
     let Trades;
+    let inverse = false;
     // check regular pair
     let { data, error } = await supabase
       .from('Trades')
@@ -53,6 +54,7 @@ const updateTrades = async () => {
         return;
       }
       Trades = data;
+      inverse = true;
     }
 
     let currentOutput = pair['current_price'];
@@ -72,6 +74,11 @@ const updateTrades = async () => {
       let movingAveragePrice =
         allMeanPrices.reduce((acc: any, val: any) => acc + Number(val), 0) /
         allMeanPrices.length;
+
+      if (inverse) {
+        movingAveragePrice = 1 / movingAveragePrice;
+        currentOutput = 1 / currentOutput;
+      }
 
       const current_time = parseInt((new Date().getTime() / 1000).toFixed(0));
 
