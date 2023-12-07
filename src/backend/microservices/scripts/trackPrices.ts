@@ -129,10 +129,11 @@ function getNextIntervalTime() {
 }
 
 async function executePeriodically() {
+  console.log(Date());
   const before = Date.now();
   await updatePriceData();
 
-  const timeTaken = Date.now() - before;
+  const timeTaken = (Date.now() - before) * 1.005;
   const nextExecutionTime = Math.max(0, 15000 - timeTaken); // 15 seconds - runtime
 
   setTimeout(executePeriodically, nextExecutionTime); // Schedule the next execution
