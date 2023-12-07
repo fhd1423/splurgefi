@@ -11,6 +11,18 @@ const getPairs = async () => {
   return Pairs;
 };
 
+const getSortedTrades = async (path: string) => {
+  let { data: Pairs, error } = await supabase
+    .from('Trades')
+    .select('*')
+    .eq('ready', 'false')
+    .eq('complete', 'false')
+    .eq('pair', path);
+
+  if (error) console.log(error);
+  return Pairs;
+};
+
 const updateTrades = async () => {
   let pairs = await getPairs();
   if (!pairs) return;
@@ -18,47 +30,27 @@ const updateTrades = async () => {
   for (let pair of pairs) {
     let Trades;
     let inverse = false;
-    // check regular pair
-    let { data, error } = await supabase
-      .from('Trades')
-      .select('*')
-      .eq('ready', 'false')
-      .eq('complete', 'false')
-      .eq('pair', pair.path);
 
-    Trades = data;
+    // check regular pair
+    Trades = await getSortedTrades(pair.path);
 
     if (!Trades || Trades.length == 0) {
       // check inverse of pair
-      pair = `${pair.path.split('-')[1]}-${pair.path.split('-')[0]}`;
-      let { data, error } = await supabase
-        .from('Trades')
-        .select('*')
-        .eq('ready', 'false')
-        .eq('complete', 'false')
-        .eq('pair', pair);
+      const path = `${pair.path.split('-')[1]}-${pair.path.split('-')[0]}`;
+      Trades = await getSortedTrades(path);
 
-      if (!data || data.length == 0) {
+      if (!Trades || Trades.length == 0) {
         return;
       }
-      Trades = data;
       inverse = true;
     }
 
     let currentOutput = pair['current_price'];
 
     for (let trade of Trades) {
-      let allMeanPrices;
-      try {
-        allMeanPrices = pair[`${trade.order.priceAvg}min_avg`]['close_prices'];
-      } catch (e) {
-        console.log(`error with ${pair}`);
-        break;
-      }
-      if (!allMeanPrices || allMeanPrices.length == 0) {
-        console.log(`error with ${pair}`);
-        break;
-      }
+      const allMeanPrices =
+        pair[`${trade.order.priceAvg}min_avg`]['close_prices'];
+
       let movingAveragePrice =
         allMeanPrices.reduce((acc: any, val: any) => acc + Number(val), 0) /
         allMeanPrices.length;
@@ -85,9 +77,6 @@ const updateTrades = async () => {
           ((100 + Number(trade.order.percentChange)) / 100) *
           movingAveragePrice;
         if (currentOutput >= buyOutputOver) {
-          console.log(
-            `percent change satisfied, currentOutput is ${currentOutput} and minimum is ${buyOutputOver}`,
-          );
           if (await simulateTrade(callData)) {
             const { data, error } = await supabase
               .from('Trades')
@@ -99,7 +88,10 @@ const updateTrades = async () => {
               .select();
             if (error)
               console.log('error pushing calldata for trade ${trade.id}');
-            else console.log(`trade ${trade.id} is ready`);
+            else
+              console.log(
+                `trade ${trade.id} is ready, currentOutput is ${currentOutput} and minimum is ${buyOutputOver}`,
+              );
           } else {
             console.log(`trade simulation failed for trade ${trade.id}`);
           }
