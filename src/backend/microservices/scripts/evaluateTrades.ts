@@ -50,7 +50,6 @@ const updateTrades = async () => {
         .eq('pair', pair);
 
       if (!data || data.length == 0) {
-        console.log('no trades to execute');
         return;
       }
       Trades = data;
@@ -85,12 +84,13 @@ const updateTrades = async () => {
         trade.signature,
       );
 
-      // Assuming current_time, lastBatchTime, and timeBetweenBatches are defined and are in seconds
-      let remainingSeconds = current_time - lastBatchTime - timeBetweenBatches;
+      /*let remainingSeconds = current_time - lastBatchTime - timeBetweenBatches;
 
       console.log(
-        `There are ${-1 * remainingSeconds} until trade ${trade.id} executes.`,
-      );
+        `There are ${-1 * remainingSeconds} seconds until trade ${
+          trade.id
+        } executes.`,
+      );*/
 
       // Only mark trade as ready if time between batches is satisfied
       if (timeBetweenBatches <= current_time - lastBatchTime) {

@@ -40,7 +40,7 @@ const updatePriceData = async () => {
       });
 
       const current_price = response.data.price;
-      console.log(`current price for ${pair.path} is ${current_price}`);
+      // console.log(`current price for ${pair.path} is ${current_price}`);
 
       const intervals = checkTime();
 
