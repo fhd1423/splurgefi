@@ -23,13 +23,12 @@ async function fetchReadyTrades(supabaseUrl: string, supabaseKey: string) {
 Web3Function.onRun(async (context: Web3FunctionContext) => {
   const { userArgs, gelatoArgs, secrets, multiChainProvider } = context;
   const provider = multiChainProvider.default();
-  const splurgeAddy = '0x42F6a5E4b31A6c5F42C667Ea4C74939D0E0558B4';
-
-  //Get Supabase Trades
+  const splurgeAddy = await secrets.get('SPLURGE_ADDY');
   const supabaseUrl = await secrets.get('SUPABASE_URL');
   const supabaseKey = await secrets.get('SUPABASE_API_KEY');
   if (!supabaseUrl) throw new Error(`no supabase url provided`);
   if (!supabaseKey) throw new Error(`no supbase key provided`);
+  if (!splurgeAddy) throw new Error(`no supabase url provided`);
   const readyTrades = await fetchReadyTrades(supabaseUrl, supabaseKey);
 
   if (readyTrades) {

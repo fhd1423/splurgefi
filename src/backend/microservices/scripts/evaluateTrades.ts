@@ -74,7 +74,8 @@ const updateTrades = async () => {
         allMeanPrices.reduce((acc: any, val: any) => acc + Number(val), 0) /
         allMeanPrices.length;
 
-      const current_time = new Date().getTime(); // UNIX timestamp
+      const current_time = parseInt((new Date().getTime() / 1000).toFixed(0));
+
       const lastBatchTime = trade.lastExecuted;
       const timeBetweenBatches = trade.order.timeBwTrade;
 
@@ -84,6 +85,12 @@ const updateTrades = async () => {
         trade.signature,
       );
 
+      console.log(
+        `There are ${
+          -1 * current_time - lastBatchTime - timeBetweenBatches
+        } seconds until trade ${trade.id} executes.`,
+      );
+
       // Only mark trade as ready if time between batches is satisfied
       if (timeBetweenBatches <= current_time - lastBatchTime) {
         console.log('time between trade is satisfied');
@@ -91,7 +98,9 @@ const updateTrades = async () => {
           ((100 + Number(trade.order.percentChange)) / 100) *
           movingAveragePrice;
         if (currentOutput >= buyOutputOver) {
-          console.log('percent change satisfied');
+          console.log(
+            `percent change satisfied, currentOutput is ${currentOutput} and minimum is ${buyOutputOver}`,
+          );
           const { data, error } = await supabase
             .from('Trades')
             .update({

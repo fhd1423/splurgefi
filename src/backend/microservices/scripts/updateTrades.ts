@@ -22,11 +22,16 @@ const updateRemainingBatches = async (id: number, remainingBatches: number) => {
     .from('Trades')
     .update({
       remainingBatches,
+      ready: false,
     })
-    .match({ id: id });
+    .match({ id });
 
   if (error) {
     console.error('Error updating row:', error);
+  } else {
+    console.log(
+      `updated trade ${id}, there are ${remainingBatches} batches remaining`,
+    );
   }
 };
 
@@ -37,10 +42,12 @@ const updateTimings = async (id: number, lastExecuted: number) => {
       lastExecuted,
       ready: false,
     })
-    .match({ id: id });
+    .match({ id });
 
   if (error) {
     console.error('Error updating row:', error);
+  } else {
+    console.log(`updated trade ${id}, executed at ${lastExecuted}`);
   }
 };
 
@@ -58,7 +65,7 @@ const updateTradeBatchTimings = async (signature: string) => {
 
   updateRemainingBatches(trade.id, trade.remainingBatches - 1);
 
-  const justExecuted = new Date().getTime();
+  const justExecuted = parseInt((new Date().getTime() / 1000).toFixed(0));
 
   updateTimings(trade.id, justExecuted);
 

@@ -5,7 +5,7 @@ import { supabase } from '../utils/client';
 config();
 
 const apiUrl: string = 'https://mumbai.api.0x.org/swap/v1/quote?';
-const apiKey: string = process.env.OX_API_KEY || '';
+const apiKey: string = '0631b1fa-5205-42d3-89ef-c4e8ea3538fe';
 
 const headers = {
   '0x-api-key': apiKey,
@@ -80,7 +80,7 @@ const updatePriceData = async () => {
           const upsertResponse = await supabase
             .from('Pairs')
             .upsert([upsertData]);
-          console.log('Upsert Response:', upsertResponse);
+          //console.log('Upsert Response:', upsertResponse);
         } else {
           const upsertData = {
             path: pair.path,
@@ -90,7 +90,7 @@ const updatePriceData = async () => {
           const upsertResponse = await supabase
             .from('Pairs')
             .upsert([upsertData]);
-          console.log('Upsert Response:', upsertResponse);
+          //console.log('Upsert Response:', upsertResponse);
         }
       } catch (error) {
         console.error('Error:', (error as Error).message);
@@ -108,10 +108,9 @@ const sleep = (delay: number): Promise<void> =>
 // Margin of error is 1 minute
 const isTimeInterval = (intervalInMinutes: number): boolean => {
   const now = new Date();
-  console.log(now);
-  const minutes = now.getMinutes();
-  console.log(minutes);
-  // const minutes = 15;
+
+  const minutes = new Date().getMinutes();
+
   return minutes % intervalInMinutes === 0;
 };
 
