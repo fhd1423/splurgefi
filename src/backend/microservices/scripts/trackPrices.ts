@@ -22,6 +22,7 @@ const updatePriceData = async () => {
   const pairs = await getPairs();
 
   if (pairs) {
+    const intervals = checkTime();
     for (let i = 0; i < pairs.length; i++) {
       const pair = pairs[i];
       const splitPair = pair.path.split('-');
@@ -29,8 +30,8 @@ const updatePriceData = async () => {
       const buyToken = splitPair[1];
 
       const params = {
-        sellToken: sellToken,
-        buyToken: buyToken,
+        sellToken,
+        buyToken,
         sellAmount: 0.01 * 10 ** 18, // TODO: add decimal logic
       };
 
@@ -47,8 +48,6 @@ const updatePriceData = async () => {
       if (!response) return;
       const current_price = (response.data.buyAmount / 10 ** 18).toFixed(4); // TODO: add decimal logic
       // console.log(`current price for ${pair.path} is ${current_price}`);
-
-      const intervals = checkTime();
 
       let executed = false;
       for (let interval of intervals) {
@@ -102,10 +101,12 @@ function checkTime() {
 
   let intervals: string[] = [];
 
-  const is15Minutes = minutes % 15 === 0 && isWithinGracePeriod(0);
-  const is1Hours = hours % 1 === 0 && minutes === 0 && isWithinGracePeriod(0);
-  const is4Hours = hours % 4 === 0 && minutes === 0 && isWithinGracePeriod(0);
-  const is24Hours = hours === 0 && minutes === 0 && isWithinGracePeriod(0);
+  const withinPeriod = isWithinGracePeriod(0);
+  const zeroMinutes = minutes === 0;
+  const is15Minutes = minutes % 15 === 0 && withinPeriod;
+  const is1Hours = hours % 1 === 0 && zeroMinutes && withinPeriod;
+  const is4Hours = hours % 4 === 0 && zeroMinutes && withinPeriod;
+  const is24Hours = hours === 0 && zeroMinutes && withinPeriod;
 
   if (is15Minutes) intervals.push(`15min_avg`);
   if (is1Hours) intervals.push(`60min_avg`); // 8 hours in minutes
@@ -130,13 +131,8 @@ function getNextIntervalTime() {
 
 async function executePeriodically() {
   console.log(Date());
-  const before = Date.now();
   await updatePriceData();
-
-  const timeTaken = (Date.now() - before) * 1.005;
-  const nextExecutionTime = Math.max(0, 15000 - timeTaken); // 15 seconds - runtime
-
-  setTimeout(executePeriodically, nextExecutionTime); // Schedule the next execution
+  setTimeout(executePeriodically, getNextIntervalTime()); // Schedule the next execution
 }
 
 console.log('Continuous evaluation loop started');

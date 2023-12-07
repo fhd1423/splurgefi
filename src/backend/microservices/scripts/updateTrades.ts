@@ -13,7 +13,7 @@ const updateTrade = async (
       remainingBatches,
       lastExecuted,
       ready: false,
-      complete: remainingBatches == 0 ? true : false,
+      complete: remainingBatches == 0,
     })
     .match({ id });
 
