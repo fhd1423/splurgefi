@@ -74,9 +74,9 @@ export default function TimeSelector({
           }
         >
           <MenuItem value={900}>15 mins</MenuItem>
+          <MenuItem value={3600}>1 hrs</MenuItem>
           <MenuItem value={14400}>4 hrs</MenuItem>
-          <MenuItem value={28800}>8 hrs</MenuItem>
-          <MenuItem value={86400}>24 hrs</MenuItem>
+          <MenuItem value={57600}>24 hrs</MenuItem>
         </CustomSelect>
         <IconButton
           onClick={toggleDropdown}

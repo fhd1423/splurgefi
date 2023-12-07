@@ -90,13 +90,13 @@ function checkTime() {
   let intervals: string[] = [];
 
   const is15Minutes = minutes % 15 === 0 && isWithinGracePeriod(0);
+  const is1Hours = hours % 1 === 0 && minutes === 0 && isWithinGracePeriod(0);
   const is4Hours = hours % 4 === 0 && minutes === 0 && isWithinGracePeriod(0);
-  const is8Hours = hours % 8 === 0 && minutes === 0 && isWithinGracePeriod(0);
   const is24Hours = hours === 0 && minutes === 0 && isWithinGracePeriod(0);
 
   if (is15Minutes) intervals.push(`15min_avg`);
+  if (is1Hours) intervals.push(`60min_avg`); // 8 hours in minutes
   if (is4Hours) intervals.push(`${4 * 60}min_avg`); // 4 hours in minutes
-  if (is8Hours) intervals.push(`${8 * 60}min_avg`); // 8 hours in minutes
   if (is24Hours) intervals.push(`${12 * 60}min_avg`); // 24 hours in minutes
 
   return intervals;

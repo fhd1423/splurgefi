@@ -183,8 +183,8 @@ export default function TradeSelector({
           }
         >
           <MenuItem value={15}>15 min</MenuItem>
+          <MenuItem value={60}>1 hr</MenuItem>
           <MenuItem value={240}>4 hr</MenuItem>
-          <MenuItem value={480}>8 hr</MenuItem>
           <MenuItem value={1440}>24 hr</MenuItem>
         </CustomSelect>
         <IconButton
