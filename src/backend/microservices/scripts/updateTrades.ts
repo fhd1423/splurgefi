@@ -2,27 +2,18 @@ import { supabase } from '../utils/client';
 import { viemClient } from '../utils/viemclient';
 import { Address, parseAbiItem } from 'viem';
 
-// Mark as complete
-const markTradeAsComplete = async (id: number) => {
-  const { data, error } = await supabase
-    .from('Trades')
-    .update({
-      complete: true,
-      ready: false,
-    })
-    .match({ id: id });
-
-  if (error) {
-    console.error('Error updating row:', error);
-  }
-};
-
-const updateRemainingBatches = async (id: number, remainingBatches: number) => {
+const updateTrade = async (
+  id: number,
+  remainingBatches: number,
+  lastExecuted: number,
+) => {
   const { data, error } = await supabase
     .from('Trades')
     .update({
       remainingBatches,
+      lastExecuted,
       ready: false,
+      complete: remainingBatches == 0 ? true : false,
     })
     .match({ id });
 
@@ -30,24 +21,8 @@ const updateRemainingBatches = async (id: number, remainingBatches: number) => {
     console.error('Error updating row:', error);
   } else {
     console.log(
-      `updated trade ${id}, there are ${remainingBatches} batches remaining`,
+      `updated trade ${id}, executed trade at ${lastExecuted} there are ${remainingBatches} batches remaining`,
     );
-  }
-};
-
-const updateTimings = async (id: number, lastExecuted: number) => {
-  const { data, error } = await supabase
-    .from('Trades')
-    .update({
-      lastExecuted,
-      ready: false,
-    })
-    .match({ id });
-
-  if (error) {
-    console.error('Error updating row:', error);
-  } else {
-    console.log(`updated trade ${id}, executed at ${lastExecuted}`);
   }
 };
 
@@ -62,21 +37,14 @@ const updateTradeBatchTimings = async (signature: string) => {
     return;
   }
   const trade = trades[0];
-
-  updateRemainingBatches(trade.id, trade.remainingBatches - 1);
-
   const justExecuted = parseInt((new Date().getTime() / 1000).toFixed(0));
 
-  updateTimings(trade.id, justExecuted);
-
-  if (trade.remainingBatches == 0) {
-    markTradeAsComplete(trade.id);
-  }
+  updateTrade(trade.id, trade.remainingBatches - 1, justExecuted);
 };
 
 const contractEventListener = async () => {
   viemClient.watchEvent({
-    address: process.env.SPLURGE_ADDRESS as Address,
+    address: process.env.SPLURGE_ADDRESS as Address, //'0xF8638B550bF764732e0a69d99b445a82858Bc572',
     event: parseAbiItem('event TradeEvent(bytes signature)'),
     onLogs: (logs) => {
       logs.forEach((log) => {
