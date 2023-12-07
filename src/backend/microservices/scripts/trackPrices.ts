@@ -129,16 +129,13 @@ function getNextIntervalTime() {
   return millisecondsToWait;
 }
 
-let lastExecutionTime = Date.now(); // Record the time when the script starts
-
 async function executePeriodically() {
-  const now = Date.now(); // Current time
-  await updatePriceData(); // Execute your function
+  const before = Date.now();
+  await updatePriceData();
 
-  const timeTaken = Date.now() - now; // Calculate the time taken to execute updatePriceData
-  const nextExecutionTime = Math.max(0, 15000 - timeTaken); // Calculate the time for the next execution
+  const timeTaken = Date.now() - before;
+  const nextExecutionTime = Math.max(0, 15000 - timeTaken); // 15 seconds - runtime
 
-  lastExecutionTime = Date.now(); // Update the last execution time after updatePriceData has executed
   setTimeout(executePeriodically, nextExecutionTime); // Schedule the next execution
 }
 
