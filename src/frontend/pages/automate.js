@@ -162,6 +162,8 @@ export default function Automate() {
             signature: data,
             complete: false,
             ready: false,
+            remainingBatches: message.tranches,
+            lastExecuted: 0,
           },
         ]);
         router.push('/trades');

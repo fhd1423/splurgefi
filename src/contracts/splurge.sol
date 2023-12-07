@@ -11,9 +11,7 @@ contract Splurge is ReentrancyGuard {
     IWETH internal wETH;
     mapping(bytes => uint256) public lastCompletedTrade;
     mapping(bytes => uint256) public tranchesCompleted;
-
-    //Can index/search by trade w/ signature
-    event TradeEvent(bytes indexed _signature);
+    event TradeEvent(bytes signature);
 
     constructor(address _swapRouter, address _wethAddress) {
         swapRouter = IZeroExSwap(_swapRouter);

@@ -70,11 +70,11 @@ const updateTradeBatchTimings = async (signature: string) => {
 const contractEventListener = async () => {
   viemClient.watchEvent({
     address: process.env.SPLURGE_ADDRESS as Address,
-    event: parseAbiItem('event TradeEvent(bytes indexed _signature)'),
+    event: parseAbiItem('event TradeEvent(bytes signature)'),
     onLogs: (logs) => {
       logs.forEach((log) => {
         // Extract the signature from the log
-        const signature = log.args._signature;
+        const signature = log.args.signature;
         updateTradeBatchTimings(signature as Address);
       });
     },
