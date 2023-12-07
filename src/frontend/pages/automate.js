@@ -45,7 +45,7 @@ export default function Automate() {
         label: pair.tokenName,
         value:
           pair.path.split('-')[0] ===
-          '0x9c3C9283D3e44854697Cd22D3Faa240Cfb032889' // if its WETH
+          '0x82aF49447D8a07e3bd95BD0d56f35241523fBab1' // if its WETH
             ? pair.path.split('-')[1] // Use the second part if the first part matches the specific string
             : pair.path.split('-')[0], // Otherwise, use the first part
       }));
@@ -55,7 +55,7 @@ export default function Automate() {
   }, []);
 
   const inputOptions = [
-    { label: 'WMATIC', value: '0x9c3C9283D3e44854697Cd22D3Faa240Cfb032889' },
+    { label: 'WETH', value: '0x82aF49447D8a07e3bd95BD0d56f35241523fBab1' },
   ];
 
   const [message, setMessage] = useState({
