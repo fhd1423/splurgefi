@@ -31,7 +31,7 @@ const updatePriceData = async () => {
       const params = {
         sellToken: sellToken,
         buyToken: buyToken,
-        sellAmount: pair.decimals || 0.01 ** 18, // Arbitrary, just trying to get exchange rate
+        sellAmount: 0.1 * 10 ** pair.decimals || 0.1 * 10 ** 18, // Arbitrary, just trying to get exchange rate
       };
 
       let response;
