@@ -11,18 +11,27 @@ contract Splurge is ReentrancyGuard {
     IWETH internal wETH;
     mapping(bytes => uint256) public lastCompletedTrade;
     mapping(bytes => uint256) public tranchesCompleted;
+    address public deployer;
+    address public executor;
     event TradeEvent(bytes signature);
 
-    constructor(address _swapRouter, address _wethAddress) {
+    modifier onlyExecutor() {
+        require(msg.sender == executor, "Not executor");
+        _;
+    }
+
+    constructor(address _swapRouter, address _wethAddress, address _executor) {
         swapRouter = IZeroExSwap(_swapRouter);
         wETH = IWETH(_wethAddress);
+        deployer = msg.sender;
+        executor = _executor;
     }
 
     function verifyExecuteTrade(
         SplurgeOrderStruct memory order,
         bytes memory signature,
         ZeroExSwapStruct memory swapCallData
-    ) public {
+    ) public onlyExecutor {
         if (getSigner(order, signature) != order.recipient)
             revert badSignature(order, signature);
 
@@ -88,7 +97,7 @@ contract Splurge is ReentrancyGuard {
         uint256 fee = (balance * 5) / 1000;
 
         wETH.withdraw(fee);
-        (bool success, ) = payable(msg.sender).call{ value: fee }("");
+        (bool success, ) = payable(deployer).call{ value: fee }("");
         if (!success) revert feeTransferFailed(balance, fee);
         return balance - fee;
     }

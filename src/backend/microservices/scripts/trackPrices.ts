@@ -130,7 +130,6 @@ function getNextIntervalTime() {
 }
 
 async function executePeriodically() {
-  console.log(Date());
   await updatePriceData();
   setTimeout(executePeriodically, getNextIntervalTime()); // Schedule the next execution
 }
