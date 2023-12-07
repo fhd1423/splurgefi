@@ -28,72 +28,39 @@ const updatePriceData = async () => {
       const sellToken = splitPair[0];
       const buyToken = splitPair[1];
 
-      //const current_price = pair.current_price;
-
-      let input_decimals = pair.input_decimals;
-
-      if (!input_decimals) {
-        input_decimals = 18;
-      }
-
       const params = {
         sellToken: sellToken,
         buyToken: buyToken,
-        sellAmount: 10 ** input_decimals, // Arbitrary, just trying to get exchange rate
+        sellAmount: pair.decimals || 10 ** 18, // Arbitrary, just trying to get exchange rate
       };
 
-      const intervals = [15, 60, 240, 1440];
+      const response: AxiosResponse = await axios.get(apiUrl, {
+        params,
+        headers,
+      });
 
-      let interval_columnName: string | null = null;
-      let interval_columnValue: number;
+      const current_price = response.data.price;
+      console.log(`current price for ${pair.path} is ${current_price}`);
 
-      for (let i = 0; i < intervals.length; i++) {
-        const interval = intervals[i];
+      const intervals = checkTime();
 
-        if (isTimeInterval(interval)) {
-          interval_columnName = `${interval}min_avg`;
-          break;
+      for (let interval of intervals) {
+        let newPrices = pair[interval]['close_prices'];
+
+        if (pair[interval]['close_prices'].length == 10) newPrices.shift(); // remove oldest price
+        newPrices.push(current_price); // push new price
+
+        const upsertData = {
+          path: pair.path,
+          ['current_price']: current_price,
+          [interval]: { close_prices: newPrices },
+        };
+
+        try {
+          await supabase.from('Pairs').upsert([upsertData]);
+        } catch (e) {
+          console.error('error upserting to ${interval}');
         }
-      }
-
-      try {
-        const response: AxiosResponse = await axios.get(apiUrl, {
-          params,
-          headers,
-        });
-        const current_price = response.data.price;
-        console.log(current_price);
-
-        if (interval_columnName != null) {
-          let xmin_avg = pair.interval_columnName;
-          if (xmin_avg.close_prices.length === 10) {
-            xmin_avg.close_prices.shift();
-          }
-          xmin_avg.close_prices.push(current_price);
-
-          const upsertData = {
-            path: pair.path,
-            ['current_price']: current_price,
-            [interval_columnName]: xmin_avg,
-          };
-
-          const upsertResponse = await supabase
-            .from('Pairs')
-            .upsert([upsertData]);
-          //console.log('Upsert Response:', upsertResponse);
-        } else {
-          const upsertData = {
-            path: pair.path,
-            ['current_price']: current_price,
-          };
-
-          const upsertResponse = await supabase
-            .from('Pairs')
-            .upsert([upsertData]);
-          //console.log('Upsert Response:', upsertResponse);
-        }
-      } catch (error) {
-        console.error('Error:', (error as Error).message);
       }
 
       await sleep(1000);
@@ -105,16 +72,30 @@ const updatePriceData = async () => {
 const sleep = (delay: number): Promise<void> =>
   new Promise((resolve) => setTimeout(resolve, delay));
 
-// Margin of error is 1 minute
-const isTimeInterval = (intervalInMinutes: number): boolean => {
+function checkTime() {
   const now = new Date();
+  const hours = now.getUTCHours();
+  const minutes = now.getUTCMinutes();
+  const seconds = now.getUTCSeconds();
 
-  const minutes = new Date().getMinutes();
+  const isWithinGracePeriod = (targetSeconds: number) =>
+    Math.abs(seconds - targetSeconds) <= 5;
 
-  return minutes % intervalInMinutes === 0;
-};
+  let intervals: string[] = [];
+
+  const is15Minutes = minutes % 15 === 0 && isWithinGracePeriod(0);
+  const is4Hours = hours % 4 === 0 && minutes === 0 && isWithinGracePeriod(0);
+  const is8Hours = hours % 8 === 0 && minutes === 0 && isWithinGracePeriod(0);
+  const is24Hours = hours === 0 && minutes === 0 && isWithinGracePeriod(0);
+
+  if (is15Minutes) intervals.push(`15min_avg`);
+  if (is4Hours) intervals.push(`${4 * 60}min_avg`); // 4 hours in minutes
+  if (is8Hours) intervals.push(`${8 * 60}min_avg`); // 8 hours in minutes
+  if (is24Hours) intervals.push(`${12 * 60}min_avg`); // 24 hours in minutes
+
+  return intervals;
+}
 
 // Execution
 console.log('Continuous evaluation loop started');
-
 setInterval(updatePriceData, 15000);

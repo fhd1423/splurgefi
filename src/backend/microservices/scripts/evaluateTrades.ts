@@ -85,10 +85,11 @@ const updateTrades = async () => {
         trade.signature,
       );
 
+      // Assuming current_time, lastBatchTime, and timeBetweenBatches are defined and are in seconds
+      let remainingSeconds = current_time - lastBatchTime - timeBetweenBatches;
+
       console.log(
-        `There are ${
-          -1 * current_time - lastBatchTime - timeBetweenBatches
-        } seconds until trade ${trade.id} executes.`,
+        `There are ${-1 * remainingSeconds} until trade ${trade.id} executes.`,
       );
 
       // Only mark trade as ready if time between batches is satisfied
