@@ -31,7 +31,7 @@ const updatePriceData = async () => {
       const params = {
         sellToken: sellToken,
         buyToken: buyToken,
-        sellAmount: 0.01 * 10 ** pair.decimals || 0.01 * 10 ** 18, // Arbitrary, just trying to get exchange rate
+        sellAmount: 0.01 * 10 ** 18, // TODO: add decimal logic
       };
 
       let response;
@@ -45,8 +45,8 @@ const updatePriceData = async () => {
       }
 
       if (!response) return;
-      const current_price = response.data.buyAmount;
-      console.log(`current price for ${pair.path} is ${current_price}`);
+      const current_price = response.data.buyAmount / 10 ** 18; // TODO: add decimal logic
+      // console.log(`current price for ${pair.path} is ${current_price}`);
 
       const intervals = checkTime();
 
