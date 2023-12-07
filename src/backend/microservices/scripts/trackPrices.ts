@@ -31,7 +31,7 @@ const updatePriceData = async () => {
       const params = {
         sellToken: sellToken,
         buyToken: buyToken,
-        sellAmount: 0.1 * 10 ** pair.decimals || 0.1 * 10 ** 18, // Arbitrary, just trying to get exchange rate
+        sellAmount: 0.01 * 10 ** pair.decimals || 0.01 * 10 ** 18, // Arbitrary, just trying to get exchange rate
       };
 
       let response;
@@ -45,22 +45,28 @@ const updatePriceData = async () => {
       }
 
       if (!response) return;
-      const current_price = response.data.price;
-      // console.log(`current price for ${pair.path} is ${current_price}`);
+      const current_price = response.data.buyAmount;
+      console.log(`current price for ${pair.path} is ${current_price}`);
 
       const intervals = checkTime();
 
       let executed = false;
       for (let interval of intervals) {
-        let newPrices = pair[interval]['close_prices'];
+        let priceArr;
+        try {
+          priceArr = pair[interval]['close_prices'];
+        } catch (e) {
+          // when the pair interval data is empty
+          priceArr = [current_price];
+        }
 
-        if (pair[interval]['close_prices'].length == 10) newPrices.shift(); // remove oldest price
-        newPrices.push(current_price); // push new price
+        if (priceArr.length == 10) priceArr.shift(); // remove oldest price
+        priceArr.push(current_price); // push new price
 
         const upsertData = {
           path: pair.path,
           ['current_price']: current_price,
-          [interval]: { close_prices: newPrices },
+          [interval]: { close_prices: priceArr },
         };
 
         let { data, error } = await supabase.from('Pairs').upsert([upsertData]);
