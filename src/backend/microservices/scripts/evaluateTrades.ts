@@ -48,12 +48,28 @@ const updateTrades = async () => {
     let currentOutput = pair['current_price'];
 
     for (let trade of Trades) {
+      try {
+        pair[`${trade.order.priceAvg}min_avg`]['close_prices'];
+      } catch (e) {
+        console.log(
+          'moving average doesnt exist yet',
+          `${trade.order.priceAvg}min_avg`,
+        );
+        break;
+      }
       const allMeanPrices =
         pair[`${trade.order.priceAvg}min_avg`]['close_prices'];
 
       let movingAveragePrice =
         allMeanPrices.reduce((acc: any, val: any) => acc + Number(val), 0) /
         allMeanPrices.length;
+
+      if (allMeanPrices.length != 10) {
+        console.log(
+          `moving average ${trade.order.priceAvg}min_avg not full of data yet`,
+        );
+        break;
+      }
 
       if (inverse) {
         movingAveragePrice = 1 / movingAveragePrice;
