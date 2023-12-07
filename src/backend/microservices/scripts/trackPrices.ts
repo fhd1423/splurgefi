@@ -31,7 +31,7 @@ const updatePriceData = async () => {
       const params = {
         sellToken: sellToken,
         buyToken: buyToken,
-        sellAmount: pair.decimals || 10 ** 18, // Arbitrary, just trying to get exchange rate
+        sellAmount: pair.decimals || 0.01 ** 18, // Arbitrary, just trying to get exchange rate
       };
 
       let response;
@@ -127,13 +127,13 @@ let lastExecutionTime = Date.now(); // Record the time when the script starts
 
 function executePeriodically() {
   const now = Date.now(); // Current time
-  const timeSinceLastExecution = now - lastExecutionTime; // Time since the last execution
-  const nextExecutionTime = 15000 - timeSinceLastExecution; // Calculate the time for the next execution
-
   updatePriceData(); // Execute your function
 
-  lastExecutionTime = now; // Update the last execution time
-  setTimeout(executePeriodically, Math.max(0, nextExecutionTime)); // Schedule the next execution
+  const timeTaken = Date.now() - now; // Calculate the time taken to execute updatePriceData
+  const nextExecutionTime = Math.max(0, 15000 - timeTaken); // Calculate the time for the next execution
+
+  lastExecutionTime = Date.now(); // Update the last execution time after updatePriceData has executed
+  setTimeout(executePeriodically, nextExecutionTime); // Schedule the next execution
 }
 
 console.log('Continuous evaluation loop started');
