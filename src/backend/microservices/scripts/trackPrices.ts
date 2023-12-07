@@ -52,12 +52,11 @@ const updatePriceData = async () => {
 
       let executed = false;
       for (let interval of intervals) {
-        let priceArr;
+        let priceArr = [];
         try {
           priceArr = pair[interval]['close_prices'];
         } catch (e) {
-          // when the pair interval data is empty
-          priceArr = [current_price];
+          // first time inserting
         }
 
         if (priceArr.length == 10) priceArr.shift(); // remove oldest price
