@@ -5,7 +5,7 @@ import { supabase } from '../utils/client';
 config();
 
 const apiUrl: string = 'https://mumbai.api.0x.org/swap/v1/quote?';
-const apiKey: string = '0631b1fa-5205-42d3-89ef-c4e8ea3538fe';
+const apiKey: string = '47e88863-d00f-4e4f-bfe0-10b124369789';
 
 const headers = {
   '0x-api-key': apiKey,
@@ -44,6 +44,7 @@ const updatePriceData = async () => {
 
       const intervals = checkTime();
 
+      let executed = false;
       for (let interval of intervals) {
         let newPrices = pair[interval]['close_prices'];
 
@@ -56,11 +57,16 @@ const updatePriceData = async () => {
           [interval]: { close_prices: newPrices },
         };
 
-        try {
-          await supabase.from('Pairs').upsert([upsertData]);
-        } catch (e) {
-          console.error('error upserting to ${interval}');
-        }
+        await supabase.from('Pairs').upsert([upsertData]);
+        executed = true;
+        console.log(`upserting price data for ${interval}`);
+      }
+      if (!executed) {
+        const upsertData = {
+          path: pair.path,
+          ['current_price']: current_price,
+        };
+        await supabase.from('Pairs').upsert([upsertData]);
       }
 
       await sleep(1000);
@@ -96,6 +102,22 @@ function checkTime() {
   return intervals;
 }
 
-// Execution
+// must be called at a 15 second interval in order to fit the grace period of 5 seconds
+function getNextIntervalTime() {
+  const now = new Date();
+  const seconds = now.getSeconds();
+  const milliseconds = now.getMilliseconds();
+
+  // Calculate how many milliseconds to next 15-second mark
+  const secondsToNextInterval = 15 - (seconds % 15);
+  const millisecondsToWait = secondsToNextInterval * 1000 - milliseconds;
+
+  return millisecondsToWait;
+}
+
 console.log('Continuous evaluation loop started');
-setInterval(updatePriceData, 15000);
+// wait till a 15 second interval, then continue calling every 15 seconds
+const waitTime = getNextIntervalTime();
+setTimeout(() => {
+  setInterval(updatePriceData, 15000);
+}, waitTime);
