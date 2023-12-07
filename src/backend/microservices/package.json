@@ -9,9 +9,9 @@
     "viem": "^1.19.9"
   },
   "scripts": {
-    "docker-evaluate": "cd scripts && ts-node evaluateTrades.ts",
-    "docker-update": "cd scripts && ts-node updateTrades.ts",
-    "docker-prices": "cd scripts && ts-node trackPrices.ts",
-    "docker-server": "cd scripts && ts-node index.ts"
+    "docker-evaluate": "cd scripts && nodemon --exitcrash evaluateTrades.ts",
+    "docker-update": "cd scripts && nodemon --exitcrash  updateTrades.ts",
+    "docker-prices": "cd scripts && nodemon --exitcrash trackPrices.ts",
+    "docker-server": "cd scripts && nodemon --exitcrash index.ts"
   }
 }

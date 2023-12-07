@@ -34,11 +34,17 @@ const updatePriceData = async () => {
         sellAmount: pair.decimals || 10 ** 18, // Arbitrary, just trying to get exchange rate
       };
 
-      const response: AxiosResponse = await axios.get(apiUrl, {
-        params,
-        headers,
-      });
+      let response;
+      try {
+        response = await axios.get(apiUrl, {
+          params,
+          headers,
+        });
+      } catch (e) {
+        console.log('Error with 0x:');
+      }
 
+      if (!response) return;
       const current_price = response.data.price;
       // console.log(`current price for ${pair.path} is ${current_price}`);
 
@@ -57,16 +63,18 @@ const updatePriceData = async () => {
           [interval]: { close_prices: newPrices },
         };
 
-        await supabase.from('Pairs').upsert([upsertData]);
+        let { data, error } = await supabase.from('Pairs').upsert([upsertData]);
         executed = true;
-        console.log(`upserting price data for ${interval}`);
+        if (error) console.log('Error:', error);
+        else console.log(`upserting price data for ${interval}`);
       }
       if (!executed) {
         const upsertData = {
           path: pair.path,
           ['current_price']: current_price,
         };
-        await supabase.from('Pairs').upsert([upsertData]);
+        let { data, error } = await supabase.from('Pairs').upsert([upsertData]);
+        if (error) console.log('Error:', error);
       }
 
       await sleep(1000);

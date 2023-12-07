@@ -9,7 +9,7 @@ RUN apk add --update python3 make g++
 COPY package*.json ./
 
 # Install dependencies
-RUN npm install && npm install -g concurrently
+RUN npm install && npm install -g concurrently && npm install -g nodemon
 
 
 # Copy the rest of your application
