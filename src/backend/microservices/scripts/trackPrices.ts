@@ -45,7 +45,7 @@ const updatePriceData = async () => {
       }
 
       if (!response) return;
-      const current_price = response.data.buyAmount / 10 ** 18; // TODO: add decimal logic
+      const current_price = (response.data.buyAmount / 10 ** 18).toFixed(4); // TODO: add decimal logic
       // console.log(`current price for ${pair.path} is ${current_price}`);
 
       const intervals = checkTime();
