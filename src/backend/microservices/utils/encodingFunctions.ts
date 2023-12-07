@@ -5,7 +5,7 @@ import splurgeAbi from '../utils/splurgeAbi';
 
 const WETH = '0x9c3C9283D3e44854697Cd22D3Faa240Cfb032889'; //wmatic for now
 
-type TransformERC20 = [
+export type TransformERC20 = [
   string, // First address
   string, // Second address
   bigint, // First big integer
@@ -16,7 +16,7 @@ type TransformERC20 = [
   }>,
 ];
 
-type SwapDataStruct = {
+export type SwapDataStruct = {
   inputTokenAddress: Address;
   outputTokenAddress: Address;
   recipient: Address;
@@ -106,4 +106,35 @@ export const encodeInput = async (
   });
 
   return data;
+};
+
+export const simulateTrade = async (calldata: any) => {
+  const TENDERLY_USER = 'fhd';
+  const TENDERLY_PROJECT = 'fhd';
+  const TENDERLY_ACCESS_KEY = 'P0pOKtbaCwV2JffMLFpbdls3SowlmIj8';
+  const resp = await axios.post(
+    `https://api.tenderly.co/api/v1/account/${TENDERLY_USER}/project/${TENDERLY_PROJECT}/simulate`,
+    {
+      save: true,
+      save_if_fails: true,
+      simulation_type: 'quick',
+      network_id: '80001',
+      from: '0x8839278a75dc8249bc0c713a710aaebd0fee6750', // TODO: change to deployer only
+      to: process.env.SPLURGE_ADDRESS,
+      input: calldata,
+      gas: 8000000,
+      gas_price: 0,
+      value: 0,
+    },
+    {
+      headers: {
+        'X-Access-Key': TENDERLY_ACCESS_KEY as string,
+      },
+    },
+  );
+  const logs = resp.data.transaction.transaction_info.logs;
+  if (logs) return true;
+  else {
+    return false;
+  }
 };

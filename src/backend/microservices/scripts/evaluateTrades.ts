@@ -1,21 +1,9 @@
-import { Address } from 'viem';
-
 import { supabase } from '../utils/client';
-import { encodeInput } from '../utils/encodingFunctions';
-
-type SwapDataStruct = {
-  inputTokenAddress: Address;
-  outputTokenAddress: Address;
-  recipient: Address;
-  amount: number;
-  tranches: number;
-  percentChange: number;
-  priceAvg: number;
-  deadline: number;
-  timeBwTrade: number;
-  slippage: number;
-  salt: Address;
-};
+import {
+  encodeInput,
+  simulateTrade,
+  SwapDataStruct,
+} from '../utils/encodingFunctions';
 
 //Get Requested Pairs & recent PriceQueue from "Pairs" Table
 const getPairs = async () => {
@@ -91,17 +79,8 @@ const updateTrades = async () => {
         trade.signature,
       );
 
-      /*let remainingSeconds = current_time - lastBatchTime - timeBetweenBatches;
-
-      console.log(
-        `There are ${-1 * remainingSeconds} seconds until trade ${
-          trade.id
-        } executes.`,
-      );*/
-
-      // Only mark trade as ready if time between batches is satisfied
       if (timeBetweenBatches <= current_time - lastBatchTime) {
-        console.log('time between trade is satisfied');
+        console.log('time between trade is satisfied for', trade.id);
         let buyOutputOver =
           ((100 + Number(trade.order.percentChange)) / 100) *
           movingAveragePrice;
@@ -109,15 +88,21 @@ const updateTrades = async () => {
           console.log(
             `percent change satisfied, currentOutput is ${currentOutput} and minimum is ${buyOutputOver}`,
           );
-          const { data, error } = await supabase
-            .from('Trades')
-            .update({
-              ready: true,
-              zero_x_call_data: callData,
-            })
-            .eq('id', trade.id)
-            .select();
-          console.log(data || error);
+          if (await simulateTrade(callData)) {
+            const { data, error } = await supabase
+              .from('Trades')
+              .update({
+                ready: true,
+                zero_x_call_data: callData,
+              })
+              .eq('id', trade.id)
+              .select();
+            if (error)
+              console.log('error pushing calldata for trade ${trade.id}');
+            else console.log(`trade ${trade.id} is ready`);
+          } else {
+            console.log(`trade simulation failed for trade ${trade.id}`);
+          }
         }
       }
     }
