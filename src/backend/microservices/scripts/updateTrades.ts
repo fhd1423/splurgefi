@@ -50,6 +50,7 @@ const contractEventListener = async () => {
       logs.forEach((log) => {
         // Extract the signature from the log
         const signature = log.args.signature;
+        console.log(signature);
         updateTradeBatchTimings(signature as Address);
       });
     },
