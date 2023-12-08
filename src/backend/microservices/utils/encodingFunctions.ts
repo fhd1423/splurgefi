@@ -118,7 +118,7 @@ export const simulateTrade = async (calldata: any) => {
       save: true,
       save_if_fails: true,
       simulation_type: 'quick',
-      network_id: '80001',
+      network_id: '42161',
       from: '0x8839278a75dc8249bc0c713a710aaebd0fee6750', // TODO: change to deployer only
       to: process.env.SPLURGE_ADDRESS,
       input: calldata,

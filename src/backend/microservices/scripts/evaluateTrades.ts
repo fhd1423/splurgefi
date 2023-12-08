@@ -88,10 +88,15 @@ const updateTrades = async () => {
       );
 
       if (timeBetweenBatches <= current_time - lastBatchTime) {
-        console.log('time between trade is satisfied for', trade.id);
+        // console.log('time between trade is satisfied for', trade.id);
         let buyOutputOver =
           ((100 + Number(trade.order.percentChange)) / 100) *
           movingAveragePrice;
+
+        const perecentAway = currentOutput / buyOutputOver;
+        console.log(
+          `trade ${trade.id} is ${100 - currentOutput / buyOutputOver}`,
+        );
         if (currentOutput >= buyOutputOver) {
           if (await simulateTrade(callData)) {
             const { data, error } = await supabase
