@@ -123,7 +123,7 @@ function getNextIntervalTime() {
   const milliseconds = now.getMilliseconds();
 
   // Calculate how many milliseconds to next 15-second mark
-  const secondsToNextInterval = 15 - (seconds % 15);
+  const secondsToNextInterval = 30 - (seconds % 30);
   const millisecondsToWait = secondsToNextInterval * 1000 - milliseconds;
 
   return millisecondsToWait;
@@ -135,6 +135,6 @@ async function executePeriodically() {
 }
 
 console.log('Continuous evaluation loop started');
-// wait till a 15 second interval, then continue calling every 15 seconds
+// wait till a 30 second interval, then continue calling every 30 seconds
 const waitTime = getNextIntervalTime();
 setTimeout(executePeriodically, waitTime);
