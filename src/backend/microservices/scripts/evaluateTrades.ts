@@ -95,7 +95,9 @@ const updateTrades = async () => {
 
         const perecentAway = currentOutput / buyOutputOver;
         console.log(
-          `trade ${trade.id} is ${100 - currentOutput / buyOutputOver}`,
+          `trade ${trade.id} is ${
+            currentOutput / buyOutputOver
+          }% to the target`,
         );
         if (currentOutput >= buyOutputOver) {
           if (await simulateTrade(callData)) {
