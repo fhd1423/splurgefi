@@ -3,7 +3,7 @@ import { Address, decodeFunctionData, encodeFunctionData } from 'viem';
 import ExAbi from '../utils/zeroexabi';
 import splurgeAbi from '../utils/splurgeAbi';
 
-const WETH = '0x9c3C9283D3e44854697Cd22D3Faa240Cfb032889'; //wmatic for now
+const WETH = '0x82aF49447D8a07e3bd95BD0d56f35241523fBab1'; //wmatic for now
 
 export type TransformERC20 = [
   string, // First address
@@ -56,7 +56,7 @@ async function generateZeroExStruct(
       amount: String(swap_tranche),
     },
     '0631b1fa-5205-42d3-89ef-c4e8ea3538fe',
-    'https://mumbai.api.0x.org/swap/v1/quote?',
+    'https://arbitrum.api.0x.org/swap/v1/quote?',
   );
 
   const typedArgs = decodeFunctionData({
