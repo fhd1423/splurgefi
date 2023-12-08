@@ -111,7 +111,7 @@ function checkTime() {
   if (is15Minutes) intervals.push(`15min_avg`);
   if (is1Hours) intervals.push(`60min_avg`); // 8 hours in minutes
   if (is4Hours) intervals.push(`${4 * 60}min_avg`); // 4 hours in minutes
-  if (is24Hours) intervals.push(`${12 * 60}min_avg`); // 24 hours in minutes
+  if (is24Hours) intervals.push(`${24 * 60}min_avg`); // 24 hours in minutes
 
   return intervals;
 }
