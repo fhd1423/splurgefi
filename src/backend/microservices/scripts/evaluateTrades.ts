@@ -81,12 +81,6 @@ const updateTrades = async () => {
       const lastBatchTime = trade.lastExecuted;
       const timeBetweenBatches = trade.order.timeBwTrade;
 
-      // Get swap call data
-      const callData = await encodeInput(
-        trade.order as SwapDataStruct,
-        trade.signature,
-      );
-
       if (timeBetweenBatches <= current_time - lastBatchTime) {
         // console.log('time between trade is satisfied for', trade.id);
         let buyOutputOver =
@@ -97,6 +91,11 @@ const updateTrades = async () => {
           `trade ${trade.id} is outputting ${currentOutput} currently but targeting ${buyOutputOver}`,
         );
         if (currentOutput >= buyOutputOver) {
+          // Get swap call data
+          const callData = await encodeInput(
+            trade.order as SwapDataStruct,
+            trade.signature,
+          );
           if (await simulateTrade(callData)) {
             const { data, error } = await supabase
               .from('Trades')
