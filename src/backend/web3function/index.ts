@@ -20,8 +20,7 @@ async function fetchReadyTrades(
     console.error('Error fetching data:', error);
     return;
   }
-  if (Trades[0] && Trades[0].id != (await storage.get('lastExecuted'))) {
-    await storage.set('lastExecuted', Trades[0].id);
+  if (Trades[0]) {
     return Trades[0].zero_x_call_data;
   }
   return null;
