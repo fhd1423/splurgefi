@@ -88,6 +88,7 @@ export const encodeInput = async (
     BigInt(SwapData.timeBwTrade), // time between trades
     SwapData.salt, // salt
   ];
+  console.log('calling quote');
 
   let swap_tranche = Math.floor(SwapData.amount / SwapData.tranches);
   if (SwapData.inputTokenAddress == WETH) {
