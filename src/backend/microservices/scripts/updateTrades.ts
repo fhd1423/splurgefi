@@ -43,15 +43,21 @@ const updateTradeBatchTimings = async (signature: string) => {
 };
 
 const contractEventListener = async () => {
+  let lastUpdated = 0;
   viemClient.watchEvent({
     address: process.env.SPLURGE_ADDRESS as Address, //'0xF8638B550bF764732e0a69d99b445a82858Bc572',
     event: parseAbiItem('event TradeEvent(bytes signature)'),
     onLogs: (logs) => {
+      const seenSignatures = new Set();
+
       logs.forEach((log) => {
-        // Extract the signature from the log
         const signature = log.args.signature;
-        console.log(signature);
-        updateTradeBatchTimings(signature as Address);
+
+        // Check if the signature has already been processed in this
+        if (!seenSignatures.has(signature)) {
+          seenSignatures.add(signature);
+          updateTradeBatchTimings(signature as Address);
+        }
       });
     },
   });
