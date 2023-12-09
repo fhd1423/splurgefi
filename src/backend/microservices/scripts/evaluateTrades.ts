@@ -47,7 +47,7 @@ const updateTrades = async () => {
 
     let currentOutput = pair['current_price'];
 
-    for (let trade of Trades) {
+    Trades.forEach(async (trade) => {
       try {
         pair[`${trade.order.priceAvg}min_avg`]['close_prices'];
       } catch (e) {
@@ -55,7 +55,7 @@ const updateTrades = async () => {
           'moving average doesnt exist yet',
           `${trade.order.priceAvg}min_avg`,
         );
-        break;
+        return;
       }
       const allMeanPrices =
         pair[`${trade.order.priceAvg}min_avg`]['close_prices'];
@@ -68,7 +68,7 @@ const updateTrades = async () => {
         console.log(
           `moving average ${trade.order.priceAvg}min_avg not full of data yet`,
         );
-        break;
+        return;
       }
 
       if (inverse) {
@@ -116,7 +116,7 @@ const updateTrades = async () => {
           }
         }
       }
-    }
+    });
   });
 };
 
