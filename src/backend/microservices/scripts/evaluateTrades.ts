@@ -27,7 +27,7 @@ const updateTrades = async () => {
   let pairs = await getPairs();
   if (!pairs) return;
 
-  for (let pair of pairs) {
+  pairs.forEach(async (pair) => {
     let Trades;
     let inverse = false;
 
@@ -117,7 +117,7 @@ const updateTrades = async () => {
         }
       }
     }
-  }
+  });
 };
 
 console.log('Continuous evaluation loop started');
