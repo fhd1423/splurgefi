@@ -3,8 +3,6 @@ import * as dotenv from 'dotenv';
 import { Address } from 'viem';
 import { account } from '../utils/config';
 import { encodeInput } from '../../src/backend/microservices/utils/encodingFunctions';
-import { getRandomValues } from 'crypto';
-import { bytesToHex } from 'viem';
 import { generateRandomSalt } from '../../src/frontend/helpers/utils';
 
 dotenv.config();
@@ -88,7 +86,7 @@ const executeTrade = async (
     console.log('error generating signature');
     return;
   }
-  const encodedInput = await encodeInput(data, signature);
+  const encodedInput = await encodeInput(data, signature, true);
 
   const resp = await axios.post(
     `https://api.tenderly.co/api/v1/account/${TENDERLY_USER}/project/${TENDERLY_PROJECT}/simulate`,

@@ -48,6 +48,7 @@ async function generateZeroExStruct(
   inputTokenAddress: Address,
   outputTokenAddress: Address,
   swap_tranche: number,
+  test: boolean,
 ) {
   const res = await fetchQuote(
     {
@@ -56,7 +57,9 @@ async function generateZeroExStruct(
       amount: String(swap_tranche),
     },
     '0631b1fa-5205-42d3-89ef-c4e8ea3538fe',
-    'https://arbitrum.api.0x.org/swap/v1/quote?',
+    test
+      ? 'https://mumbai.api.0x.org/swap/v1/quote?'
+      : 'https://arbitrum.api.0x.org/swap/v1/quote?',
   );
 
   const typedArgs = decodeFunctionData({
@@ -75,6 +78,7 @@ async function generateZeroExStruct(
 export const encodeInput = async (
   SwapData: SwapDataStruct,
   signature: string,
+  test?: boolean,
 ) => {
   const splurgeOrderStruct = [
     SwapData.inputTokenAddress, // inputTokenAddy
@@ -91,13 +95,17 @@ export const encodeInput = async (
   console.log('calling quote');
 
   let swap_tranche = Math.floor(SwapData.amount / SwapData.tranches);
-  if (SwapData.inputTokenAddress == WETH) {
+  if (
+    SwapData.inputTokenAddress == WETH ||
+    SwapData.inputTokenAddress == '0x9c3C9283D3e44854697Cd22D3Faa240Cfb032889' // for test
+  ) {
     swap_tranche = Math.floor(swap_tranche * 0.995);
   }
   const zeroExSwapStruct = await generateZeroExStruct(
     SwapData.inputTokenAddress,
     SwapData.outputTokenAddress,
     swap_tranche,
+    test || false,
   );
 
   const data = encodeFunctionData({
