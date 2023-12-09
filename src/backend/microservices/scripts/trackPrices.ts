@@ -4,7 +4,7 @@ import { supabase } from '../utils/client';
 
 config();
 
-const apiUrl: string = 'https://arbitrum.api.0x.org/swap/v1/quote?';
+const apiUrl: string = 'https://arbitrum.api.0x.org/swap/v1/price?';
 const apiKey: string = '47e88863-d00f-4e4f-bfe0-10b124369789';
 
 const headers = {
