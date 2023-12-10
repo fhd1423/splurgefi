@@ -1,0 +1,11 @@
+{
+    "name": "actions",
+    "scripts": {
+        "build": "tsc"
+    },
+    "dependencies": {
+        "@tenderly/actions": "^0.2.0",
+        "viem": "^1.19.13"
+    },
+    "private": true
+}

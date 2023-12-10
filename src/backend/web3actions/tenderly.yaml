@@ -1,0 +1,15 @@
+account_id: ''
+actions:
+  fhd/fhd:
+    runtime: v2
+    sources: actions
+    specs:
+      splurgeExecutor:
+        description: Executes Splurge Orders.
+        function: splurge:execTrade
+        trigger:
+          type: webhook
+          webhook:
+            authenticated: true
+        execution_type: sequential
+project_slug: ''

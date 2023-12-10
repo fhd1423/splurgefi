@@ -5,7 +5,7 @@
     "lint-staged": "^15.1.0",
     "prettier": "3.0.3",
     "solhint": "^4.0.0",
-    "supabase": "^1.112.0"
+    "supabase": "^1.115.5"
   },
   "dependencies": {
     "@gelatonetwork/web3-functions-sdk": "^2.1.7",
