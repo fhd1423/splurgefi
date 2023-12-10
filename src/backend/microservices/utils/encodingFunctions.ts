@@ -4,7 +4,7 @@ import ExAbi from '../utils/zeroexabi';
 import splurgeAbi from '../utils/splurgeAbi';
 import { viemClient } from './viemclient';
 
-const WETH = '0x82aF49447D8a07e3bd95BD0d56f35241523fBab1'; //wmatic for now
+const WETH = '0x82aF49447D8a07e3bd95BD0d56f35241523fBab1'; // production weth: arbitrum currently
 
 export type TransformERC20 = [
   string, // First address
@@ -49,7 +49,6 @@ async function generateZeroExStruct(
   inputTokenAddress: Address,
   outputTokenAddress: Address,
   swap_tranche: number,
-  test: boolean,
 ) {
   const res = await fetchQuote(
     {
@@ -58,9 +57,7 @@ async function generateZeroExStruct(
       amount: String(swap_tranche),
     },
     '47e88863-d00f-4e4f-bfe0-10b124369789',
-    test
-      ? 'https://mumbai.api.0x.org/swap/v1/quote?'
-      : 'https://arbitrum.api.0x.org/swap/v1/quote?',
+    'https://arbitrum.api.0x.org/swap/v1/quote?',
   );
 
   const typedArgs = decodeFunctionData({
@@ -79,7 +76,6 @@ async function generateZeroExStruct(
 export const encodeInput = async (
   SwapData: SwapDataStruct,
   signature: string,
-  test?: boolean,
 ) => {
   const splurgeOrderStruct = [
     SwapData.inputTokenAddress, // inputTokenAddy
@@ -96,10 +92,7 @@ export const encodeInput = async (
   console.log('calling quote');
 
   let swap_tranche = Math.floor(SwapData.amount / SwapData.tranches);
-  if (
-    SwapData.inputTokenAddress == WETH ||
-    SwapData.inputTokenAddress == '0x9c3C9283D3e44854697Cd22D3Faa240Cfb032889' // for test
-  ) {
+  if (SwapData.inputTokenAddress == WETH) {
     let gasFee = Number(await viemClient.getGasPrice()) * 400000; // gasPrice * gasLimit
     swap_tranche -= gasFee;
     swap_tranche = swap_tranche * 0.995; // take fee
@@ -108,7 +101,6 @@ export const encodeInput = async (
     SwapData.inputTokenAddress,
     SwapData.outputTokenAddress,
     swap_tranche,
-    test || false,
   );
 
   const data = encodeFunctionData({
@@ -130,7 +122,7 @@ export const simulateTrade = async (calldata: any) => {
       save: true,
       save_if_fails: true,
       simulation_type: 'quick',
-      network_id: '42161',
+      network_id: '42161', // prod: arbitrum
       from: '0xB067AabAcA41112E9f060786E08c55ad2EaaCc2A', // TODO: change to deployer only
       to: process.env.SPLURGE_ADDRESS,
       input: calldata,
@@ -144,9 +136,10 @@ export const simulateTrade = async (calldata: any) => {
       },
     },
   );
-  const logs = resp.data.transaction.transaction_info.logs;
-  if (logs) return true;
-  else {
+  const transaction = resp.data.transaction;
+  const error = transaction.error_message;
+  if (error) {
     return false;
   }
+  return true;
 };

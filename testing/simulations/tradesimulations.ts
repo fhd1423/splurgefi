@@ -1,12 +1,102 @@
 import axios from 'axios';
 import * as dotenv from 'dotenv';
-import { Address } from 'viem';
+import { Address, decodeFunctionData, encodeFunctionData } from 'viem';
 import { account } from '../utils/config';
-import { encodeInput } from '../../src/backend/microservices/utils/encodingFunctions';
 import { generateRandomSalt } from '../../src/frontend/helpers/utils';
 import { viemClient } from '../../src/backend/microservices/utils/viemclient';
+import {
+  TransformERC20,
+  SwapDataStruct,
+} from '../../src/backend/microservices/utils/encodingFunctions';
+import splurgeAbi from '../../src/backend/microservices/utils/splurgeAbi';
+import ExAbi from '../../src/backend/microservices/utils/zeroexabi';
 
 dotenv.config();
+
+async function fetchQuote(
+  pair: {
+    input: string;
+    output: string;
+    amount: string;
+  },
+  apiKey: string,
+  apiUrl: string,
+) {
+  const url = `${apiUrl}buyToken=${pair.output}&sellToken=${pair.input}&sellAmount=${pair.amount}`;
+  const headers = { '0x-api-key': apiKey };
+  const response = await axios.get(url, { headers });
+
+  return response.data;
+}
+
+async function generateZeroExStruct(
+  inputTokenAddress: Address,
+  outputTokenAddress: Address,
+  swap_tranche: number,
+) {
+  const res = await fetchQuote(
+    {
+      input: inputTokenAddress,
+      output: outputTokenAddress,
+      amount: String(swap_tranche),
+    },
+    '47e88863-d00f-4e4f-bfe0-10b124369789',
+    'https://mumbai.api.0x.org/swap/v1/quote?',
+  );
+
+  const typedArgs = decodeFunctionData({
+    abi: ExAbi,
+    data: res.data,
+  }).args as TransformERC20;
+
+  const object = typedArgs[4].map(({ deploymentNonce, data }) => [
+    deploymentNonce,
+    data,
+  ]);
+
+  return [typedArgs[3], object]; // (uint256,(uint32, bytes)[])
+}
+
+export const encodeInput = async (
+  SwapData: SwapDataStruct,
+  signature: string,
+) => {
+  const splurgeOrderStruct = [
+    SwapData.inputTokenAddress, // inputTokenAddy
+    SwapData.outputTokenAddress, // outputTokenAddy
+    SwapData.recipient, // recipient
+    BigInt(SwapData.amount), // amount
+    BigInt(SwapData.tranches), // tranches
+    BigInt(SwapData.percentChange), // percent change
+    BigInt(SwapData.priceAvg), // priceAvg
+    BigInt(SwapData.deadline), // deadline
+    BigInt(SwapData.timeBwTrade), // time between trades
+    SwapData.salt, // salt
+  ];
+  console.log('calling quote');
+
+  let swap_tranche = Math.floor(SwapData.amount / SwapData.tranches);
+  if (
+    SwapData.inputTokenAddress == '0x9c3C9283D3e44854697Cd22D3Faa240Cfb032889' // for test
+  ) {
+    let gasFee = Number(await viemClient.getGasPrice()) * 400000; // gasPrice * gasLimit
+    swap_tranche -= gasFee;
+    swap_tranche = swap_tranche * 0.995; // take fee
+  }
+  const zeroExSwapStruct = await generateZeroExStruct(
+    SwapData.inputTokenAddress,
+    SwapData.outputTokenAddress,
+    swap_tranche,
+  );
+
+  const data = encodeFunctionData({
+    abi: splurgeAbi,
+    functionName: 'verifyExecuteTrade',
+    args: [splurgeOrderStruct, signature, zeroExSwapStruct],
+  });
+
+  return data;
+};
 
 const generateSignature = async (data: {
   inputTokenAddress: Address;
@@ -87,7 +177,7 @@ const executeTrade = async (
     console.log('error generating signature');
     return;
   }
-  const encodedInput = await encodeInput(data, signature, true);
+  const encodedInput = await encodeInput(data, signature);
 
   const resp = await axios.post(
     `https://api.tenderly.co/api/v1/account/${TENDERLY_USER}/project/${TENDERLY_PROJECT}/simulate`,
@@ -95,12 +185,12 @@ const executeTrade = async (
       save: true,
       save_if_fails: true,
       simulation_type: 'quick',
-      network_id: '80001',
+      network_id: '80001', // polygon mumbai
       from: '0x8839278a75dc8249bc0c713a710aaebd0fee6750',
       to: splurgeContract,
       input: encodedInput,
       gas: 8000000,
-      gas_price: Number(await viemClient.getGasPrice()), //30000000000, //30 gwei
+      gas_price: Number(await viemClient.getGasPrice()),
       value: 0,
     },
     {
@@ -111,14 +201,13 @@ const executeTrade = async (
   );
 
   const transaction = resp.data.transaction;
-  const logs = resp.data.transaction.transaction_info.logs;
-  if (logs)
-    console.log(
-      `Successful transaction: hash: ${transaction.hash} block number: ${transaction.block_number}`,
-    );
-  else {
+  const error = transaction.error_message;
+  if (error) {
     throw new Error(`Transaction failed`);
   }
+  console.log(
+    `Successful transaction: hash: ${transaction.hash} block number: ${transaction.block_number}`,
+  );
 };
 
 async function main(splurgeContract: Address) {
