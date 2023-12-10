@@ -3,10 +3,9 @@ pragma solidity ^0.8.21;
 
 import { IERC20 } from "@openzeppelin/contracts/token/ERC20/IERC20.sol";
 import { ECDSA } from "@openzeppelin/contracts/utils/cryptography/ECDSA.sol";
-import { ReentrancyGuard } from "@openzeppelin/contracts/utils/ReentrancyGuard.sol";
 import { IZeroExSwap, IWETH, SplurgeOrderStruct, ZeroExSwapStruct, badSignature, tradesCompleted, mustIncludeWETH, tradeExpired, timeNotSatisfied } from "./Interfaces.sol";
 
-contract Splurge is ReentrancyGuard {
+contract Splurge {
     IZeroExSwap public swapRouter;
     IWETH internal wETH;
     mapping(bytes => uint256) public lastCompletedTrade;
@@ -63,7 +62,7 @@ contract Splurge is ReentrancyGuard {
         SplurgeOrderStruct memory order,
         ZeroExSwapStruct memory swapCallData,
         bytes memory signature
-    ) private nonReentrant returns (uint256) {
+    ) private returns (uint256) {
         IERC20 input = IERC20(order.inputTokenAddy);
         IERC20 output = IERC20(order.outputTokenAddy);
 
