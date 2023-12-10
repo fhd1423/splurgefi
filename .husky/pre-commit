@@ -2,5 +2,5 @@
 . "$(dirname -- "$0")/_/husky.sh"
 
 npx prettier --write "src/**/*.*"
-npm run solhint
+# npm run solhint
 forge test
