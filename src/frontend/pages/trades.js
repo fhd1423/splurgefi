@@ -59,9 +59,7 @@ export default function Trades() {
       if (primaryWallet?.address) {
         const { data, error } = await supabase
           .from('Trades')
-          .select(
-            'id, pair, complete, batches, percent_change, deadline, remainingBatches',
-          )
+          .select('*')
           .eq('user', primaryWallet.address);
 
         if (error) {
@@ -74,9 +72,9 @@ export default function Trades() {
           newTrades.set(trade.id, [
             trade.pair,
             trade.complete,
-            trade.batches,
-            trade.percent_change,
-            trade.deadline,
+            trade.order.tranches,
+            trade.order.percentChange,
+            trade.order.deadline,
             trade.remainingBatches,
           ]);
         });
@@ -138,7 +136,7 @@ export default function Trades() {
                     <Trade
                       complete={complete}
                       batches={batches}
-                      percentChange={percentChange}
+                      percentChange={`${percentChange}%`}
                       deadline={deadline}
                       remainingBatches={remainingBatches}
                     />
