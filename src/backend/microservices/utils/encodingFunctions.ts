@@ -2,6 +2,7 @@ const axios = require('axios');
 import { Address, decodeFunctionData, encodeFunctionData } from 'viem';
 import ExAbi from '../utils/zeroexabi';
 import splurgeAbi from '../utils/splurgeAbi';
+import { viemClient } from './viemclient';
 
 const WETH = '0x82aF49447D8a07e3bd95BD0d56f35241523fBab1'; //wmatic for now
 
@@ -99,7 +100,9 @@ export const encodeInput = async (
     SwapData.inputTokenAddress == WETH ||
     SwapData.inputTokenAddress == '0x9c3C9283D3e44854697Cd22D3Faa240Cfb032889' // for test
   ) {
-    swap_tranche = Math.floor(swap_tranche * 0.995);
+    let gasFee = Number(await viemClient.getGasPrice()) * 400000; // gasPrice * gasLimit
+    swap_tranche -= gasFee;
+    swap_tranche = swap_tranche * 0.995; // take fee
   }
   const zeroExSwapStruct = await generateZeroExStruct(
     SwapData.inputTokenAddress,
@@ -132,7 +135,7 @@ export const simulateTrade = async (calldata: any) => {
       to: process.env.SPLURGE_ADDRESS,
       input: calldata,
       gas: 8000000,
-      gas_price: 0,
+      gas_price: Number(await viemClient.getGasPrice()),
       value: 0,
     },
     {

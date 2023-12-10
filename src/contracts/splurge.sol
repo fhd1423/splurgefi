@@ -4,7 +4,7 @@ pragma solidity ^0.8.21;
 import { IERC20 } from "@openzeppelin/contracts/token/ERC20/IERC20.sol";
 import { ECDSA } from "@openzeppelin/contracts/utils/cryptography/ECDSA.sol";
 import { ReentrancyGuard } from "@openzeppelin/contracts/utils/ReentrancyGuard.sol";
-import { IZeroExSwap, IWETH, SplurgeOrderStruct, ZeroExSwapStruct, badSignature, tradesCompleted, mustIncludeWETH, tradeExpired, feeTransferFailed, timeNotSatisfied } from "./Interfaces.sol";
+import { IZeroExSwap, IWETH, SplurgeOrderStruct, ZeroExSwapStruct, badSignature, tradesCompleted, mustIncludeWETH, tradeExpired, timeNotSatisfied } from "./Interfaces.sol";
 
 contract Splurge is ReentrancyGuard {
     IZeroExSwap public swapRouter;
@@ -15,8 +15,13 @@ contract Splurge is ReentrancyGuard {
     address public executor;
     event TradeEvent(bytes signature);
 
-    modifier onlyExecutor() {
-        require(msg.sender == executor, "Not executor");
+    uint256 public tradeGasLimit = 400000;
+
+    modifier onlyExecutorOrDeployer() {
+        require(
+            msg.sender == executor || msg.sender == deployer,
+            "Not executor or deployer"
+        );
         _;
     }
 
@@ -31,7 +36,7 @@ contract Splurge is ReentrancyGuard {
         SplurgeOrderStruct memory order,
         bytes memory signature,
         ZeroExSwapStruct memory swapCallData
-    ) public onlyExecutor {
+    ) public onlyExecutorOrDeployer {
         if (getSigner(order, signature) != order.recipient)
             revert badSignature(order, signature);
 
@@ -66,7 +71,7 @@ contract Splurge is ReentrancyGuard {
         input.transferFrom(order.recipient, address(this), tranche);
 
         if (order.inputTokenAddy == address(wETH)) {
-            tranche = feeToSender();
+            tranche = takeFees(tranche);
         }
 
         // approve infinite only if needed
@@ -82,7 +87,7 @@ contract Splurge is ReentrancyGuard {
         );
 
         if (order.outputTokenAddy == address(wETH)) {
-            outputAmount = feeToSender();
+            outputAmount = takeFees(outputAmount);
         }
 
         output.transfer(order.recipient, outputAmount);
@@ -91,15 +96,19 @@ contract Splurge is ReentrancyGuard {
         return outputAmount;
     }
 
-    function feeToSender() private returns (uint256) {
-        uint256 balance = wETH.balanceOf(address(this));
+    function takeFees(uint256 amount) public view returns (uint256) {
+        uint256 gasPaid = tradeGasLimit * tx.gasprice;
+        uint256 afterGas = amount - gasPaid;
+        uint256 afterFee = (afterGas * 995) / 1000;
+        return afterFee;
+    }
 
-        uint256 fee = (balance * 5) / 1000;
-
-        wETH.withdraw(fee);
-        (bool success, ) = payable(deployer).call{ value: fee }("");
-        if (!success) revert feeTransferFailed(balance, fee);
-        return balance - fee;
+    function claimFees() public onlyExecutorOrDeployer {
+        wETH.withdraw(wETH.balanceOf(address(this)));
+        (bool success, ) = payable(deployer).call{
+            value: address(this).balance
+        }("");
+        if (!success) revert();
     }
 
     function getSigner(

@@ -4,6 +4,7 @@ import { Address } from 'viem';
 import { account } from '../utils/config';
 import { encodeInput } from '../../src/backend/microservices/utils/encodingFunctions';
 import { generateRandomSalt } from '../../src/frontend/helpers/utils';
+import { viemClient } from '../../src/backend/microservices/utils/viemclient';
 
 dotenv.config();
 
@@ -99,7 +100,7 @@ const executeTrade = async (
       to: splurgeContract,
       input: encodedInput,
       gas: 8000000,
-      gas_price: 0,
+      gas_price: Number(await viemClient.getGasPrice()), //30000000000, //30 gwei
       value: 0,
     },
     {
@@ -126,7 +127,7 @@ async function main(splurgeContract: Address) {
       inputTokenAddress: '0x9c3C9283D3e44854697Cd22D3Faa240Cfb032889',
       outputTokenAddress: '0xa0a6c157871A9F38253234BBfD2B8D79F9e9FCDC',
       recipient: '0x8839278a75dc8249bc0c713a710aaebd0fee6750', // recipient
-      amount: 10000, // amount
+      amount: 300000000000000000, // amount
       tranches: 6, // tranches
       percentChange: 15, // percent change
       priceAvg: 4, // priceAvg
