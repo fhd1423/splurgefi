@@ -35,14 +35,11 @@ export const execTrade: ActionFn = async (context: Context, event: Event) => {
   const trade = data[0];
 
   let txHash;
-  try {
-    txHash = await walletClient.sendTransaction({
-      to: SPLURGE_ADDRESS as Address,
-      data: trade.zero_x_call_data,
-    });
-  } catch (e) {
-    console.log('transaction failure');
-  }
+
+  txHash = await walletClient.sendTransaction({
+    to: SPLURGE_ADDRESS as Address,
+    data: trade.zero_x_call_data,
+  });
 
   if (txHash) console.log(`Trade ${tradeID} processed successfully`);
 };

@@ -123,8 +123,8 @@ export const simulateTrade = async (calldata: any) => {
       save_if_fails: true,
       simulation_type: 'quick',
       network_id: '42161', // prod: arbitrum
-      from: '0xB067AabAcA41112E9f060786E08c55ad2EaaCc2A', // TODO: change to deployer only
-      to: process.env.SPLURGE_ADDRESS,
+      from: '0xBb6AeaBdf61Ca96e80Aa239bA8cC7e436862E596', // TODO: change to deployer only
+      to: process.env.SPLURGE_ADDRESS, // 0xFA1a9623054154EF25F782f04411B39A40f01880
       input: calldata,
       gas: 8000000,
       gas_price: Number(await viemClient.getGasPrice()),

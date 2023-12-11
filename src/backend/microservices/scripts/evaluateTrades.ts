@@ -110,12 +110,10 @@ const updateTrades = async () => {
               console.log('error pushing calldata for trade ${trade.id}');
             else {
               try {
-                await axios.get(
-                  'https://dashboard.tenderly.co/fhd/fhd/action/6122a3e2-5cbd-43c4-bd10-08e88a504cdf',
+                axios.post(
+                  'https://api.tenderly.co/api/v1/actions/6122a3e2-5cbd-43c4-bd10-08e88a504cdf/webhook',
+                  { id: trade.id },
                   {
-                    params: {
-                      id: trade.id,
-                    },
                     headers: {
                       'x-access-key': 'P0pOKtbaCwV2JffMLFpbdls3SowlmIj8',
                     },

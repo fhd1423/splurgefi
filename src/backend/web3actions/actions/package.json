@@ -4,6 +4,7 @@
         "build": "tsc"
     },
     "dependencies": {
+        "@supabase/supabase-js": "^2.39.0",
         "@tenderly/actions": "^0.2.0",
         "viem": "^1.19.13"
     },
