@@ -5,6 +5,7 @@ import Button from '@mui/material/Button';
 import Typography from '@mui/material/Typography';
 
 export default function Trade({
+  name,
   complete,
   batches,
   percentChange,
@@ -54,7 +55,7 @@ export default function Trade({
             variant='h5'
             style={{ fontWeight: 'bold', paddingBottom: '16px' }}
           >
-            WETH → JOE
+            {name}
           </Typography>
           <Grid container alignItems='center' spacing={1}>
             <Grid item>
@@ -64,7 +65,9 @@ export default function Trade({
               <Typography style={labelStyle}>{percentChange}</Typography>
             </Grid>
             <Grid item>
-              <Typography style={labelStyle}>{deadline}</Typography>
+              <Typography style={labelStyle}>
+                {new Date(deadline * 1000).toLocaleString()}
+              </Typography>
             </Grid>
           </Grid>
         </Grid>

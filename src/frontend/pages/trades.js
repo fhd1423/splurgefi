@@ -1,7 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import Head from 'next/head';
 import Trade from '../components/Trade';
-import { Grid } from '@mui/material';
 import {
   DynamicContextProvider,
   DynamicWidget,
@@ -12,49 +11,26 @@ import { supabase } from '../components/client';
 import NavBar from '../components/NavBar';
 
 export default function Trades() {
-  const [isWalletConnected, setIsWalletConnected] = useState(false);
   const { setShowAuthFlow, primaryWallet } = useDynamicContext();
   const [userTrades, setUserTrades] = useState(new Map());
-  const [userTradeSignatures, setUserTradeSignatures] = useState(new Array());
 
-  const checkRemainingBatches = (trade_signature) => {
-    const contractABI = ['NEED TO ADD ABI'];
+  const getNameFromPair = async (pair) => {
+    const { data: payingETH } = await supabase
+      .from('Pairs')
+      .select('tokenName')
+      .eq('path', pair);
 
-    const contractAddress = 'CONTRACT_ADDRESS';
-    const contract = new web3.eth.Contract(contractABI, contractAddress);
+    if (payingETH) return `ETH -> ${payingETH[0].tokenName}`;
 
-    contract.events
-      .TradeEvent({
-        filter: { _signature: 'WE NEED TO ADD SIGNATURE HER' },
-        fromBlock: 'latest',
-      })
-      .on('data', (event) => {
-        console.log(event);
-      })
-      .on('error', console.error);
+    const { data: payingToken } = await supabase
+      .from('Pairs')
+      .select('tokenName')
+      .eq('path', `${pair.path.split('-')[1]}-${pair.path.split('-')[0]}`);
+
+    if (payingToken) return `${payingETH[0].tokenName}`;
   };
 
   useEffect(() => {
-    const fetchUsersTradeSignatures = async () => {
-      if (primaryWallet?.address) {
-        const { data, error } = await supabase
-          .from('Trades')
-          .select('signature')
-          .eq('user', primaryWallet.address);
-
-        if (error) {
-          console.error('Error fetching trade signatures:', error);
-          return;
-        }
-
-        // Empty array
-        const signatureArray = [];
-
-        // data.forEach(trade => {
-        //   signatureArray.push()
-        // });
-      }
-    };
     const fetchTrades = async () => {
       if (primaryWallet?.address) {
         const { data, error } = await supabase
@@ -67,17 +43,23 @@ export default function Trades() {
           return;
         }
 
-        let newTrades = new Map();
-        data.forEach((trade) => {
-          newTrades.set(trade.id, [
+        const tradesPromises = data.map(async (trade) => ({
+          id: trade.id,
+          details: [
+            await getNameFromPair(trade.pair),
             trade.pair,
             trade.complete,
             trade.order.tranches,
             trade.order.percentChange,
             trade.order.deadline,
             trade.remainingBatches,
-          ]);
-        });
+          ],
+        }));
+
+        const tradesResults = await Promise.all(tradesPromises);
+        let newTrades = new Map(
+          tradesResults.map((item) => [item.id, item.details]),
+        );
 
         setUserTrades(newTrades);
       }
@@ -124,6 +106,7 @@ export default function Trades() {
                 ([
                   id,
                   [
+                    tokenName,
                     pair,
                     complete,
                     batches,
@@ -134,6 +117,7 @@ export default function Trades() {
                 ]) => (
                   <div key={id} className='first:mt-0 mt-3'>
                     <Trade
+                      name={tokenName}
                       complete={complete}
                       batches={batches}
                       percentChange={`${percentChange}%`}
