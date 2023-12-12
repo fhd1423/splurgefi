@@ -6,6 +6,32 @@ import {
   SwapDataStruct,
 } from '../utils/encodingFunctions';
 
+const activateAction = async (id: number) => {
+  try {
+    await axios.post(
+      'https://api.tenderly.co/api/v1/actions/6122a3e2-5cbd-43c4-bd10-08e88a504cdf/webhook',
+      { id },
+      {
+        headers: {
+          'x-access-key': 'P0pOKtbaCwV2JffMLFpbdls3SowlmIj8',
+        },
+      },
+    );
+  } catch (e) {
+    console.log('Error with web3action');
+  }
+};
+
+const insertCalldata = async (calldata: string, id: number) => {
+  await supabase
+    .from('Trades')
+    .update({
+      ready: true,
+      zero_x_call_data: calldata,
+    })
+    .eq('id', id);
+};
+
 //Get Requested Pairs & recent PriceQueue from "Pairs" Table
 const getPairs = async () => {
   let { data: Pairs, error } = await supabase.from('Pairs').select('*');
@@ -83,7 +109,6 @@ const updateTrades = async () => {
       const timeBetweenBatches = trade.order.timeBwTrade;
 
       if (timeBetweenBatches <= current_time - lastBatchTime) {
-        // console.log('time between trade is satisfied for', trade.id);
         let buyOutputOver =
           ((100 + Number(trade.order.percentChange)) / 100) *
           movingAveragePrice;
@@ -92,37 +117,13 @@ const updateTrades = async () => {
           `trade ${trade.id} is outputting ${currentOutput} currently and targeting ${buyOutputOver}`,
         );
         if (currentOutput >= buyOutputOver) {
-          // Get swap call data
           const callData = await encodeInput(
             trade.order as SwapDataStruct,
             trade.signature,
           );
           if (await simulateTrade(callData)) {
-            const { data, error } = await supabase
-              .from('Trades')
-              .update({
-                ready: true,
-                zero_x_call_data: callData,
-              })
-              .eq('id', trade.id)
-              .select();
-            if (error)
-              console.log('error pushing calldata for trade ${trade.id}');
-            else {
-              try {
-                axios.post(
-                  'https://api.tenderly.co/api/v1/actions/6122a3e2-5cbd-43c4-bd10-08e88a504cdf/webhook',
-                  { id: trade.id },
-                  {
-                    headers: {
-                      'x-access-key': 'P0pOKtbaCwV2JffMLFpbdls3SowlmIj8',
-                    },
-                  },
-                );
-              } catch (e) {
-                console.log('Error with web3action');
-              }
-            }
+            await insertCalldata(callData, trade.id);
+            await activateAction(trade.id);
           } else {
             console.log(`trade simulation failed for trade ${trade.id}`);
           }
