@@ -32,6 +32,15 @@ const insertCalldata = async (calldata: string, id: number) => {
     .eq('id', id);
 };
 
+const markFailedSimulation = async (id: number) => {
+  await supabase
+    .from('Trades')
+    .update({
+      failedSimulation: true,
+    })
+    .eq('id', id);
+};
+
 //Get Requested Pairs & recent PriceQueue from "Pairs" Table
 const getPairs = async () => {
   let { data: Pairs, error } = await supabase.from('Pairs').select('*');
@@ -44,7 +53,8 @@ const getSortedTrades = async (path: string) => {
     .select('*')
     .eq('ready', 'false')
     .eq('complete', 'false')
-    .eq('pair', path);
+    .eq('pair', path)
+    .neq('failedSimulation', true);
 
   if (error) console.log(error);
   return Pairs;
@@ -126,6 +136,7 @@ const updateTrades = async () => {
             await activateAction(trade.id);
           } else {
             console.log(`trade simulation failed for trade ${trade.id}`);
+            await markFailedSimulation(trade.id);
           }
         }
       }
