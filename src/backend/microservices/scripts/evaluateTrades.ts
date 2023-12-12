@@ -54,7 +54,7 @@ const getSortedTrades = async (path: string) => {
     .eq('ready', 'false')
     .eq('complete', 'false')
     .eq('pair', path)
-    .neq('failedSimulation', true);
+    .is('failedSimulation', null);
 
   if (error) console.log(error);
   return Pairs;
@@ -145,5 +145,4 @@ const updateTrades = async () => {
 };
 
 console.log('Continuous evaluation loop started');
-
 setInterval(updateTrades, 15000);
