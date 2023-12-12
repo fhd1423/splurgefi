@@ -19,14 +19,21 @@ import TradeSelector from '../components/TradeSelector';
 import CustomDatePicker from '@/components/CustomDatePicker';
 import TimeSelector from '@/components/TimeSelector';
 import NavBar from '../components/NavBar';
-import { useSignTypedData } from 'wagmi';
+import {
+  useSignTypedData,
+  usePrepareContractWrite,
+  useContractWrite,
+  useContractRead,
+} from 'wagmi';
 
 // SDK & Client Imports
 import { useDynamicContext } from '@dynamic-labs/sdk-react-core';
 import { supabase } from '../components/client';
 import { uploadUserData, generateRandomSalt, parseJwt } from '@/helpers/utils';
+import { ERC20abi } from '@/helpers/ERC20';
 
 export default function Automate() {
+  const SPLURGE_ADDRESS = '0xFA1a9623054154EF25F782f04411B39A40f01880';
   // Define a function to handle the asynchronous Supabase call
   function fetchPairsData() {
     return supabase.from('Pairs').select('*');
@@ -127,12 +134,39 @@ export default function Automate() {
     }
   }, [primaryWallet?.address, authToken]);
 
+  const { data: allowance } = useContractRead({
+    address: message.inputTokenAddress,
+    abi: ERC20abi,
+    functionName: 'allowance',
+    args: [primaryWallet?.address, SPLURGE_ADDRESS],
+    chainId: 42161,
+    onSuccess(data) {
+      return data;
+    },
+  });
+
+  const { config } = usePrepareContractWrite({
+    address: message.inputTokenAddress,
+    abi: ERC20abi,
+    functionName: 'approve',
+    chainId: 42161,
+    args: [SPLURGE_ADDRESS, message.amount],
+    onSuccess(data) {
+      return true;
+    },
+    onError(error) {
+      return false;
+    },
+  });
+
+  const { write: approveToken } = useContractWrite(config);
+
   const { data, isError, isLoading, isSuccess, signTypedData } =
     useSignTypedData({
       domain: {
         name: 'Splurge Finance',
         version: '1',
-        chainId: 1,
+        chainId: 42161,
         verifyingContract: '0xCcCCccccCCCCcCCCCCCcCcCccCcCCCcCcccccccC', //CHANGE: to Splurge Addy
       },
       types: {
@@ -307,6 +341,9 @@ export default function Automate() {
                   <button
                     onClick={() => {
                       console.log('Button clicked');
+                      if (allowance < message.amount) {
+                        approveToken?.();
+                      }
                       signTypedData();
                     }}
                     className='bg-green-500 text-white text-xl font-bold rounded-lg shadow-lg hover:bg-green-600 w-96 h-14 mt-[10px]'

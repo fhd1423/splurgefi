@@ -20,14 +20,16 @@ export default function Trades() {
       .select('tokenName')
       .eq('path', pair);
 
-    if (payingETH) return `ETH -> ${payingETH[0].tokenName}`;
+    if (payingETH[0]) return `ETH -> ${payingETH[0].tokenName}`;
 
     const { data: payingToken } = await supabase
       .from('Pairs')
       .select('tokenName')
-      .eq('path', `${pair.path.split('-')[1]}-${pair.path.split('-')[0]}`);
+      .eq('path', `${pair.split('-')[1]}-${pair.split('-')[0]}`);
 
-    if (payingToken) return `${payingETH[0].tokenName}`;
+    console.log(payingToken[0].tokenName);
+
+    if (payingToken[0]) return `${payingToken[0].tokenName} -> ETH`;
   };
 
   useEffect(() => {

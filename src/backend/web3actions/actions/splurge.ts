@@ -1,10 +1,9 @@
 import { ActionFn, Context, Event, WebhookEvent } from '@tenderly/actions';
-import { Address, createWalletClient, http } from 'viem';
 import { createClient } from '@supabase/supabase-js';
 
-import { privateKeyToAccount } from 'viem/accounts';
+import { JsonRpcProvider, Wallet } from 'ethers';
 
-import { arbitrum } from 'viem/chains';
+const provider = new JsonRpcProvider('https://arb1.arbitrum.io/rpc');
 
 const supabase = createClient(
   'https://gmupexxqnzrrzozcovjp.supabase.co',
@@ -14,13 +13,7 @@ const supabase = createClient(
 export const execTrade: ActionFn = async (context: Context, event: Event) => {
   const PRIVATE_KEY = await context.secrets.get('PRIVATE_KEY');
   const SPLURGE_ADDRESS = await context.secrets.get('SPLURGE_ADDRESS');
-  const account = privateKeyToAccount(PRIVATE_KEY as Address);
-
-  const walletClient = createWalletClient({
-    account,
-    chain: arbitrum,
-    transport: http(),
-  });
+  const account = new Wallet(PRIVATE_KEY, provider);
 
   let request = event as WebhookEvent;
   const tradeID = request.payload.id;
@@ -36,10 +29,11 @@ export const execTrade: ActionFn = async (context: Context, event: Event) => {
 
   let txHash;
 
-  txHash = await walletClient.sendTransaction({
-    to: SPLURGE_ADDRESS as Address,
+  txHash = await account.sendTransaction({
+    to: SPLURGE_ADDRESS,
     data: trade.zero_x_call_data,
   });
 
-  if (txHash) console.log(`Trade ${tradeID} processed successfully`);
+  if (txHash)
+    console.log(`Trade ${tradeID} processed successfully at ${txHash}`);
 };
