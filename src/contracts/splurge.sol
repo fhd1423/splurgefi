@@ -17,6 +17,7 @@ contract Splurge {
     uint256 public tradeGasLimit = 400000;
 
     modifier onlyExecutorOrDeployer() {
+        //solhint-disable-next-line
         require(
             msg.sender == executor || msg.sender == deployer,
             "Not executor or deployer"
@@ -104,10 +105,7 @@ contract Splurge {
 
     function claimFees() public onlyExecutorOrDeployer {
         wETH.withdraw(wETH.balanceOf(address(this)));
-        (bool success, ) = payable(deployer).call{
-            value: address(this).balance
-        }("");
-        if (!success) revert();
+        payable(deployer).transfer(address(this).balance);
     }
 
     function getSigner(
