@@ -167,7 +167,7 @@ export default function Automate() {
         name: 'Splurge Finance',
         version: '1',
         chainId: 42161,
-        verifyingContract: '0xCcCCccccCCCCcCCCCCCcCcCccCcCCCcCcccccccC', //CHANGE: to Splurge Addy
+        verifyingContract: SPLURGE_ADDRESS, //CHANGE: to Splurge Addy
       },
       types: {
         conditionalOrder: [

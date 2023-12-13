@@ -115,8 +115,8 @@ const generateSignature = async (data: {
       domain: {
         name: 'Splurge Finance',
         version: '1',
-        chainId: 1,
-        verifyingContract: '0xCcCCccccCCCCcCCCCCCcCcCccCcCCCcCcccccccC', //CHANGE: to Splurge Addy
+        chainId: 42161,
+        verifyingContract: splurgeContract as Address, //CHANGE: to Splurge Addy
       },
       types: {
         conditionalOrder: [
