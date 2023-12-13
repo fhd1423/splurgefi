@@ -79,7 +79,7 @@ const CustomMenuItem = styled(MenuItem)({
   },
 });
 
-export default function TokenSelector({
+export default function CustomOutputToken({
   title,
   options,
   onValueChange,
@@ -126,7 +126,7 @@ export default function TokenSelector({
             input={<OutlinedInput />}
             renderValue={(value) => {
               if (value === '') {
-                return <span aria-label='placeholder'>Select token</span>;
+                return <span aria-label='placeholder'>Select output</span>;
               }
               return (
                 options.find((option) => option.value === value)?.label || ''

@@ -131,7 +131,7 @@ export default function CustomInputToken({
             input={<OutlinedInput />}
             renderValue={(value) => {
               if (value === '') {
-                return <span aria-label='placeholder'>Select token</span>;
+                return <span aria-label='placeholder'>Select input</span>;
               }
               return (
                 options.find((option) => option.value === value)?.label || ''

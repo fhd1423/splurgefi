@@ -11,8 +11,9 @@ import { AdapterDayjs } from '@mui/x-date-pickers/AdapterDayjs';
 
 // Custom Component Imports
 import CustomInputToken from '../components/CustomInputToken';
-import TokenSelector from '../components/TokenSelector';
+import CustomOutputToken from '../components/CustomOutputToken';
 import CustomToggle from '../components/CustomToggle';
+import NEWCustomToggle from '../components/NEWCustomToggle'
 import CustomInputPercent from '../components/CustomInputPercent';
 import CustomInputBatches from '../components/CustomInputBatches';
 import TradeSelector from '../components/TradeSelector';
@@ -266,7 +267,7 @@ export default function Automate() {
               boxShadow: '0 0 15px 5px rgba(255, 255, 255, 0.3)',
             }}
           >
-            <Grid container spacing={1.25}>
+            <Grid container spacing={1.25} justify="center">
               <Grid item xs={12}>
                 <CustomToggle
                   selection={toggleSelection}
@@ -275,7 +276,6 @@ export default function Automate() {
               </Grid>
               <Grid item xs={12}>
                 <CustomInputToken
-                  title='Input Token'
                   options={
                     toggleSelection === 'buy' ? inputOptions : outputOptions
                   }
@@ -283,9 +283,14 @@ export default function Automate() {
                   onSelectChange={handleMessageChange}
                 />
               </Grid>
-              <Grid item xs={12}>
-                <TokenSelector
-                  title='Output Token'
+              <Grid item xs={12} align="center" style={{margin: '-20px 0px', zIndex: 2}}> 
+                  <NEWCustomToggle                   
+                    selection={toggleSelection}
+                    setSelection={setToggleSelection}
+                  />
+              </Grid>
+              <Grid item xs={12}  style={{marginTop: '-8px', marginBottom:'20px',zIndex: 1}}>
+                <CustomOutputToken
                   options={
                     toggleSelection === 'buy' ? outputOptions : inputOptions
                   }
