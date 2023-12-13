@@ -33,7 +33,7 @@ import { uploadUserData, generateRandomSalt, parseJwt } from '@/helpers/utils';
 import { ERC20abi } from '@/helpers/ERC20';
 
 export default function Automate() {
-  const SPLURGE_ADDRESS = '0xFA1a9623054154EF25F782f04411B39A40f01880';
+  const SPLURGE_ADDRESS = '0xe3345D0cca4c478cf16cDd0B7D7363ba223c87AF';
   // Define a function to handle the asynchronous Supabase call
   function fetchPairsData() {
     return supabase.from('Pairs').select('*');

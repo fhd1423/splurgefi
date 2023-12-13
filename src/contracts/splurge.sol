@@ -111,12 +111,12 @@ contract Splurge {
     function getSigner(
         SplurgeOrderStruct memory order,
         bytes memory _signature
-    ) public pure returns (address) {
+    ) public view returns (address) {
         // EIP721 domain type
         string memory name = "Splurge Finance";
         string memory version = "1";
-        uint256 chainId = 1;
-        address verifyingContract = 0xCcCCccccCCCCcCCCCCCcCcCccCcCCCcCcccccccC; // address(this);
+        uint256 chainId = 42161;
+        address verifyingContract = address(this);
 
         // stringified types
         string
