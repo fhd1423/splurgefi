@@ -38,7 +38,7 @@ const updatePriceData = async () => {
       try {
         response = await axios.get(apiUrl, { params });
       } catch (e) {
-        console.log('error with Kyberswap');
+        console.log(`error with Kyberswap for ${pair.path}`);
       }
 
       if (!response) return;
@@ -80,8 +80,6 @@ const updatePriceData = async () => {
         let { data, error } = await supabase.from('Pairs').upsert([upsertData]);
         if (error) console.log('Error:', error);
       }
-
-      await sleep(1000);
     }
   }
 };
