@@ -116,14 +116,14 @@ function checkTime() {
   return intervals;
 }
 
-// must be called at a 15 second interval in order to fit the grace period of 5 seconds
+// must be called at a 30 second interval in order to fit the grace period of 5 seconds
 function getNextIntervalTime() {
   const now = new Date();
   const seconds = now.getSeconds();
   const milliseconds = now.getMilliseconds();
 
   // Calculate how many milliseconds to next 60-second mark
-  const secondsToNextInterval = 60 - (seconds % 60);
+  const secondsToNextInterval = 30 - (seconds % 30);
   const millisecondsToWait = secondsToNextInterval * 1000 - milliseconds;
 
   return millisecondsToWait;
@@ -135,6 +135,6 @@ async function executePeriodically() {
 }
 
 console.log('Continuous evaluation loop started');
-// wait till a 60 second interval, then continue calling every 60 seconds
+// wait till a 30 second interval, then continue calling every 30 seconds
 const waitTime = getNextIntervalTime();
 setTimeout(executePeriodically, waitTime);
