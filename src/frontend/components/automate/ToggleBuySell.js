@@ -4,8 +4,8 @@ import ToggleButtonGroup from '@mui/material/ToggleButtonGroup';
 import { styled } from '@mui/material/styles';
 import PropTypes from 'prop-types';
 
+// STYLING
 const StyledToggleButtonGroup = styled(ToggleButtonGroup)(({ theme }) => ({
-  // Adjust the margins if needed to control the spacing between the buttons
   '& .MuiToggleButtonGroup-grouped': {
     margin: theme.spacing(0.5),
     border: 0,
@@ -23,50 +23,56 @@ const StyledToggleButtonGroup = styled(ToggleButtonGroup)(({ theme }) => ({
 
 const StyledToggleButton = styled(ToggleButton)(({ theme }) => ({
   color: '#D9D9D9', // Default color for non-selected text
-  // backgroundColor: '#1B1B1B', // Default background color for all buttons
-  padding: '6px 12px', // Adjust padding to change the size
-  fontSize: '0.875rem', // Adjust font size as needed
-  lineHeight: 1.75, // Adjust line height to ensure text is centered vertically
-  fontFamily: 'Inter, sans-serif', // Set the font family to Inter
-  textTransform: 'capitalize', // Capitalize only the first letter
-  fontWeight: 'normal', // Default font weight for non-selected buttons
+  padding: '6px 12px',
+  fontSize: '0.875rem',
+  lineHeight: 1.75,
+  fontFamily: 'Inter, sans-serif',
+  textTransform: 'capitalize',
+  fontWeight: 'normal',
   '&.Mui-selected, &.Mui-selected:hover': {
-    color: 'white', // Text color for selected button
-    backgroundColor: '#1B1B1B', // Background color for selected button remains the same
-    fontWeight: 'bold', // Font weight for selected button
+    color: 'white',
+    backgroundColor: '#1B1B1B',
+    fontWeight: 'bold',
   },
-  border: 'none', // Remove border for all buttons
+  border: 'none',
   '&:hover': {
-    backgroundColor: '#1B1B1B', // Maintain the same color on hover
-    color: 'white', // Optionally change the text color on hover for non-selected buttons
+    backgroundColor: '#1B1B1B',
+    color: 'white',
+  },
+  // Custom styles for the "Pumpinator" button
+  '&.Mui-selected.Pumpinator': {
+    color: '#27ae60', // Green text color
+    transform: 'skewX(-20deg)', // Apply skew transformation
+    boxShadow: '0 4px 6px rgba(0, 0, 0, 0.1)', // Add a subtle shadow
   },
 }));
 
-export default function ToggleBuySell({ selection, setSelection }) {
+// FUNCTION - REAL SHIT
+export default function ToggleOrderType({ toggleTrade, setToggleTrade }) {
   const handleSelection = (event, newSelection) => {
     if (newSelection !== null) {
-      setSelection(newSelection);
+      setToggleTrade(newSelection);
     }
   };
 
   return (
     <StyledToggleButtonGroup
-      value={selection}
+      value={toggleTrade}
       exclusive
       onChange={handleSelection}
-      aria-label='buy sell toggle'
+      aria-label='pumpinator limit toggle'
     >
-      <StyledToggleButton value='buy' aria-label='buy'>
-        Buy
+      <StyledToggleButton value='pumpinator' aria-label='pumpinator' className={toggleTrade === 'pumpinator' ? 'Pumpinator' : ''}>
+        Pumpinator
       </StyledToggleButton>
-      <StyledToggleButton value='sell' aria-label='sell'>
-        Sell
+      <StyledToggleButton value='limit' aria-label='limit'>
+        Limit
       </StyledToggleButton>
     </StyledToggleButtonGroup>
   );
 }
 
-ToggleBuySell.propTypes = {
+ToggleOrderType.propTypes = {
   selection: PropTypes.string.isRequired,
   setSelection: PropTypes.func.isRequired,
 };

@@ -10,7 +10,7 @@ import {
   FormControl,
 } from '@mui/material';
 
-// Custom styles for the input container
+//STYLING 
 const CustomInputContainer = styled('div')({
   display: 'flex',
   alignItems: 'center',
@@ -22,7 +22,6 @@ const CustomInputContainer = styled('div')({
   justifyContent: 'space-between',
 });
 
-// Custom styles for the input component
 const CustomInput = styled(InputBase)(({ theme }) => ({
   color: 'white',
   fontSize: '1.5rem',
@@ -32,7 +31,6 @@ const CustomInput = styled(InputBase)(({ theme }) => ({
   },
 }));
 
-// Custom styles for the select component
 const CustomSelect = styled(Select)(({ theme }) => ({
   color: 'white',
   backgroundColor: '#27ae60',
@@ -54,7 +52,7 @@ const CustomSelect = styled(Select)(({ theme }) => ({
     border: 'none',
   },
 }));
-// Custom styles for the form control (to remove the underline from the select)
+
 const CustomFormControl = styled(FormControl)({
   flexShrink: 0,
   '&&&:before': {
@@ -72,7 +70,6 @@ const CustomFormControl = styled(FormControl)({
   marginRight: '10px', // Right margin to keep space inside the container
 });
 
-// Custom styles for the menu item in the dropdown
 const CustomMenuItem = styled(MenuItem)({
   '&.MuiMenuItem-root': {
     justifyContent: 'flex-end',
@@ -86,29 +83,19 @@ export default function OutputToken({
   onSelectChange,
   message,
 }) {
-  // Local state for the input's value
-  const [value, setValue] = useState('');
+  //STATE
+  const [selectedToken, setSelectedToken] = useState('');
 
-  // Local state for the selected token's value
-  const [selectedValue, setSelectedValue] = useState('');
-
-  // Update local state and lift up the value when it changes
-  const handleInputChange = (event) => {
-    const newValue = event.target.value;
-    setValue(newValue);
-    onValueChange('outputTokenAmount', newValue); // Send to parent view
-  };
-
-  // Lift up the selected token when it changes
-  const handleSelectChange = (event) => {
+  //HANDLERS
+  const handleTokenChange = (event) => {
     const newToken = event.target.value;
-    setSelectedValue(newToken);
+    setSelectedToken(newToken);
     onSelectChange('outputTokenAddress', newToken); // Send to parent view
   };
 
   useEffect(() => {
     if (message && message.outputTokenAddress) {
-      setSelectedValue(message.outputTokenAddress || ''); // Set the selected value to the prop value
+      setSelectedToken(message.outputTokenAddress || '');
     }
   }, [message?.outputTokenAddress]);
 
@@ -124,11 +111,11 @@ export default function OutputToken({
         {title}
       </Typography>
       <CustomInputContainer>
-        <CustomInput placeholder='Token' value={selectedValue} />
+        <CustomInput placeholder='Token' value={selectedToken} readOnly/>
         <CustomFormControl variant='standard'>
           <CustomSelect
-            value={selectedValue}
-            onChange={handleSelectChange}
+            value={selectedToken}
+            onChange={handleTokenChange}
             displayEmpty
             input={<OutlinedInput />}
             renderValue={(value) => {

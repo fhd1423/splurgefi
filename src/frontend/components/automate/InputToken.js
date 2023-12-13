@@ -1,5 +1,5 @@
 import { styled } from '@mui/system';
-import React, { useState, useEffect} from 'react';
+import React, { useState, useEffect } from 'react';
 import OutlinedInput from '@mui/material/OutlinedInput';
 import { parseEther } from 'viem';
 
@@ -11,7 +11,7 @@ import {
   FormControl,
 } from '@mui/material';
 
-// Custom styles for the input container
+//STYLING
 const CustomInputContainer = styled('div')({
   display: 'flex',
   alignItems: 'center',
@@ -23,7 +23,6 @@ const CustomInputContainer = styled('div')({
   justifyContent: 'space-between',
 });
 
-// Custom styles for the input component
 const CustomInput = styled(InputBase)(({ theme }) => ({
   color: 'white',
   fontSize: '1.5rem',
@@ -33,7 +32,6 @@ const CustomInput = styled(InputBase)(({ theme }) => ({
   },
 }));
 
-// Custom styles for the select component
 const CustomSelect = styled(Select)(({ theme }) => ({
   color: 'white',
   backgroundColor: '#27ae60',
@@ -55,7 +53,7 @@ const CustomSelect = styled(Select)(({ theme }) => ({
     border: 'none',
   },
 }));
-// Custom styles for the form control (to remove the underline from the select)
+
 const CustomFormControl = styled(FormControl)({
   flexShrink: 0,
   '&&&:before': {
@@ -70,16 +68,18 @@ const CustomFormControl = styled(FormControl)({
   '&& .MuiInput-underline:hover:not(.Mui-disabled):before': {
     borderBottom: 'none',
   },
-  marginRight: '10px', // Right margin to keep space inside the container
+  marginRight: '10px',
 });
 
-// Custom styles for the menu item in the dropdown
 const CustomMenuItem = styled(MenuItem)({
   '&.MuiMenuItem-root': {
     justifyContent: 'flex-end',
   },
 });
 
+
+
+//FUNCTION - REAL SHIT
 export default function InputToken({
   title,
   options,
@@ -87,31 +87,33 @@ export default function InputToken({
   onSelectChange,
   message,
 }) {
-  // Local state for the input's value
-  const [value, setValue] = useState('');
+  //STATE - token Amt
+  const [amount, setAmount] = useState('');
 
-  // ADD THIS LINE: Local state for the selected token's value
-  const [selectedValue, setSelectedValue] = useState('');
+  //STATE - token symbol
+  const [selectedToken, setSelectedToken] = useState('');
 
-  // Update local state and lift up the value when it changes
-  const handleInputChange = (event) => {
+  //HANDLERS
+  const handleAmountChange = (event) => {
     const newValue = event.target.value;
-    setValue(newValue);
+    setAmount(newValue);
     onValueChange('amount', String(parseEther(newValue))); // put wei value in order to sign
   };
 
+  const handleTokenChange = (event) => {
+    const newToken = event.target.value;
+    setSelectedToken(newToken);
+    onSelectChange('inputTokenAddress', newToken); // Lift up the selected token
+  };
+
+  //HELPER - ToggleSwap functionality
   useEffect(() => {
     if (message && message.inputTokenAddress) {
-      setSelectedValue(message.inputTokenAddress || ''); // Set the selected value to the prop value
+      setSelectedToken(message.inputTokenAddress || '');
     }
   }, [message?.inputTokenAddress]);
 
-  // Lift up the selected token when it changes
-  const handleSelectChange = (event) => {
-    const newToken = event.target.value;
-    setSelectedValue(newToken);
-    onSelectChange('inputTokenAddress', newToken); // Lift up the selected token
-  };
+
 
   return (
     <div>
@@ -127,13 +129,13 @@ export default function InputToken({
       <CustomInputContainer>
         <CustomInput
           placeholder='0'
-          value={value}
-          onChange={handleInputChange}
+          value={amount}
+          onChange={handleAmountChange}
         />
         <CustomFormControl variant='standard'>
           <CustomSelect
-            value={selectedValue}
-            onChange={handleSelectChange}
+            value={selectedToken}
+            onChange={handleTokenChange}
             displayEmpty
             input={<OutlinedInput />}
             renderValue={(value) => {

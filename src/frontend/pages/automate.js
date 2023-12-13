@@ -12,13 +12,14 @@ import { AdapterDayjs } from '@mui/x-date-pickers/AdapterDayjs';
 // Custom Component Imports
 import InputToken from '../components/automate/InputToken';
 import OutputToken from '../components/automate/OutputToken';
-import ToggleBuySell from '../components/automate/ToggleBuySell';
+import ToggleOrderType from '../components/automate/ToggleBuySell';
 import ToggleSwap from '../components/automate/ToggleSwap';
 import InputPercent from '../components/automate/InputPercent';
 import InputBatches from '../components/automate/InputBatches';
 import TradeSelector from '../components/automate/TradeSelector';
 import DatePicker from '@/components/automate/DatePicker';
 import TimeSelector from '@/components/automate/TimeSelector';
+import LimitPriceInput from '@/components/limit/limitPrice';
 import NavBar from '../components/NavBar';
 import {
   useSignTypedData,
@@ -35,11 +36,15 @@ import { ERC20abi } from '@/helpers/ERC20';
 
 export default function Automate() {
   const SPLURGE_ADDRESS = '0xe3345D0cca4c478cf16cDd0B7D7363ba223c87AF';
-  
+
   //AUTOMATION STATE
   const [toggleSelection, setToggleSelection] = useState('buy');
+  const [toggleTrade, setToggleTrade] = useState('pumpinator');
   const [userInputError, setUserInputError] = useState('');
   const [outputOptions, setOutputOptions] = useState([]);
+  const [limitPrice, setLimitPrice] = useState('');
+
+
   const inputOptions = [
     { label: 'WETH', value: '0x82aF49447D8a07e3bd95BD0d56f35241523fBab1' },
   ];
@@ -57,11 +62,16 @@ export default function Automate() {
     salt: generateRandomSalt(),
   });
 
+  //HANDLERS
   const handleMessageChange = (field, value) => {
     setMessage((prevMessage) => ({
       ...prevMessage,
       [field]: value,
     }));
+  };
+
+  const handleLimitPriceChange = (newValue) => {
+    setLimitPrice(newValue);
   };
 
   const validateInputs = () => {
@@ -105,7 +115,6 @@ export default function Automate() {
       setIsWalletConnected(true);
     }
   }, [primaryWallet?.address, authToken]);
-
 
   //ON-CHAIN INTERACTIONS
   const { data: allowance } = useContractRead({
@@ -185,8 +194,6 @@ export default function Automate() {
       },
     });
 
-
-    
   //SUPABASE - PAIRS
   const [averageMap, setAverageMap] = useState();
   function fetchPairsData() {
@@ -204,19 +211,19 @@ export default function Automate() {
           );
         }
 
-        // const averageMap = {};
+        const averageMap = {};
 
-        // pairs.forEach((pair) => {
-        //   const { tokenName } = pair;
-        //   const avg15min = calculateAverage(pair['15min_avg'].close_prices);
-        //   const avg60min = calculateAverage(pair['60min_avg'].close_prices);
-        //   const avg240min = calculateAverage(pair['240min_avg'].close_prices);
-        //   const avg1440min = calculateAverage(pair['1440min_avg'].close_prices);
+        pairs.forEach((pair) => {
+          const { tokenName } = pair;
+          const avg15min = calculateAverage(pair['15min_avg'].close_prices);
+          const avg60min = calculateAverage(pair['60min_avg'].close_prices);
+          const avg240min = calculateAverage(pair['240min_avg'].close_prices);
+          const avg1440min = calculateAverage(pair['1440min_avg'].close_prices);
 
-        //   averageMap[tokenName] = [avg15min, avg60min, avg240min, avg1440min];
-        // });
+          averageMap[tokenName] = [avg15min, avg60min, avg240min, avg1440min];
+        });
 
-        // setAverageMap(averageMap);
+        setAverageMap(averageMap);
 
         if (error) {
           console.error('Error fetching pairs data:', error);
@@ -238,8 +245,6 @@ export default function Automate() {
     outputOptions,
     averageMap,
   );
-
-
 
   return (
     <LocalizationProvider dateAdapter={AdapterDayjs}>
@@ -273,9 +278,9 @@ export default function Automate() {
           >
             <Grid container spacing={1.25} justify='center'>
               <Grid item xs={12}>
-                <ToggleBuySell
-                  selection={toggleSelection}
-                  setSelection={setToggleSelection}
+                <ToggleOrderType
+                  toggleTrade={toggleTrade}
+                  setToggleTrade={setToggleTrade}
                 />
               </Grid>
               <Grid item xs={12}>
@@ -315,57 +320,72 @@ export default function Automate() {
                   message={message}
                 />
               </Grid>
-              <Grid item xs={4}>
-                {toggleSelection === 'buy' ? (
-                  <InputPercent
-                    title='Percent Change'
-                    value={message.percentChange}
-                    onValueChange={handleMessageChange}
-                    isUpSelected={false} // Pass the derived state to the component
-                    placeHolder={'0%'}
-                  />
-                ) : (
-                  <InputPercent
-                    title='Percent Change'
-                    value={message.percentChange}
-                    onValueChange={handleMessageChange}
-                    isUpSelected={true} // Pass the derived state to the component
-                    placeHolder={'0%'}
-                  />
-                )}
-              </Grid>
-              <Grid item xs={4}>
-                <InputBatches
-                  title='Batches'
-                  placeHolder={'5'}
-                  value={message.tranches}
-                  onValueChange={(e) =>
-                    handleMessageChange('tranches', e.target.value)
-                  }
-                />
-              </Grid>
-              <Grid item xs={4}>
-                <TradeSelector
-                  // currentMovAvg= message.priceAvg
-                  onTradeActionChange={handleMessageChange}
-                  title='Moving Avg.'
-                  tokenAddy={message.outputTokenAddress}
-                />
-              </Grid>
-              <Grid item xs={6}>
-                <DatePicker
-                  // selectedDate={selectedDate}
-                  setSelectedDate={handleMessageChange}
-                />
-              </Grid>
+              {toggleTrade === 'pumpinator' ? (
+                <React.Fragment>
+                  <Grid item xs={4}>
+                    {toggleSelection === 'buy' ? (
+                      <InputPercent
+                        title='Percent Change'
+                        value={message.percentChange}
+                        onValueChange={handleMessageChange}
+                        isUpSelected={false} // Pass the derived state to the component
+                        placeHolder={'0%'}
+                      />
+                    ) : (
+                      <InputPercent
+                        title='Percent Change'
+                        value={message.percentChange}
+                        onValueChange={handleMessageChange}
+                        isUpSelected={true} // Pass the derived state to the component
+                        placeHolder={'0%'}
+                      />
+                    )}
+                  </Grid>
+                  <Grid item xs={4}>
+                    <InputBatches
+                      title='Batches'
+                      placeHolder={'5'}
+                      value={message.tranches}
+                      onValueChange={(e) =>
+                        handleMessageChange('tranches', e.target.value)
+                      }
+                    />
+                  </Grid>
+                  <Grid item xs={4}>
+                    <TradeSelector
+                      // currentMovAvg= message.priceAvg
+                      onTradeActionChange={handleMessageChange}
+                      title='Moving Avg.'
+                      tokenAddy={message.outputTokenAddress}
+                    />
+                  </Grid>
+                  <Grid item xs={6}>
+                    <DatePicker
+                      // selectedDate={selectedDate}
+                      setSelectedDate={handleMessageChange}
+                    />
+                  </Grid>
 
-              <Grid item xs={6}>
-                <TimeSelector
-                  // selectedTradeAction={selectedTimeBwTrade}
-                  onTradeActionChange={handleMessageChange}
-                  title='Execution Interval'
-                />
-              </Grid>
+                  <Grid item xs={6}>
+                    <TimeSelector
+                      // selectedTradeAction={selectedTimeBwTrade}
+                      onTradeActionChange={handleMessageChange}
+                      title='Execution Interval'
+                    />
+                  </Grid>
+                </React.Fragment>) : (
+                  <Grid item xs={12}>
+                    <LimitPriceInput
+                      label="Limit Price"
+                      value={limitPrice}
+                      onValueChange={handleLimitPriceChange}
+                    />
+                    <DatePicker
+                      // selectedDate={selectedDate}
+                      setSelectedDate={handleMessageChange}
+                    />
+                  </Grid>
+              )}
 
               <Grid
                 item

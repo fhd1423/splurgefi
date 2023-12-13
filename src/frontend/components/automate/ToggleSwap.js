@@ -2,7 +2,12 @@ import * as React from 'react';
 import ToggleButtonGroup from '@mui/material/ToggleButtonGroup';
 import PropTypes from 'prop-types';
 
-export default function ToggleSwap({ selection, setSelection, message, handleMessageChange }) {
+export default function ToggleSwap({
+  selection,
+  setSelection,
+  message,
+  handleMessageChange,
+}) {
   const [isClicked, setIsClicked] = React.useState(false);
 
   const handleToggle = () => {
@@ -13,7 +18,6 @@ export default function ToggleSwap({ selection, setSelection, message, handleMes
 
     handleMessageChange('inputTokenAddress', message.outputTokenAddress);
     handleMessageChange('outputTokenAddress', inputTokenAddress);
-
 
     setTimeout(() => {
       setIsClicked(false);
