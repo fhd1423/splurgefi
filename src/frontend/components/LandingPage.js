@@ -67,7 +67,7 @@ const LandingPage = () => {
             Best trading experience ever.
           </p>
 
-          <TradeSummaryDropdown />
+          {/* <TradeSummaryDropdown /> */}
 
           <Link href='/automate' passHref>
             <button className='bg-green-500 text-white text-xl font-semibold rounded-lg shadow-lg hover:bg-green-600 w-64 h-14'>
