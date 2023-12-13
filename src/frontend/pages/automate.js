@@ -39,28 +39,6 @@ export default function Automate() {
     return supabase.from('Pairs').select('*');
   }
 
-  useEffect(() => {
-    fetchPairsData().then((response) => {
-      const { data: pairs, error } = response;
-
-      if (error) {
-        console.error('Error fetching pairs data:', error);
-        return;
-      }
-
-      const newOutputOptions = pairs.map((pair) => ({
-        label: pair.tokenName,
-        value:
-          pair.path.split('-')[0] ===
-          '0x82aF49447D8a07e3bd95BD0d56f35241523fBab1' // if its WETH
-            ? pair.path.split('-')[1] // Use the second part if the first part matches the specific string
-            : pair.path.split('-')[0], // Otherwise, use the first part
-      }));
-
-      setOutputOptions(newOutputOptions);
-    });
-  }, []);
-
   const inputOptions = [
     { label: 'WETH', value: '0x82aF49447D8a07e3bd95BD0d56f35241523fBab1' },
   ];
@@ -82,6 +60,7 @@ export default function Automate() {
   const [isWalletConnected, setIsWalletConnected] = useState(false);
   const [userInputError, setUserInputError] = useState('');
   const [outputOptions, setOutputOptions] = useState([]);
+  const [averageMap, setAverageMap] = useState();
 
   const { setShowAuthFlow, authToken, primaryWallet } = useDynamicContext();
 
@@ -119,6 +98,52 @@ export default function Automate() {
   const handleWalletConnection = () => {
     setShowAuthFlow(true);
   };
+
+  useEffect(
+    () => {
+      fetchPairsData().then((response) => {
+        const { data: pairs, error } = response;
+
+        function calculateAverage(arr) {
+          return (
+            arr.reduce((acc, val) => Number(acc) + Number(val), 0) / arr.length
+          );
+        }
+
+        const averageMap = {};
+
+        pairs.forEach((pair) => {
+          const { tokenName } = pair;
+          const avg15min = calculateAverage(pair['15min_avg'].close_prices);
+          const avg60min = calculateAverage(pair['60min_avg'].close_prices);
+          const avg240min = calculateAverage(pair['240min_avg'].close_prices);
+          const avg1440min = calculateAverage(pair['1440min_avg'].close_prices);
+
+          averageMap[tokenName] = [avg15min, avg60min, avg240min, avg1440min];
+        });
+
+        setAverageMap(averageMap);
+
+        if (error) {
+          console.error('Error fetching pairs data:', error);
+          return;
+        }
+
+        const newOutputOptions = pairs.map((pair) => ({
+          label: pair.tokenName,
+          value:
+            pair.path.split('-')[0] ===
+            '0x82aF49447D8a07e3bd95BD0d56f35241523fBab1' // if its WETH
+              ? pair.path.split('-')[1] // Use the second part if the first part matches the specific string
+              : pair.path.split('-')[0], // Otherwise, use the first part
+        }));
+
+        setOutputOptions(newOutputOptions);
+      });
+    },
+    outputOptions,
+    averageMap,
+  );
 
   // Listen for changes in primaryWallet
   useEffect(() => {
