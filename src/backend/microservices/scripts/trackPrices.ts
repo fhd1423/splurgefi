@@ -4,12 +4,7 @@ import { supabase } from '../utils/client';
 
 config();
 
-const apiUrl: string = 'https://arbitrum.api.0x.org/swap/v1/price?';
-const apiKey: string = '47e88863-d00f-4e4f-bfe0-10b124369789';
-
-const headers = {
-  '0x-api-key': apiKey,
-};
+const apiUrl: string = 'https://apiv5.paraswap.io/prices/';
 
 // Get Requested Pairs & recent PriceQueue from "Pairs" Table
 const getPairs = async () => {
@@ -26,30 +21,35 @@ const updatePriceData = async () => {
     for (let i = 0; i < pairs.length; i++) {
       const pair = pairs[i];
       const splitPair = pair.path.split('-');
-      const sellToken = splitPair[0];
-      const buyToken = splitPair[1];
+      const srcToken = splitPair[0];
+      const destToken = splitPair[1];
 
       const params = {
-        sellToken,
-        buyToken,
-        sellAmount: 0.01 * 10 ** 18, // TODO: add decimal logic
+        srcToken,
+        destToken,
+        amount: 0.01 * 10 ** 18,
+        srcDecimals: 18,
+        destDecimals: 18,
+        side: 'SELL',
+        network: 42161, //arbitrum
       };
 
       let response;
       try {
-        response = await axios.get(apiUrl, {
-          params,
-          headers,
-        });
+        response = await axios.get(apiUrl, { params });
       } catch (e) {
-        console.log('Error with 0x:');
+        console.log('error with Kyberswap');
       }
 
       if (!response) return;
-      const current_price = (response.data.buyAmount / 10 ** 18).toFixed(4); // TODO: add decimal logic
+      let current_price = Number(
+        response.data.priceRoute.destAmount / 10 ** 18,
+      ).toFixed(4);
+
       // console.log(`current price for ${pair.path} is ${current_price}`);
 
       let executed = false;
+
       for (let interval of intervals) {
         let priceArr = [];
         try {
@@ -116,14 +116,14 @@ function checkTime() {
   return intervals;
 }
 
-// must be called at a 30 second interval in order to fit the grace period of 5 seconds
+// must be called at a 10 second interval in order to fit the grace period of 5 seconds
 function getNextIntervalTime() {
   const now = new Date();
   const seconds = now.getSeconds();
   const milliseconds = now.getMilliseconds();
 
-  // Calculate how many milliseconds to next 60-second mark
-  const secondsToNextInterval = 30 - (seconds % 30);
+  // Calculate how many milliseconds to next 10-second mark
+  const secondsToNextInterval = 10 - (seconds % 10);
   const millisecondsToWait = secondsToNextInterval * 1000 - milliseconds;
 
   return millisecondsToWait;
@@ -135,6 +135,6 @@ async function executePeriodically() {
 }
 
 console.log('Continuous evaluation loop started');
-// wait till a 30 second interval, then continue calling every 30 seconds
+// wait till a 10 second interval, then continue calling every 10 seconds
 const waitTime = getNextIntervalTime();
 setTimeout(executePeriodically, waitTime);

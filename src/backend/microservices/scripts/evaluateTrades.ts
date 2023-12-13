@@ -60,6 +60,69 @@ const getSortedTrades = async (path: string) => {
   return Trades;
 };
 
+const interateThroughTrades = async (
+  trades: any[],
+  pair: any,
+  inverse = false,
+) => {
+  trades.forEach(async (trade) => {
+    try {
+      pair[`${trade.order.priceAvg}min_avg`]['close_prices'];
+    } catch (e) {
+      console.log(
+        'moving average doesnt exist yet',
+        `${trade.order.priceAvg}min_avg`,
+      );
+      return;
+    }
+    const allMeanPrices =
+      pair[`${trade.order.priceAvg}min_avg`]['close_prices'];
+
+    let movingAveragePrice =
+      allMeanPrices.reduce((acc: any, val: any) => acc + Number(val), 0) /
+      allMeanPrices.length;
+
+    if (allMeanPrices.length != 10) {
+      console.log(
+        `moving average ${trade.order.priceAvg}min_avg not full of data yet`,
+      );
+      return;
+    }
+    const current_time = parseInt((new Date().getTime() / 1000).toFixed(0));
+
+    const lastBatchTime = trade.lastExecuted;
+    const timeBetweenBatches = trade.order.timeBwTrade;
+    let currentOutput = pair['current_price'];
+
+    if (inverse) {
+      movingAveragePrice = 1 / movingAveragePrice;
+      currentOutput = 1 / currentOutput;
+    }
+
+    if (timeBetweenBatches <= current_time - lastBatchTime) {
+      let buyOutputOver =
+        ((100 + Number(trade.order.percentChange)) / 100) * movingAveragePrice;
+
+      console.log(
+        `trade ${trade.id} is outputting ${currentOutput} currently and targeting ${buyOutputOver}`,
+      );
+      if (currentOutput >= buyOutputOver) {
+        const callData = await encodeInput(
+          trade.order as SwapDataStruct,
+          trade.signature,
+        );
+        if (await simulateTrade(callData)) {
+          await insertCalldata(callData, trade.id);
+          await activateAction(trade.id);
+        } else {
+          console.log(`trade simulation failed for trade ${trade.id}`);
+          await markFailedSimulation(trade.id);
+        }
+      }
+    }
+  });
+};
+
 const updateTrades = async () => {
   let pairs = await getPairs();
   if (!pairs) return;
@@ -69,120 +132,14 @@ const updateTrades = async () => {
     let regularTrades = await getSortedTrades(pair.path);
 
     if (regularTrades && regularTrades.length > 0) {
-      regularTrades.forEach(async (trade) => {
-        try {
-          pair[`${trade.order.priceAvg}min_avg`]['close_prices'];
-        } catch (e) {
-          console.log(
-            'moving average doesnt exist yet',
-            `${trade.order.priceAvg}min_avg`,
-          );
-          return;
-        }
-        const allMeanPrices =
-          pair[`${trade.order.priceAvg}min_avg`]['close_prices'];
-
-        let movingAveragePrice =
-          allMeanPrices.reduce((acc: any, val: any) => acc + Number(val), 0) /
-          allMeanPrices.length;
-
-        if (allMeanPrices.length != 10) {
-          console.log(
-            `moving average ${trade.order.priceAvg}min_avg not full of data yet`,
-          );
-          return;
-        }
-        const current_time = parseInt((new Date().getTime() / 1000).toFixed(0));
-
-        const lastBatchTime = trade.lastExecuted;
-        const timeBetweenBatches = trade.order.timeBwTrade;
-        let currentOutput = pair['current_price'];
-
-        if (timeBetweenBatches <= current_time - lastBatchTime) {
-          let buyOutputOver =
-            ((100 + Number(trade.order.percentChange)) / 100) *
-            movingAveragePrice;
-
-          console.log(
-            `trade ${trade.id} is outputting ${currentOutput} currently and targeting ${buyOutputOver}`,
-          );
-          if (currentOutput >= buyOutputOver) {
-            const callData = await encodeInput(
-              trade.order as SwapDataStruct,
-              trade.signature,
-            );
-            if (await simulateTrade(callData)) {
-              await insertCalldata(callData, trade.id);
-              await activateAction(trade.id);
-            } else {
-              console.log(`trade simulation failed for trade ${trade.id}`);
-              await markFailedSimulation(trade.id);
-            }
-          }
-        }
-      });
+      interateThroughTrades(regularTrades, pair);
     }
 
     const inversePath = `${pair.path.split('-')[1]}-${pair.path.split('-')[0]}`;
     let inverseTrades = await getSortedTrades(inversePath);
 
     if (inverseTrades && inverseTrades.length > 0) {
-      inverseTrades.forEach(async (trade) => {
-        try {
-          pair[`${trade.order.priceAvg}min_avg`]['close_prices'];
-        } catch (e) {
-          console.log(
-            'moving average doesnt exist yet',
-            `${trade.order.priceAvg}min_avg`,
-          );
-          return;
-        }
-        const allMeanPrices =
-          pair[`${trade.order.priceAvg}min_avg`]['close_prices'];
-
-        let movingAveragePrice =
-          allMeanPrices.reduce((acc: any, val: any) => acc + Number(val), 0) /
-          allMeanPrices.length;
-
-        if (allMeanPrices.length != 10) {
-          console.log(
-            `moving average ${trade.order.priceAvg}min_avg not full of data yet`,
-          );
-          return;
-        }
-        let currentOutput = pair['current_price'];
-
-        movingAveragePrice = 1 / movingAveragePrice;
-        currentOutput = 1 / currentOutput;
-
-        const current_time = parseInt((new Date().getTime() / 1000).toFixed(0));
-
-        const lastBatchTime = trade.lastExecuted;
-        const timeBetweenBatches = trade.order.timeBwTrade;
-
-        if (timeBetweenBatches <= current_time - lastBatchTime) {
-          let buyOutputOver =
-            ((100 + Number(trade.order.percentChange)) / 100) *
-            movingAveragePrice;
-
-          console.log(
-            `trade ${trade.id} is outputting ${currentOutput} currently and targeting ${buyOutputOver}`,
-          );
-          if (currentOutput >= buyOutputOver) {
-            const callData = await encodeInput(
-              trade.order as SwapDataStruct,
-              trade.signature,
-            );
-            if (await simulateTrade(callData)) {
-              await insertCalldata(callData, trade.id);
-              await activateAction(trade.id);
-            } else {
-              console.log(`trade simulation failed for trade ${trade.id}`);
-              await markFailedSimulation(trade.id);
-            }
-          }
-        }
-      });
+      interateThroughTrades(inverseTrades, pair, true);
     }
   });
 };
