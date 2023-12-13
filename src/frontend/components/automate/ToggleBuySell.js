@@ -42,7 +42,7 @@ const StyledToggleButton = styled(ToggleButton)(({ theme }) => ({
   },
 }));
 
-export default function CustomToggle({ selection, setSelection }) {
+export default function ToggleBuySell({ selection, setSelection }) {
   const handleSelection = (event, newSelection) => {
     if (newSelection !== null) {
       setSelection(newSelection);
@@ -66,7 +66,7 @@ export default function CustomToggle({ selection, setSelection }) {
   );
 }
 
-CustomToggle.propTypes = {
+ToggleBuySell.propTypes = {
   selection: PropTypes.string.isRequired,
   setSelection: PropTypes.func.isRequired,
 };

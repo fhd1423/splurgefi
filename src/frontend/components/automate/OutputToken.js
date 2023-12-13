@@ -1,7 +1,6 @@
 import { styled } from '@mui/system';
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import OutlinedInput from '@mui/material/OutlinedInput';
-import { parseEther } from 'viem';
 
 import {
   Typography,
@@ -80,31 +79,38 @@ const CustomMenuItem = styled(MenuItem)({
   },
 });
 
-export default function CustomInputToken({
+export default function OutputToken({
   title,
   options,
   onValueChange,
   onSelectChange,
+  message,
 }) {
   // Local state for the input's value
   const [value, setValue] = useState('');
 
-  // ADD THIS LINE: Local state for the selected token's value
+  // Local state for the selected token's value
   const [selectedValue, setSelectedValue] = useState('');
 
   // Update local state and lift up the value when it changes
   const handleInputChange = (event) => {
     const newValue = event.target.value;
     setValue(newValue);
-    onValueChange('amount', String(parseEther(newValue))); // put wei value in order to sign
+    onValueChange('outputTokenAmount', newValue); // Send to parent view
   };
 
   // Lift up the selected token when it changes
   const handleSelectChange = (event) => {
     const newToken = event.target.value;
     setSelectedValue(newToken);
-    onSelectChange('inputTokenAddress', newToken); // Lift up the selected token
+    onSelectChange('outputTokenAddress', newToken); // Send to parent view
   };
+
+  useEffect(() => {
+    if (message && message.outputTokenAddress) {
+      setSelectedValue(message.outputTokenAddress || ''); // Set the selected value to the prop value
+    }
+  }, [message?.outputTokenAddress]);
 
   return (
     <div>
@@ -118,11 +124,7 @@ export default function CustomInputToken({
         {title}
       </Typography>
       <CustomInputContainer>
-        <CustomInput
-          placeholder='0'
-          value={value}
-          onChange={handleInputChange}
-        />
+        <CustomInput placeholder='Token' value={selectedValue} />
         <CustomFormControl variant='standard'>
           <CustomSelect
             value={selectedValue}
@@ -131,7 +133,7 @@ export default function CustomInputToken({
             input={<OutlinedInput />}
             renderValue={(value) => {
               if (value === '') {
-                return <span aria-label='placeholder'>Select input</span>;
+                return <span aria-label='placeholder'>Select output</span>;
               }
               return (
                 options.find((option) => option.value === value)?.label || ''

@@ -8,7 +8,7 @@ import IconButton from '@mui/material/IconButton';
 import KeyboardArrowDownIcon from '@mui/icons-material/KeyboardArrowDown';
 import Typography from '@mui/material/Typography';
 import Popover from '@mui/material/Popover';
-import LineChart from './LineChart';
+import LineChart from '../unused/LineChart';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { faInfo } from '@fortawesome/free-solid-svg-icons';
 
@@ -154,7 +154,7 @@ export default function TradeSelector({
         >
           Use this
           <a
-            href={`https://dexscreener.com/ethereum/${tokenAddy}`}
+            href={`https://dexscreener.com/arbitrum/${tokenAddy}`}
             target='_blank'
             rel='noopener noreferrer'
             style={{

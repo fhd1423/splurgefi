@@ -27,7 +27,7 @@ const CustomInput = styled(InputBase)({
   },
 });
 
-export default function CustomInputPercent({
+export default function InputPercent({
   title,
   placeHolder,
   value,

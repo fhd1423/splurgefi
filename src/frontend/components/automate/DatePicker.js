@@ -1,5 +1,5 @@
 import React from 'react';
-import { DatePicker } from '@mui/x-date-pickers/DatePicker';
+import { DatePicker as DatePicker_mui } from '@mui/x-date-pickers/DatePicker';
 import {
   TextField,
   createTheme,
@@ -63,7 +63,7 @@ const customDatePickerTheme = createTheme({
   },
 });
 
-const CustomDatePicker = ({ selectedDate, setSelectedDate }) => {
+const DatePicker = ({ selectedDate, setSelectedDate }) => {
   return (
     <ThemeProvider theme={customDatePickerTheme}>
       <Typography
@@ -75,7 +75,7 @@ const CustomDatePicker = ({ selectedDate, setSelectedDate }) => {
       >
         Deadline
       </Typography>
-      <DatePicker
+      <DatePicker_mui
         value={selectedDate}
         onChange={(e) => setSelectedDate('deadline', e.unix())}
         renderInput={(params) => <TextField {...params} />}
@@ -84,4 +84,4 @@ const CustomDatePicker = ({ selectedDate, setSelectedDate }) => {
   );
 };
 
-export default CustomDatePicker;
+export default DatePicker;

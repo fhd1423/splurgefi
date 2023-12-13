@@ -5,8 +5,8 @@ import { useDynamicContext, DynamicWidget } from '@dynamic-labs/sdk-react-core';
 import GradientText from './GradientText';
 import Link from 'next/link';
 import { useRouter } from 'next/navigation';
-import NavBar from './NavBar';
-import TradeSummaryDropdown from './TradeSummaryDropdown';
+import NavBar from '../NavBar';
+import TradeSummaryDropdown from '../TradeSummaryDropdown';
 
 const LandingPage = () => {
   const router = useRouter();

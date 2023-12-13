@@ -27,7 +27,7 @@ const CustomInput = styled(InputBase)({
   },
 });
 
-export default function CustomInputBatches({
+export default function InputBatches({
   title,
   placeHolder,
   value,

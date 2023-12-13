@@ -10,15 +10,15 @@ import { LocalizationProvider } from '@mui/x-date-pickers/LocalizationProvider';
 import { AdapterDayjs } from '@mui/x-date-pickers/AdapterDayjs';
 
 // Custom Component Imports
-import CustomInputToken from '../components/CustomInputToken';
-import CustomOutputToken from '../components/CustomOutputToken';
-import CustomToggle from '../components/CustomToggle';
-import NEWCustomToggle from '../components/NEWCustomToggle'
-import CustomInputPercent from '../components/CustomInputPercent';
-import CustomInputBatches from '../components/CustomInputBatches';
-import TradeSelector from '../components/TradeSelector';
-import CustomDatePicker from '@/components/CustomDatePicker';
-import TimeSelector from '@/components/TimeSelector';
+import InputToken from '../components/automate/InputToken';
+import OutputToken from '../components/automate/OutputToken';
+import ToggleBuySell from '../components/automate/ToggleBuySell';
+import ToggleSwap from '../components/automate/ToggleSwap';
+import InputPercent from '../components/automate/InputPercent';
+import InputBatches from '../components/automate/InputBatches';
+import TradeSelector from '../components/automate/TradeSelector';
+import DatePicker from '@/components/automate/DatePicker';
+import TimeSelector from '@/components/automate/TimeSelector';
 import NavBar from '../components/NavBar';
 import {
   useSignTypedData,
@@ -35,11 +35,11 @@ import { ERC20abi } from '@/helpers/ERC20';
 
 export default function Automate() {
   const SPLURGE_ADDRESS = '0xe3345D0cca4c478cf16cDd0B7D7363ba223c87AF';
-  // Define a function to handle the asynchronous Supabase call
-  function fetchPairsData() {
-    return supabase.from('Pairs').select('*');
-  }
-
+  
+  //AUTOMATION STATE
+  const [toggleSelection, setToggleSelection] = useState('buy');
+  const [userInputError, setUserInputError] = useState('');
+  const [outputOptions, setOutputOptions] = useState([]);
   const inputOptions = [
     { label: 'WETH', value: '0x82aF49447D8a07e3bd95BD0d56f35241523fBab1' },
   ];
@@ -57,13 +57,12 @@ export default function Automate() {
     salt: generateRandomSalt(),
   });
 
-  const [toggleSelection, setToggleSelection] = useState('buy');
-  const [isWalletConnected, setIsWalletConnected] = useState(false);
-  const [userInputError, setUserInputError] = useState('');
-  const [outputOptions, setOutputOptions] = useState([]);
-  const [averageMap, setAverageMap] = useState();
-
-  const { setShowAuthFlow, authToken, primaryWallet } = useDynamicContext();
+  const handleMessageChange = (field, value) => {
+    setMessage((prevMessage) => ({
+      ...prevMessage,
+      [field]: value,
+    }));
+  };
 
   const validateInputs = () => {
     const fields = [
@@ -89,67 +88,14 @@ export default function Automate() {
     }
   };
 
-  const handleMessageChange = (field, value) => {
-    setMessage((prevMessage) => ({
-      ...prevMessage,
-      [field]: value,
-    }));
-  };
-
+  //AUTH - DYNAMIC
+  const { setShowAuthFlow, authToken, primaryWallet } = useDynamicContext();
+  const [isWalletConnected, setIsWalletConnected] = useState(false);
   const handleWalletConnection = () => {
     setShowAuthFlow(true);
   };
-
-  useEffect(
-    () => {
-      fetchPairsData().then((response) => {
-        const { data: pairs, error } = response;
-
-        function calculateAverage(arr) {
-          return (
-            arr.reduce((acc, val) => Number(acc) + Number(val), 0) / arr.length
-          );
-        }
-
-        const averageMap = {};
-
-        pairs.forEach((pair) => {
-          const { tokenName } = pair;
-          const avg15min = calculateAverage(pair['15min_avg'].close_prices);
-          const avg60min = calculateAverage(pair['60min_avg'].close_prices);
-          const avg240min = calculateAverage(pair['240min_avg'].close_prices);
-          const avg1440min = calculateAverage(pair['1440min_avg'].close_prices);
-
-          averageMap[tokenName] = [avg15min, avg60min, avg240min, avg1440min];
-        });
-
-        setAverageMap(averageMap);
-
-        if (error) {
-          console.error('Error fetching pairs data:', error);
-          return;
-        }
-
-        const newOutputOptions = pairs.map((pair) => ({
-          label: pair.tokenName,
-          value:
-            pair.path.split('-')[0] ===
-            '0x82aF49447D8a07e3bd95BD0d56f35241523fBab1' // if its WETH
-              ? pair.path.split('-')[1] // Use the second part if the first part matches the specific string
-              : pair.path.split('-')[0], // Otherwise, use the first part
-        }));
-
-        setOutputOptions(newOutputOptions);
-      });
-    },
-    outputOptions,
-    averageMap,
-  );
-
-  // Listen for changes in primaryWallet
   useEffect(() => {
     if (primaryWallet?.address && authToken) {
-      // authenticateUserWithSupabase(authToken);
       const jwtData = parseJwt(authToken);
 
       uploadUserData(primaryWallet?.address, jwtData);
@@ -160,6 +106,8 @@ export default function Automate() {
     }
   }, [primaryWallet?.address, authToken]);
 
+
+  //ON-CHAIN INTERACTIONS
   const { data: allowance } = useContractRead({
     address: message.inputTokenAddress,
     abi: ERC20abi,
@@ -237,6 +185,62 @@ export default function Automate() {
       },
     });
 
+
+    
+  //SUPABASE - PAIRS
+  const [averageMap, setAverageMap] = useState();
+  function fetchPairsData() {
+    return supabase.from('Pairs').select('*');
+  }
+
+  useEffect(
+    () => {
+      fetchPairsData().then((response) => {
+        const { data: pairs, error } = response;
+
+        function calculateAverage(arr) {
+          return (
+            arr.reduce((acc, val) => Number(acc) + Number(val), 0) / arr.length
+          );
+        }
+
+        // const averageMap = {};
+
+        // pairs.forEach((pair) => {
+        //   const { tokenName } = pair;
+        //   const avg15min = calculateAverage(pair['15min_avg'].close_prices);
+        //   const avg60min = calculateAverage(pair['60min_avg'].close_prices);
+        //   const avg240min = calculateAverage(pair['240min_avg'].close_prices);
+        //   const avg1440min = calculateAverage(pair['1440min_avg'].close_prices);
+
+        //   averageMap[tokenName] = [avg15min, avg60min, avg240min, avg1440min];
+        // });
+
+        // setAverageMap(averageMap);
+
+        if (error) {
+          console.error('Error fetching pairs data:', error);
+          return;
+        }
+
+        const newOutputOptions = pairs.map((pair) => ({
+          label: pair.tokenName,
+          value:
+            pair.path.split('-')[0] ===
+            '0x82aF49447D8a07e3bd95BD0d56f35241523fBab1' // if its WETH
+              ? pair.path.split('-')[1] // Use the second part if the first part matches the specific string
+              : pair.path.split('-')[0], // Otherwise, use the first part
+        }));
+
+        setOutputOptions(newOutputOptions);
+      });
+    },
+    outputOptions,
+    averageMap,
+  );
+
+
+
   return (
     <LocalizationProvider dateAdapter={AdapterDayjs}>
       <NavBar inTradesPage={false} />
@@ -267,40 +271,53 @@ export default function Automate() {
               boxShadow: '0 0 15px 5px rgba(255, 255, 255, 0.3)',
             }}
           >
-            <Grid container spacing={1.25} justify="center">
+            <Grid container spacing={1.25} justify='center'>
               <Grid item xs={12}>
-                <CustomToggle
+                <ToggleBuySell
                   selection={toggleSelection}
                   setSelection={setToggleSelection}
                 />
               </Grid>
               <Grid item xs={12}>
-                <CustomInputToken
+                <InputToken
                   options={
                     toggleSelection === 'buy' ? inputOptions : outputOptions
                   }
                   onValueChange={handleMessageChange}
                   onSelectChange={handleMessageChange}
+                  message={message}
                 />
               </Grid>
-              <Grid item xs={12} align="center" style={{margin: '-20px 0px', zIndex: 2}}> 
-                  <NEWCustomToggle                   
-                    selection={toggleSelection}
-                    setSelection={setToggleSelection}
-                  />
+              <Grid
+                item
+                xs={12}
+                align='center'
+                style={{ margin: '-20px 0px', zIndex: 2 }}
+              >
+                <ToggleSwap
+                  selection={toggleSelection}
+                  setSelection={setToggleSelection}
+                  message={message}
+                  handleMessageChange={handleMessageChange}
+                />
               </Grid>
-              <Grid item xs={12}  style={{marginTop: '-8px', marginBottom:'20px',zIndex: 1}}>
-                <CustomOutputToken
+              <Grid
+                item
+                xs={12}
+                style={{ marginTop: '-8px', marginBottom: '20px', zIndex: 1 }}
+              >
+                <OutputToken
                   options={
                     toggleSelection === 'buy' ? outputOptions : inputOptions
                   }
                   onValueChange={handleMessageChange}
                   onSelectChange={handleMessageChange}
+                  message={message}
                 />
               </Grid>
               <Grid item xs={4}>
                 {toggleSelection === 'buy' ? (
-                  <CustomInputPercent
+                  <InputPercent
                     title='Percent Change'
                     value={message.percentChange}
                     onValueChange={handleMessageChange}
@@ -308,7 +325,7 @@ export default function Automate() {
                     placeHolder={'0%'}
                   />
                 ) : (
-                  <CustomInputPercent
+                  <InputPercent
                     title='Percent Change'
                     value={message.percentChange}
                     onValueChange={handleMessageChange}
@@ -318,7 +335,7 @@ export default function Automate() {
                 )}
               </Grid>
               <Grid item xs={4}>
-                <CustomInputBatches
+                <InputBatches
                   title='Batches'
                   placeHolder={'5'}
                   value={message.tranches}
@@ -336,7 +353,7 @@ export default function Automate() {
                 />
               </Grid>
               <Grid item xs={6}>
-                <CustomDatePicker
+                <DatePicker
                   // selectedDate={selectedDate}
                   setSelectedDate={handleMessageChange}
                 />

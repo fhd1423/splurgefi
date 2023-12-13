@@ -1,12 +1,12 @@
 'use client';
-import LandingPage from '../components/LandingPage';
-import FeaturesSection from '../components/FeaturesSection';
-import WaitlistSection from '../components/WaitlistSection';
+import LandingPage from '../components/home/LandingPage';
+import FeaturesSection from '../components/home/FeaturesSection';
+import WaitlistSection from '../components/home/WaitlistSection';
 import {
   DynamicContextProvider,
   DynamicWidget,
 } from '@dynamic-labs/sdk-react-core';
-import Graph from '../components/Graph';
+import Graph from '../components/home/Graph';
 import { EthereumWalletConnectors } from '@dynamic-labs/ethereum';
 
 export default function Home() {

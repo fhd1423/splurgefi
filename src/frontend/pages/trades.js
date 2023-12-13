@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import Head from 'next/head';
-import Trade from '../components/Trade';
+import Trade from '../components/trades/Trade';
 import {
   DynamicContextProvider,
   DynamicWidget,
