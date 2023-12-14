@@ -29,6 +29,9 @@ const CustomInput = styled(InputBase)(({ theme }) => ({
   '& .MuiInputBase-input': {
     padding: '20px 12px',
     flex: 1,
+    overflow: 'hidden',
+    textOverflow: 'ellipsis',
+    whiteSpace: 'nowrap',
   },
 }));
 
@@ -107,16 +110,14 @@ const CustomMenuItem = styled(MenuItem)({
 export default function OutputToken({
   title,
   options,
-  onValueChange,
   onSelectChange,
   message,
   currentOutput,
-  setCurrentOutput
+  setCurrentOutput,
 }) {
   //STATE
   const [selectedToken, setSelectedToken] = useState(currentOutput);
   const [isTokenModalOpen, setIsTokenModalOpen] = useState(false);
-
 
   //HANDLERS
   const handleTokenChange = (event) => {
@@ -151,44 +152,17 @@ export default function OutputToken({
         {title}
       </Typography>
       <CustomInputContainer>
-        <CustomInput placeholder='Token' value={selectedToken.address} readOnly />
+        <CustomInput
+          placeholder='Token'
+          value={selectedToken.address}
+          readOnly
+        />
         <CustomFormControl variant='standard'>
           <CustomBlackCapsule onClick={handleOpenTokenModal}>
             <Logo src={selectedToken.logoURI} alt={selectedToken.name} />
-            {selectedToken.name}
+            {selectedToken.name.length <= 10 ? selectedToken.name : selectedToken.symbol}
             <DropdownArrow>▼</DropdownArrow>
           </CustomBlackCapsule>
-          {/* <CustomSelect
-            value={selectedToken}
-            onChange={handleTokenChange}
-            displayEmpty
-            input={<OutlinedInput />}
-            renderValue={(value) => {
-              if (value === '') {
-                return <span aria-label='placeholder'>Select output</span>;
-              }
-              return (
-                options.find((option) => option.value === value)?.label || ''
-              );
-            }}
-            MenuProps={{
-              anchorOrigin: {
-                vertical: 'bottom',
-                horizontal: 'right',
-              },
-              transformOrigin: {
-                vertical: 'top',
-                horizontal: 'right',
-              },
-              getContentAnchorEl: null,
-            }}
-          >
-            {options.map((option) => (
-              <CustomMenuItem key={option.value} value={option.value}>
-                {option.label}
-              </CustomMenuItem>
-            ))}
-          </CustomSelect> */}
         </CustomFormControl>
       </CustomInputContainer>
       <TokenModal
@@ -196,7 +170,7 @@ export default function OutputToken({
         onClose={() => setIsTokenModalOpen(false)}
         setSelectedToken={setSelectedToken}
         onSelectChange={onSelectChange}
-        isInput={true}
+        isInput={false}
         tokenSetter={setCurrentOutput}
       />
     </div>

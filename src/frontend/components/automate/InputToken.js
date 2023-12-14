@@ -4,12 +4,7 @@ import OutlinedInput from '@mui/material/OutlinedInput';
 import TokenModal from './TokenListModal';
 import { parseEther } from 'viem';
 
-
-import {
-  Typography,
-  InputBase,
-  FormControl,
-} from '@mui/material';
+import { Typography, InputBase, FormControl } from '@mui/material';
 
 const CustomInputContainer = styled('div')({
   display: 'flex',
@@ -77,7 +72,12 @@ export default function InputToken({
   const [isTokenModalOpen, setIsTokenModalOpen] = useState(false);
 
   const handleAmountChange = (event) => {
-    const newValue = event.target.value;
+    //Ensure input is numerical
+    const newValue = event.target.value.replace(/[^0-9.]/g, '');
+
+    const dotCount = (newValue.match(/\./g) || []).length;
+    if (dotCount > 1) return;
+
     setAmount(newValue);
     onValueChange('amount', String(parseEther(newValue)));
   };
@@ -98,25 +98,16 @@ export default function InputToken({
 
   return (
     <div>
-      <Typography
-        variant="h6"
-        color="white"
-        fontWeight="500"
-        gutterBottom
-        style={{ marginBottom: '3px', fontSize: '1rem' }}
-      >
-        {title}
-      </Typography>
       <CustomInputContainer>
         <CustomInput
-          placeholder="0"
+          placeholder='0'
           value={amount}
           onChange={handleAmountChange}
         />
-        <CustomFormControl variant="standard">
+        <CustomFormControl variant='standard'>
           <CustomBlackCapsule onClick={handleOpenTokenModal}>
-            <Logo src={selectedToken.logoURI} alt={selectedToken.name} />
-            {selectedToken.name}
+            <Logo src={selectedToken.logoURI} alt={selectedToken.name} />            
+            {selectedToken.name.length <= 10 ? selectedToken.name : selectedToken.symbol}
             <DropdownArrow>▼</DropdownArrow>
           </CustomBlackCapsule>
         </CustomFormControl>
@@ -129,6 +120,7 @@ export default function InputToken({
         onSelectChange={onSelectChange}
         isInput={true}
         tokenSetter={setCurrentInput}
+
       />
     </div>
   );

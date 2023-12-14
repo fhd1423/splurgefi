@@ -18,7 +18,7 @@ const IconContainer = styled('div')({
   alignItems: 'center',
   width: '20px',
   height: '20px',
-  backgroundColor: '#50d890',
+  backgroundColor: '#000000',
   borderRadius: '50%',
   alignSelf: 'center',
 });
@@ -95,38 +95,12 @@ export default function TradeSelector({
         >
           {title}
         </Typography>
-
-        {/* <div
-          style={{
-            display: 'flex',
-            justifyContent: 'center',
-            alignItems: 'center',
-            width: '20px',
-            height: '20px',
-            backgroundColor: '#50d890',
-            borderRadius: '50%',
-            alignSelf: 'center',
-          }}
-          aria-describedby={id}
-          variant='contained'
-          onClick={handleClick}
-        >
-          <FontAwesomeIcon
-            icon={faInfo}
-            style={{
-              color: 'white',
-              fontSize: '0.8rem',
-              marginBottom: '3px',
-            }}
-          />
-        </div> */}
-
         <IconContainer
           aria-describedby={id}
           variant='contained'
           onClick={handleClick}
         >
-          <InfoIcon icon={faInfo} size='xs' />
+          <InfoIcon icon={faInfo} style={{ fontSize: '0.8rem'}} />
         </IconContainer>
       </div>
 
