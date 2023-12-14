@@ -50,8 +50,8 @@ export default function Automate() {
   ];
 
   const [message, setMessage] = useState({
-    inputTokenAddress: "0x82af49447d8a07e3bd95bd0d56f35241523fbab1", // DEFAULT INPUT - WETH
-    outputTokenAddress: "0xd77b108d4f6cefaa0cae9506a934e825becca46e", // DEFAULT OUTPUT - WINR
+    inputTokenAddress: '0x82af49447d8a07e3bd95bd0d56f35241523fbab1', // DEFAULT INPUT - WETH
+    outputTokenAddress: '0xd77b108d4f6cefaa0cae9506a934e825becca46e', // DEFAULT OUTPUT - WINR
     recipient: null,
     amount: null, // Input token scaled(18 decimal places)
     tranches: null,
@@ -67,7 +67,7 @@ export default function Automate() {
     address: '0x82af49447d8a07e3bd95bd0d56f35241523fbab1',
     logoURI:
       'https://assets.coingecko.com/coins/images/2518/thumb/weth.png?1696503332',
-    symbol: 'WETH'
+    symbol: 'WETH',
   });
 
   const [currentOutput, setCurrentOutput] = useState({
@@ -75,7 +75,7 @@ export default function Automate() {
     address: '0xd77b108d4f6cefaa0cae9506a934e825becca46e',
     logoURI:
       'https://assets.coingecko.com/coins/images/29340/thumb/WINR.png?1696528290',
-    symbol: 'WINR'
+    symbol: 'WINR',
   });
 
   //HANDLERS
@@ -103,8 +103,19 @@ export default function Automate() {
       'timeBwTrade',
       'salt',
     ];
-    const isAnyFieldEmpty = fields.every((field) => message[field]);
-
+  
+    const isValidToken = (
+      message.inputTokenAddress === '0x82af49447d8a07e3bd95bd0d56f35241523fbab1' ||
+      message.outputTokenAddress === '0x82af49447d8a07e3bd95bd0d56f35241523fbab1'
+    );
+  
+    if (!isValidToken) {
+      setUserInputError('Either input or output must be WETH (0x82af49447d8a07e3bd95bd0d56f35241523fbab1).');
+      return false;
+    }
+  
+    const isAnyFieldEmpty = fields.some((field) => !message[field]);
+  
     if (isAnyFieldEmpty) {
       setUserInputError('Please make sure all inputs are filled.');
       return false;
@@ -427,6 +438,8 @@ export default function Automate() {
                       pt: 4,
                     }}
                   >
+                    {console.log("SEX", message)}
+
                     {!isWalletConnected ? (
                       <button
                         onClick={handleWalletConnection}
@@ -438,6 +451,9 @@ export default function Automate() {
                       <button
                         onClick={() => {
                           console.log('Button clicked');
+                          if(!validateInputs()){
+                            return;
+                          }
                           if (allowance < message.amount) {
                             approveToken?.();
                           }

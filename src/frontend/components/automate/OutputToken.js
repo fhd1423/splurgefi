@@ -160,7 +160,9 @@ export default function OutputToken({
         <CustomFormControl variant='standard'>
           <CustomBlackCapsule onClick={handleOpenTokenModal}>
             <Logo src={selectedToken.logoURI} alt={selectedToken.name} />
-            {selectedToken.name.length <= 10 ? selectedToken.name : selectedToken.symbol}
+            {selectedToken.name.length <= 10
+              ? selectedToken.name
+              : selectedToken.symbol}
             <DropdownArrow>▼</DropdownArrow>
           </CustomBlackCapsule>
         </CustomFormControl>

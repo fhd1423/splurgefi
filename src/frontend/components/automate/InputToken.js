@@ -106,8 +106,10 @@ export default function InputToken({
         />
         <CustomFormControl variant='standard'>
           <CustomBlackCapsule onClick={handleOpenTokenModal}>
-            <Logo src={selectedToken.logoURI} alt={selectedToken.name} />            
-            {selectedToken.name.length <= 10 ? selectedToken.name : selectedToken.symbol}
+            <Logo src={selectedToken.logoURI} alt={selectedToken.name} />
+            {selectedToken.name.length <= 10
+              ? selectedToken.name
+              : selectedToken.symbol}
             <DropdownArrow>▼</DropdownArrow>
           </CustomBlackCapsule>
         </CustomFormControl>
@@ -120,7 +122,6 @@ export default function InputToken({
         onSelectChange={onSelectChange}
         isInput={true}
         tokenSetter={setCurrentInput}
-
       />
     </div>
   );

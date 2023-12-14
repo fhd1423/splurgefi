@@ -227,7 +227,7 @@ const TokenModal = ({
                     </div>
                   }
                 />
-                <Tooltip title="Copy Address" arrow>
+                <Tooltip title='Copy Address' arrow>
                   <CopyIcon
                     onClick={(e) => {
                       e.stopPropagation(); // Prevent the TokenListItem onClick from firing
