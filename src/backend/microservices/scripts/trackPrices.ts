@@ -65,17 +65,18 @@ const updatePriceData = async () => {
           path: pair.path,
           ['current_price']: current_price,
           [interval]: { close_prices: priceArr },
+          updated_at: new Date(),
         };
 
         let { data, error } = await supabase.from('Pairs').upsert([upsertData]);
         executed = true;
         if (error) console.log('Error:', error);
-        else console.log(`upserting price data for ${interval}`);
       }
       if (!executed) {
         const upsertData = {
           path: pair.path,
           ['current_price']: current_price,
+          updated_at: new Date(),
         };
         let { data, error } = await supabase.from('Pairs').upsert([upsertData]);
         if (error) console.log('Error:', error);

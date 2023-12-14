@@ -113,33 +113,38 @@ export const encodeInput = async (
 };
 
 export const simulateTrade = async (calldata: any) => {
-  const TENDERLY_USER = 'fhd';
-  const TENDERLY_PROJECT = 'fhd';
-  const TENDERLY_ACCESS_KEY = 'P0pOKtbaCwV2JffMLFpbdls3SowlmIj8';
-  const resp = await axios.post(
-    `https://api.tenderly.co/api/v1/account/${TENDERLY_USER}/project/${TENDERLY_PROJECT}/simulate`,
-    {
-      save: true,
-      save_if_fails: true,
-      simulation_type: 'quick',
-      network_id: '42161', // prod: arbitrum
-      from: '0xBb6AeaBdf61Ca96e80Aa239bA8cC7e436862E596', // TODO: change to deployer only
-      to: process.env.SPLURGE_ADDRESS, // 0xFA1a9623054154EF25F782f04411B39A40f01880
-      input: calldata,
-      gas: 8000000,
-      gas_price: Number(await viemClient.getGasPrice()),
-      value: 0,
-    },
-    {
-      headers: {
-        'X-Access-Key': TENDERLY_ACCESS_KEY as string,
+  try {
+    const TENDERLY_USER = 'fhd';
+    const TENDERLY_PROJECT = 'fhd';
+    const TENDERLY_ACCESS_KEY = 'P0pOKtbaCwV2JffMLFpbdls3SowlmIj8';
+    const resp = await axios.post(
+      `https://api.tenderly.co/api/v1/account/${TENDERLY_USER}/project/${TENDERLY_PROJECT}/simulate`,
+      {
+        save: true,
+        save_if_fails: true,
+        simulation_type: 'quick',
+        network_id: '42161', // prod: arbitrum
+        from: '0xBb6AeaBdf61Ca96e80Aa239bA8cC7e436862E596', // TODO: change to deployer only
+        to: process.env.SPLURGE_ADDRESS, // 0xFA1a9623054154EF25F782f04411B39A40f01880
+        input: calldata,
+        gas: 8000000,
+        gas_price: Number(await viemClient.getGasPrice()),
+        value: 0,
       },
-    },
-  );
-  const transaction = resp.data.transaction;
-  const error = transaction.error_message;
-  if (error) {
+      {
+        headers: {
+          'X-Access-Key': TENDERLY_ACCESS_KEY as string,
+        },
+      },
+    );
+    const transaction = resp.data.transaction;
+    const error = transaction.error_message;
+    if (error) {
+      return false;
+    }
+    return true;
+  } catch (e) {
+    console.log('error simulating trade');
     return false;
   }
-  return true;
 };
