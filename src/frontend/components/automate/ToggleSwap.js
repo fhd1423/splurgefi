@@ -7,6 +7,10 @@ export default function ToggleSwap({
   setSelection,
   message,
   handleMessageChange,
+  currentInput,
+  currentOutput,
+  setCurrentInput,
+  setCurrentOutput,
 }) {
   const [isClicked, setIsClicked] = React.useState(false);
 
@@ -18,6 +22,9 @@ export default function ToggleSwap({
 
     handleMessageChange('inputTokenAddress', message.outputTokenAddress);
     handleMessageChange('outputTokenAddress', inputTokenAddress);
+
+    setCurrentInput(currentOutput);
+    setCurrentOutput(currentInput);
 
     setTimeout(() => {
       setIsClicked(false);

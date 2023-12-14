@@ -8,6 +8,8 @@ import router from 'next/router';
 // MUI Date Picker Imports
 import { LocalizationProvider } from '@mui/x-date-pickers/LocalizationProvider';
 import { AdapterDayjs } from '@mui/x-date-pickers/AdapterDayjs';
+import { styled } from '@mui/material/styles';
+
 
 // Custom Component Imports
 import InputToken from '../components/automate/InputToken';
@@ -20,6 +22,7 @@ import TradeSelector from '../components/automate/TradeSelector';
 import DatePicker from '@/components/automate/DatePicker';
 import TimeSelector from '@/components/automate/TimeSelector';
 import LimitPriceInput from '@/components/limit/limitPrice';
+import TokenModal from '../components/automate/TokenListModal';
 import NavBar from '../components/NavBar';
 import {
   useSignTypedData,
@@ -44,7 +47,6 @@ export default function Automate() {
   const [outputOptions, setOutputOptions] = useState([]);
   const [limitPrice, setLimitPrice] = useState('');
 
-
   const inputOptions = [
     { label: 'WETH', value: '0x82aF49447D8a07e3bd95BD0d56f35241523fBab1' },
   ];
@@ -61,6 +63,20 @@ export default function Automate() {
     timeBwTrade: null,
     salt: generateRandomSalt(),
   });
+
+  const [currentInput, setCurrentInput] = useState({
+    name: 'WETH',
+    address: '0x82af49447d8a07e3bd95bd0d56f35241523fbab1',
+    logoURI:
+      'https://assets.coingecko.com/coins/images/2518/thumb/weth.png?1696503332',
+  })
+
+  const [currentOutput, setCurrentOutput] = useState({
+    name: 'WINR',
+    address: '0xd77b108d4f6cefaa0cae9506a934e825becca46e',
+    logoURI:
+      'https://assets.coingecko.com/coins/images/29340/thumb/WINR.png?1696528290',
+  })
 
   //HANDLERS
   const handleMessageChange = (field, value) => {
@@ -246,6 +262,25 @@ export default function Automate() {
     averageMap,
   );
 
+
+
+  //STYLING
+  const StyledTypography = styled(Typography)(({ theme }) => ({
+    color: '#D9D9D9',
+    padding: '6px 12px',
+    margin: '80px',
+    fontSize: '1.5rem',
+    lineHeight: 1.75,
+    fontFamily: 'Inter, sans-serif',
+    fontWeight: 'bold',
+    textTransform: 'capitalize',
+    fontWeight: 'normal',
+    border: 'none',
+    color: '#27ae60', // Green text color
+    transform: 'skewX(-20deg)', // Apply skew transformation
+  }));
+  
+
   return (
     <LocalizationProvider dateAdapter={AdapterDayjs}>
       <NavBar inTradesPage={false} />
@@ -283,6 +318,8 @@ export default function Automate() {
                   setToggleTrade={setToggleTrade}
                 />
               </Grid>
+              {toggleTrade === 'pumpinator' ? (
+              <React.Fragment>
               <Grid item xs={12}>
                 <InputToken
                   options={
@@ -291,6 +328,8 @@ export default function Automate() {
                   onValueChange={handleMessageChange}
                   onSelectChange={handleMessageChange}
                   message={message}
+                  currentInput={currentInput}
+                  setCurrentInput={setCurrentInput}
                 />
               </Grid>
               <Grid
@@ -304,6 +343,10 @@ export default function Automate() {
                   setSelection={setToggleSelection}
                   message={message}
                   handleMessageChange={handleMessageChange}
+                  currentInput={currentInput}
+                  currentOutput={currentOutput}
+                  setCurrentInput={setCurrentInput}
+                  setCurrentOutput={setCurrentOutput}
                 />
               </Grid>
               <Grid
@@ -318,75 +361,61 @@ export default function Automate() {
                   onValueChange={handleMessageChange}
                   onSelectChange={handleMessageChange}
                   message={message}
+                  currentOutput={currentOutput}
+                  setCurrentOutput={setCurrentOutput}
                 />
               </Grid>
-              {toggleTrade === 'pumpinator' ? (
-                <React.Fragment>
-                  <Grid item xs={4}>
-                    {toggleSelection === 'buy' ? (
-                      <InputPercent
-                        title='Percent Change'
-                        value={message.percentChange}
-                        onValueChange={handleMessageChange}
-                        isUpSelected={false} // Pass the derived state to the component
-                        placeHolder={'0%'}
-                      />
-                    ) : (
-                      <InputPercent
-                        title='Percent Change'
-                        value={message.percentChange}
-                        onValueChange={handleMessageChange}
-                        isUpSelected={true} // Pass the derived state to the component
-                        placeHolder={'0%'}
-                      />
-                    )}
-                  </Grid>
-                  <Grid item xs={4}>
-                    <InputBatches
-                      title='Batches'
-                      placeHolder={'5'}
-                      value={message.tranches}
-                      onValueChange={(e) =>
-                        handleMessageChange('tranches', e.target.value)
-                      }
+              <Grid item xs={4}>
+                  {toggleSelection === 'buy' ? (
+                    <InputPercent
+                      title='Percent Change'
+                      value={message.percentChange}
+                      onValueChange={handleMessageChange}
+                      isUpSelected={false} // Pass the derived state to the component
+                      placeHolder={'0%'}
                     />
-                  </Grid>
-                  <Grid item xs={4}>
-                    <TradeSelector
-                      // currentMovAvg= message.priceAvg
-                      onTradeActionChange={handleMessageChange}
-                      title='Moving Avg.'
-                      tokenAddy={message.outputTokenAddress}
+                  ) : (
+                    <InputPercent
+                      title='Percent Change'
+                      value={message.percentChange}
+                      onValueChange={handleMessageChange}
+                      isUpSelected={true} // Pass the derived state to the component
+                      placeHolder={'0%'}
                     />
-                  </Grid>
-                  <Grid item xs={6}>
-                    <DatePicker
-                      // selectedDate={selectedDate}
-                      setSelectedDate={handleMessageChange}
-                    />
-                  </Grid>
+                  )}
+                </Grid>
+                <Grid item xs={4}>
+                  <InputBatches
+                    title='Batches'
+                    placeHolder={'5'}
+                    value={message.tranches}
+                    onValueChange={(e) =>
+                      handleMessageChange('tranches', e.target.value)
+                    }
+                  />
+                </Grid>
+                <Grid item xs={4}>
+                  <TradeSelector
+                    // currentMovAvg= message.priceAvg
+                    onTradeActionChange={handleMessageChange}
+                    title='Moving Avg.'
+                    tokenAddy={message.outputTokenAddress}
+                  />
+                </Grid>
+                <Grid item xs={6}>
+                  <DatePicker
+                    // selectedDate={selectedDate}
+                    setSelectedDate={handleMessageChange}
+                  />
+                </Grid>
 
-                  <Grid item xs={6}>
-                    <TimeSelector
-                      // selectedTradeAction={selectedTimeBwTrade}
-                      onTradeActionChange={handleMessageChange}
-                      title='Execution Interval'
-                    />
-                  </Grid>
-                </React.Fragment>) : (
-                  <Grid item xs={12}>
-                    <LimitPriceInput
-                      label="Limit Price"
-                      value={limitPrice}
-                      onValueChange={handleLimitPriceChange}
-                    />
-                    <DatePicker
-                      // selectedDate={selectedDate}
-                      setSelectedDate={handleMessageChange}
-                    />
-                  </Grid>
-              )}
-
+                <Grid item xs={6}>
+                  <TimeSelector
+                    // selectedTradeAction={selectedTimeBwTrade}
+                    onTradeActionChange={handleMessageChange}
+                    title='Execution Interval'
+                  />
+                </Grid>
               <Grid
                 item
                 xs={12}
@@ -419,6 +448,14 @@ export default function Automate() {
                   </button>
                 )}
               </Grid>
+              </React.Fragment>
+                ) : (
+                  <Grid item xs={12} align='center'>
+                    <StyledTypography variant="h4">
+                      Coming Soon!
+                    </StyledTypography>
+                 </Grid>
+              )}
             </Grid>
           </Paper>
         </Box>

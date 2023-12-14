@@ -1,6 +1,7 @@
 import { styled } from '@mui/system';
 import React, { useState, useEffect } from 'react';
 import OutlinedInput from '@mui/material/OutlinedInput';
+import TokenModal from './TokenListModal';
 
 import {
   Typography,
@@ -10,7 +11,7 @@ import {
   FormControl,
 } from '@mui/material';
 
-//STYLING 
+//STYLING
 const CustomInputContainer = styled('div')({
   display: 'flex',
   alignItems: 'center',
@@ -31,27 +32,54 @@ const CustomInput = styled(InputBase)(({ theme }) => ({
   },
 }));
 
-const CustomSelect = styled(Select)(({ theme }) => ({
-  color: 'white',
-  backgroundColor: '#27ae60',
+const CustomBlackCapsule = styled('div')({
+  display: 'flex',
+  alignItems: 'center',
+  backgroundColor: 'black',
   borderRadius: '20px',
-  height: '30px',
-  width: '140px',
-  '& .MuiSelect-select': {
-    '&[aria-label="placeholder"]': {
-      color: 'white',
-    },
-    paddingRight: '30px',
-    paddingLeft: '12px',
-    display: 'flex',
+  padding: '0 10px',
+  height: '40px',
+  width: '150px',
+  color: 'white',
+  justifyContent: 'space-between',
+  cursor: 'pointer',
+  transition: 'background-color 0.3s ease', // Add transition for smooth color change
+  '&:hover': {
+    backgroundColor: '#2B2B2B', // Change this to the desired whitish-grey color
   },
-  '& .MuiSelect-icon': {
-    color: 'white',
-  },
-  '& .MuiOutlinedInput-notchedOutline': {
-    border: 'none',
-  },
-}));
+});
+
+const Logo = styled('img')({
+  width: '20px',
+  marginRight: '8px',
+});
+
+const DropdownArrow = styled('span')({
+  marginLeft: 'auto',
+  transform: 'scale(0.8)', // Adjust the scale factor to make it less tall
+});
+
+// const CustomSelect = styled(Select)(({ theme }) => ({
+//   color: 'white',
+//   backgroundColor: '#27ae60',
+//   borderRadius: '20px',
+//   height: '30px',
+//   width: '140px',
+//   '& .MuiSelect-select': {
+//     '&[aria-label="placeholder"]': {
+//       color: 'white',
+//     },
+//     paddingRight: '30px',
+//     paddingLeft: '12px',
+//     display: 'flex',
+//   },
+//   '& .MuiSelect-icon': {
+//     color: 'white',
+//   },
+//   '& .MuiOutlinedInput-notchedOutline': {
+//     border: 'none',
+//   },
+// }));
 
 const CustomFormControl = styled(FormControl)({
   flexShrink: 0,
@@ -82,9 +110,13 @@ export default function OutputToken({
   onValueChange,
   onSelectChange,
   message,
+  currentOutput,
+  setCurrentOutput
 }) {
   //STATE
-  const [selectedToken, setSelectedToken] = useState('');
+  const [selectedToken, setSelectedToken] = useState(currentOutput);
+  const [isTokenModalOpen, setIsTokenModalOpen] = useState(false);
+
 
   //HANDLERS
   const handleTokenChange = (event) => {
@@ -93,11 +125,19 @@ export default function OutputToken({
     onSelectChange('outputTokenAddress', newToken); // Send to parent view
   };
 
+  const handleOpenTokenModal = () => {
+    setIsTokenModalOpen(true);
+  };
+
+  const handleCloseTokenModal = () => {
+    setIsTokenModalOpen(false);
+  };
+
   useEffect(() => {
-    if (message && message.outputTokenAddress) {
-      setSelectedToken(message.outputTokenAddress || '');
+    if (currentOutput) {
+      setSelectedToken(currentOutput);
     }
-  }, [message?.outputTokenAddress]);
+  }, [currentOutput]);
 
   return (
     <div>
@@ -111,9 +151,14 @@ export default function OutputToken({
         {title}
       </Typography>
       <CustomInputContainer>
-        <CustomInput placeholder='Token' value={selectedToken} readOnly/>
+        <CustomInput placeholder='Token' value={selectedToken.address} readOnly />
         <CustomFormControl variant='standard'>
-          <CustomSelect
+          <CustomBlackCapsule onClick={handleOpenTokenModal}>
+            <Logo src={selectedToken.logoURI} alt={selectedToken.name} />
+            {selectedToken.name}
+            <DropdownArrow>▼</DropdownArrow>
+          </CustomBlackCapsule>
+          {/* <CustomSelect
             value={selectedToken}
             onChange={handleTokenChange}
             displayEmpty
@@ -143,9 +188,17 @@ export default function OutputToken({
                 {option.label}
               </CustomMenuItem>
             ))}
-          </CustomSelect>
+          </CustomSelect> */}
         </CustomFormControl>
       </CustomInputContainer>
+      <TokenModal
+        open={isTokenModalOpen}
+        onClose={() => setIsTokenModalOpen(false)}
+        setSelectedToken={setSelectedToken}
+        onSelectChange={onSelectChange}
+        isInput={true}
+        tokenSetter={setCurrentOutput}
+      />
     </div>
   );
 }

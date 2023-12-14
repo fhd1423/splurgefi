@@ -62,7 +62,11 @@ export default function ToggleOrderType({ toggleTrade, setToggleTrade }) {
       onChange={handleSelection}
       aria-label='pumpinator limit toggle'
     >
-      <StyledToggleButton value='pumpinator' aria-label='pumpinator' className={toggleTrade === 'pumpinator' ? 'Pumpinator' : ''}>
+      <StyledToggleButton
+        value='pumpinator'
+        aria-label='pumpinator'
+        className={'Pumpinator'}
+      >
         Pumpinator
       </StyledToggleButton>
       <StyledToggleButton value='limit' aria-label='limit'>

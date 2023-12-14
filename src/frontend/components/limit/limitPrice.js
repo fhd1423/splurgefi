@@ -11,9 +11,9 @@ export default function LimitPriceInput({ onValueChange, label, value }) {
     <div>
       <label style={{ color: 'white', fontSize: '1rem' }}>{label}</label>
       <TextField
-        variant="outlined"
-        type="number"
-        placeholder="0"
+        variant='outlined'
+        type='number'
+        placeholder='0'
         value={value}
         onChange={handleInputChange}
         style={{ width: '100%' }}

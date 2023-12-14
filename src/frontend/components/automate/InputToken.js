@@ -1,17 +1,16 @@
 import { styled } from '@mui/system';
 import React, { useState, useEffect } from 'react';
 import OutlinedInput from '@mui/material/OutlinedInput';
+import TokenModal from './TokenListModal';
 import { parseEther } from 'viem';
+
 
 import {
   Typography,
-  Select,
-  MenuItem,
   InputBase,
   FormControl,
 } from '@mui/material';
 
-//STYLING
 const CustomInputContainer = styled('div')({
   display: 'flex',
   alignItems: 'center',
@@ -32,95 +31,77 @@ const CustomInput = styled(InputBase)(({ theme }) => ({
   },
 }));
 
-const CustomSelect = styled(Select)(({ theme }) => ({
-  color: 'white',
-  backgroundColor: '#27ae60',
+const CustomBlackCapsule = styled('div')({
+  display: 'flex',
+  alignItems: 'center',
+  backgroundColor: 'black',
   borderRadius: '20px',
-  height: '30px',
-  width: '140px',
-  '& .MuiSelect-select': {
-    '&[aria-label="placeholder"]': {
-      color: 'white',
-    },
-    paddingRight: '30px',
-    paddingLeft: '12px',
-    display: 'flex',
+  padding: '0 10px',
+  height: '40px',
+  width: '150px',
+  color: 'white',
+  justifyContent: 'space-between',
+  cursor: 'pointer',
+  transition: 'background-color 0.3s ease', // Add transition for smooth color change
+  '&:hover': {
+    backgroundColor: '#2B2B2B', // Change this to the desired whitish-grey color
   },
-  '& .MuiSelect-icon': {
-    color: 'white',
-  },
-  '& .MuiOutlinedInput-notchedOutline': {
-    border: 'none',
-  },
-}));
+});
+
+const Logo = styled('img')({
+  width: '20px',
+  marginRight: '8px',
+});
+
+const DropdownArrow = styled('span')({
+  marginLeft: 'auto',
+  transform: 'scale(0.8)', // Adjust the scale factor to make it less tall
+});
 
 const CustomFormControl = styled(FormControl)({
   flexShrink: 0,
-  '&&&:before': {
-    borderBottom: 'none',
-  },
-  '&&:after': {
-    borderBottom: 'none',
-  },
-  '&& .MuiInput-underline:before': {
-    borderBottom: 'none',
-  },
-  '&& .MuiInput-underline:hover:not(.Mui-disabled):before': {
-    borderBottom: 'none',
-  },
   marginRight: '10px',
 });
 
-const CustomMenuItem = styled(MenuItem)({
-  '&.MuiMenuItem-root': {
-    justifyContent: 'flex-end',
-  },
-});
-
-
-
-//FUNCTION - REAL SHIT
+// FUNCTION - REAL SHIT
 export default function InputToken({
   title,
-  options,
   onValueChange,
   onSelectChange,
   message,
+  currentInput,
+  setCurrentInput,
 }) {
-  //STATE - token Amt
   const [amount, setAmount] = useState('');
+  const [selectedToken, setSelectedToken] = useState(currentInput);
+  const [isTokenModalOpen, setIsTokenModalOpen] = useState(false);
 
-  //STATE - token symbol
-  const [selectedToken, setSelectedToken] = useState('');
-
-  //HANDLERS
   const handleAmountChange = (event) => {
     const newValue = event.target.value;
     setAmount(newValue);
-    onValueChange('amount', String(parseEther(newValue))); // put wei value in order to sign
+    onValueChange('amount', String(parseEther(newValue)));
   };
 
-  const handleTokenChange = (event) => {
-    const newToken = event.target.value;
-    setSelectedToken(newToken);
-    onSelectChange('inputTokenAddress', newToken); // Lift up the selected token
+  const handleOpenTokenModal = () => {
+    setIsTokenModalOpen(true);
   };
 
-  //HELPER - ToggleSwap functionality
+  const handleCloseTokenModal = () => {
+    setIsTokenModalOpen(false);
+  };
+
   useEffect(() => {
-    if (message && message.inputTokenAddress) {
-      setSelectedToken(message.inputTokenAddress || '');
+    if (currentInput) {
+      setSelectedToken(currentInput);
     }
-  }, [message?.inputTokenAddress]);
-
-
+  }, [currentInput]);
 
   return (
     <div>
       <Typography
-        variant='h6'
-        color='white'
-        fontWeight='500'
+        variant="h6"
+        color="white"
+        fontWeight="500"
         gutterBottom
         style={{ marginBottom: '3px', fontSize: '1rem' }}
       >
@@ -128,44 +109,27 @@ export default function InputToken({
       </Typography>
       <CustomInputContainer>
         <CustomInput
-          placeholder='0'
+          placeholder="0"
           value={amount}
           onChange={handleAmountChange}
         />
-        <CustomFormControl variant='standard'>
-          <CustomSelect
-            value={selectedToken}
-            onChange={handleTokenChange}
-            displayEmpty
-            input={<OutlinedInput />}
-            renderValue={(value) => {
-              if (value === '') {
-                return <span aria-label='placeholder'>Select input</span>;
-              }
-              return (
-                options.find((option) => option.value === value)?.label || ''
-              );
-            }}
-            MenuProps={{
-              anchorOrigin: {
-                vertical: 'bottom',
-                horizontal: 'right',
-              },
-              transformOrigin: {
-                vertical: 'top',
-                horizontal: 'right',
-              },
-              getContentAnchorEl: null,
-            }}
-          >
-            {options.map((option) => (
-              <CustomMenuItem key={option.value} value={option.value}>
-                {option.label}
-              </CustomMenuItem>
-            ))}
-          </CustomSelect>
+        <CustomFormControl variant="standard">
+          <CustomBlackCapsule onClick={handleOpenTokenModal}>
+            <Logo src={selectedToken.logoURI} alt={selectedToken.name} />
+            {selectedToken.name}
+            <DropdownArrow>▼</DropdownArrow>
+          </CustomBlackCapsule>
         </CustomFormControl>
       </CustomInputContainer>
+
+      <TokenModal
+        open={isTokenModalOpen}
+        onClose={() => setIsTokenModalOpen(false)}
+        setSelectedToken={setSelectedToken}
+        onSelectChange={onSelectChange}
+        isInput={true}
+        tokenSetter={setCurrentInput}
+      />
     </div>
   );
 }
