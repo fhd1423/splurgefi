@@ -38,20 +38,15 @@ import { ERC20abi } from '@/helpers/ERC20';
 
 export default function Automate() {
   const SPLURGE_ADDRESS = '0xe3345D0cca4c478cf16cDd0B7D7363ba223c87AF';
+  const WETH_ADDRESS = '0x82af49447d8a07e3bd95bd0d56f35241523fbab1';
 
   //STATE
   const [toggleSelection, setToggleSelection] = useState('buy');
   const [toggleTrade, setToggleTrade] = useState('pumpinator');
   const [userInputError, setUserInputError] = useState('');
-  const [outputOptions, setOutputOptions] = useState([]);
-  const [limitPrice, setLimitPrice] = useState('');
-
-  const inputOptions = [
-    { label: 'WETH', value: '0x82aF49447D8a07e3bd95BD0d56f35241523fBab1' },
-  ];
 
   const [message, setMessage] = useState({
-    inputTokenAddress: '0x82af49447d8a07e3bd95bd0d56f35241523fbab1', // DEFAULT INPUT - WETH
+    inputTokenAddress: WETH_ADDRESS, // DEFAULT INPUT - WETH
     outputTokenAddress: '0xd77b108d4f6cefaa0cae9506a934e825becca46e', // DEFAULT OUTPUT - WINR
     recipient: null,
     amount: null, // Input token scaled(18 decimal places)
@@ -65,7 +60,7 @@ export default function Automate() {
 
   const [currentInput, setCurrentInput] = useState({
     name: 'WETH',
-    address: '0x82af49447d8a07e3bd95bd0d56f35241523fbab1',
+    address: WETH_ADDRESS,
     logoURI:
       'https://assets.coingecko.com/coins/images/2518/thumb/weth.png?1696503332',
     symbol: 'WETH',
@@ -87,10 +82,6 @@ export default function Automate() {
     }));
   };
 
-  const handleLimitPriceChange = (newValue) => {
-    setLimitPrice(newValue);
-  };
-
   const validateInputs = () => {
     const fields = [
       'inputTokenAddress',
@@ -105,16 +96,10 @@ export default function Automate() {
       'salt',
     ];
 
-    const isValidToken =
-      message.inputTokenAddress ===
-        '0x82af49447d8a07e3bd95bd0d56f35241523fbab1' ||
-      message.outputTokenAddress ===
-        '0x82af49447d8a07e3bd95bd0d56f35241523fbab1';
+    const isValidSwap = fields.some((field) => message[field] == WETH_ADDRESS);
 
-    if (!isValidToken) {
-      setUserInputError(
-        'Either input or output must be WETH (0x82af49447d8a07e3bd95bd0d56f35241523fbab1).',
-      );
+    if (!isValidSwap) {
+      setUserInputError(`Either input or output must be WETH ${WETH_ADDRESS}`);
       return false;
     }
 
@@ -123,10 +108,8 @@ export default function Automate() {
     if (isAnyFieldEmpty) {
       setUserInputError('Please make sure all inputs are filled.');
       return false;
-    } else {
-      setUserInputError('');
-      return true;
     }
+    return true;
   };
 
   //AUTH - DYNAMIC
@@ -262,20 +245,9 @@ export default function Automate() {
           console.error('Error fetching pairs data:', error);
           return;
         }
-
-        const newOutputOptions = pairs.map((pair) => ({
-          label: pair.tokenName,
-          value:
-            pair.path.split('-')[0] ===
-            '0x82aF49447D8a07e3bd95BD0d56f35241523fBab1' // if its WETH
-              ? pair.path.split('-')[1] // Use the second part if the first part matches the specific string
-              : pair.path.split('-')[0], // Otherwise, use the first part
-        }));
-
-        setOutputOptions(newOutputOptions);
       });
     },
-    outputOptions,
+
     averageMap,
   );
 
@@ -309,7 +281,7 @@ export default function Automate() {
           sx={{
             width: 500,
             mx: 'auto',
-            marginTop: '-30px', // Adjust this value to move the modal up
+            marginTop: '-30px',
           }}
         >
           <Paper
@@ -321,7 +293,6 @@ export default function Automate() {
               maxWidth: '100%',
               mx: 'auto',
               borderRadius: '16px',
-              // Applying a white glow effect:
               boxShadow: '0 0 15px 5px rgba(255, 255, 255, 0.3)',
             }}
           >
@@ -336,9 +307,6 @@ export default function Automate() {
                 <React.Fragment>
                   <Grid item xs={12}>
                     <InputToken
-                      options={
-                        toggleSelection === 'buy' ? inputOptions : outputOptions
-                      }
                       onValueChange={handleMessageChange}
                       onSelectChange={handleMessageChange}
                       message={message}
@@ -373,9 +341,6 @@ export default function Automate() {
                     }}
                   >
                     <OutputToken
-                      options={
-                        toggleSelection === 'buy' ? outputOptions : inputOptions
-                      }
                       onValueChange={handleMessageChange}
                       onSelectChange={handleMessageChange}
                       message={message}
@@ -414,22 +379,17 @@ export default function Automate() {
                   </Grid>
                   <Grid item xs={4}>
                     <TradeSelector
-                      // currentMovAvg= message.priceAvg
                       onTradeActionChange={handleMessageChange}
                       title='Moving Avg.'
                       tokenAddy={message.outputTokenAddress}
                     />
                   </Grid>
                   <Grid item xs={6}>
-                    <DatePicker
-                      // selectedDate={selectedDate}
-                      setSelectedDate={handleMessageChange}
-                    />
+                    <DatePicker setSelectedDate={handleMessageChange} />
                   </Grid>
 
                   <Grid item xs={6}>
                     <TimeSelector
-                      // selectedTradeAction={selectedTimeBwTrade}
                       onTradeActionChange={handleMessageChange}
                       title='Time Between Batches'
                     />
@@ -457,9 +417,9 @@ export default function Automate() {
                       <button
                         onClick={() => {
                           console.log('Button clicked');
-                          /*if(!validateInputs()){
+                          if (!validateInputs()) {
                             return;
-                          }*/ //validate doesnt work
+                          }
                           if (allowance < message.amount) {
                             approveToken?.();
                           }
