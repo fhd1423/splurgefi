@@ -21,15 +21,15 @@ export default function Trades() {
       .eq('path', pair);
 
     if (payingETH[0]) return `ETH -> ${payingETH[0].tokenName}`;
+    else {
+      const { data: payingToken } = await supabase
+        .from('Pairs')
+        .select('tokenName')
+        .eq('path', `${pair.split('-')[1]}-${pair.split('-')[0]}`);
 
-    const { data: payingToken } = await supabase
-      .from('Pairs')
-      .select('tokenName')
-      .eq('path', `${pair.split('-')[1]}-${pair.split('-')[0]}`);
-
-    console.log(payingToken[0].tokenName);
-
-    if (payingToken[0]) return `${payingToken[0].tokenName} -> ETH`;
+      if (payingToken[0]) return `${payingToken[0].tokenName} -> ETH`;
+      return `Unkown Trade Pair`;
+    }
   };
 
   useEffect(() => {

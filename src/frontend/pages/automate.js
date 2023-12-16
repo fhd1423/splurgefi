@@ -3,6 +3,7 @@
 import React, { useState, useEffect } from 'react';
 import { Box, Grid, Paper, Typography, Alert } from '@mui/material';
 import Head from 'next/head';
+import { getAddress } from 'viem';
 import router from 'next/router';
 
 // MUI Date Picker Imports
@@ -103,19 +104,22 @@ export default function Automate() {
       'timeBwTrade',
       'salt',
     ];
-  
-    const isValidToken = (
-      message.inputTokenAddress === '0x82af49447d8a07e3bd95bd0d56f35241523fbab1' ||
-      message.outputTokenAddress === '0x82af49447d8a07e3bd95bd0d56f35241523fbab1'
-    );
-  
+
+    const isValidToken =
+      message.inputTokenAddress ===
+        '0x82af49447d8a07e3bd95bd0d56f35241523fbab1' ||
+      message.outputTokenAddress ===
+        '0x82af49447d8a07e3bd95bd0d56f35241523fbab1';
+
     if (!isValidToken) {
-      setUserInputError('Either input or output must be WETH (0x82af49447d8a07e3bd95bd0d56f35241523fbab1).');
+      setUserInputError(
+        'Either input or output must be WETH (0x82af49447d8a07e3bd95bd0d56f35241523fbab1).',
+      );
       return false;
     }
-  
+
     const isAnyFieldEmpty = fields.some((field) => !message[field]);
-  
+
     if (isAnyFieldEmpty) {
       setUserInputError('Please make sure all inputs are filled.');
       return false;
@@ -201,7 +205,9 @@ export default function Automate() {
         await supabase.from('Trades').insert([
           {
             user: primaryWallet.address,
-            pair: `${message.inputTokenAddress}-${message.outputTokenAddress}`,
+            pair: `${getAddress(message.inputTokenAddress)}-${getAddress(
+              message.outputTokenAddress,
+            )}`, // have to checksum to match in db for now
             order: message,
             signature: data,
             complete: false,
@@ -438,7 +444,7 @@ export default function Automate() {
                       pt: 4,
                     }}
                   >
-                    {console.log("SEX", message)}
+                    {console.log('trade:', message)}
 
                     {!isWalletConnected ? (
                       <button
@@ -451,9 +457,9 @@ export default function Automate() {
                       <button
                         onClick={() => {
                           console.log('Button clicked');
-                          if(!validateInputs()){
+                          /*if(!validateInputs()){
                             return;
-                          }
+                          }*/ //validate doesnt work
                           if (allowance < message.amount) {
                             approveToken?.();
                           }
