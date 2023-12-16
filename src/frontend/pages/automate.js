@@ -10,7 +10,7 @@ import router from 'next/router';
 import { LocalizationProvider } from '@mui/x-date-pickers/LocalizationProvider';
 import { AdapterDayjs } from '@mui/x-date-pickers/AdapterDayjs';
 import { styled } from '@mui/material/styles';
-
+import Container from '@mui/material';
 // Custom Component Imports
 import InputToken from '../components/automate/InputToken';
 import OutputToken from '../components/automate/OutputToken';
@@ -23,6 +23,7 @@ import DatePicker from '@/components/automate/DatePicker';
 import TimeSelector from '@/components/automate/TimeSelector';
 import LimitPriceInput from '@/components/automate/limitPrice';
 import NavBar from '../components/NavBar';
+import TradeSummaryDropdown from '@/components/automate/TradeSummaryDropdown';
 import {
   useSignTypedData,
   usePrepareContractWrite,
@@ -271,177 +272,186 @@ export default function Automate() {
     <LocalizationProvider dateAdapter={AdapterDayjs}>
       <NavBar inTradesPage={false} />
 
-      <div className='h-screen bg-black flex flex-col justify-center items-center'>
+      <div className='h-screen bg-black flex justify-center items-center overflow-hidden relative'>
         <Head>
           <title>Step One</title>
           <link rel='icon' href='/favicon.ico' />
         </Head>
 
-        <Box
-          sx={{
-            width: 500,
-            mx: 'auto',
-            marginTop: '-30px',
-          }}
-        >
-          <Paper
-            elevation={3}
-            sx={{
-              backgroundColor: '#2B2B2B',
-              padding: 2,
-              color: 'text.primary',
-              maxWidth: '100%',
-              mx: 'auto',
-              borderRadius: '16px',
-              boxShadow: '0 0 15px 5px rgba(255, 255, 255, 0.3)',
-            }}
-          >
-            <Grid container spacing={1.25} justify='center'>
-              <Grid item xs={12}>
-                <ToggleOrderType
-                  toggleTrade={toggleTrade}
-                  setToggleTrade={setToggleTrade}
-                />
-              </Grid>
-              {toggleTrade === 'pumpinator' ? (
-                <React.Fragment>
+        <div className='flex items-start'>
+          <div className='flex flex-row align-items-start'>
+            <Box
+              sx={{
+                width: 500,
+                // mx: 'auto',
+                // marginTop: '-30px',
+              }}
+            >
+              <Paper
+                elevation={3}
+                sx={{
+                  backgroundColor: '#2B2B2B',
+                  padding: 2,
+                  color: 'text.primary',
+                  maxWidth: '100%',
+                  mx: 'auto',
+                  borderRadius: '16px',
+                  boxShadow: '0 0 15px 5px rgba(255, 255, 255, 0.3)',
+                }}
+              >
+                <Grid container spacing={1.25} justify='center'>
                   <Grid item xs={12}>
-                    <InputToken
-                      onValueChange={handleMessageChange}
-                      onSelectChange={handleMessageChange}
-                      message={message}
-                      currentInput={currentInput}
-                      setCurrentInput={setCurrentInput}
+                    <ToggleOrderType
+                      toggleTrade={toggleTrade}
+                      setToggleTrade={setToggleTrade}
                     />
                   </Grid>
-                  <Grid
-                    item
-                    xs={12}
-                    align='center'
-                    style={{ margin: '-20px 0px', zIndex: 2 }}
-                  >
-                    <ToggleSwap
-                      selection={toggleSelection}
-                      setSelection={setToggleSelection}
-                      message={message}
-                      handleMessageChange={handleMessageChange}
-                      currentInput={currentInput}
-                      currentOutput={currentOutput}
-                      setCurrentInput={setCurrentInput}
-                      setCurrentOutput={setCurrentOutput}
-                    />
-                  </Grid>
-                  <Grid
-                    item
-                    xs={12}
-                    style={{
-                      marginTop: '-8px',
-                      marginBottom: '20px',
-                      zIndex: 1,
-                    }}
-                  >
-                    <OutputToken
-                      onValueChange={handleMessageChange}
-                      onSelectChange={handleMessageChange}
-                      message={message}
-                      currentOutput={currentOutput}
-                      setCurrentOutput={setCurrentOutput}
-                    />
-                  </Grid>
-                  <Grid item xs={4}>
-                    {toggleSelection === 'buy' ? (
-                      <InputPercent
-                        title='Percent Change'
-                        value={message.percentChange}
-                        onValueChange={handleMessageChange}
-                        isUpSelected={false} // Pass the derived state to the component
-                        placeHolder={'0%'}
-                      />
-                    ) : (
-                      <InputPercent
-                        title='Percent Change'
-                        value={message.percentChange}
-                        onValueChange={handleMessageChange}
-                        isUpSelected={true} // Pass the derived state to the component
-                        placeHolder={'0%'}
-                      />
-                    )}
-                  </Grid>
-                  <Grid item xs={4}>
-                    <InputBatches
-                      title='Batches'
-                      placeHolder={'5'}
-                      value={message.tranches}
-                      onValueChange={(e) =>
-                        handleMessageChange('tranches', e.target.value)
-                      }
-                    />
-                  </Grid>
-                  <Grid item xs={4}>
-                    <TradeSelector
-                      onTradeActionChange={handleMessageChange}
-                      title='Moving Avg.'
-                      tokenAddy={message.outputTokenAddress}
-                    />
-                  </Grid>
-                  <Grid item xs={6}>
-                    <DatePicker setSelectedDate={handleMessageChange} />
-                  </Grid>
-
-                  <Grid item xs={6}>
-                    <TimeSelector
-                      onTradeActionChange={handleMessageChange}
-                      title='Time Between Batches'
-                    />
-                  </Grid>
-                  <Grid
-                    item
-                    xs={12}
-                    sx={{
-                      display: 'flex',
-                      justifyContent: 'center',
-                      alignItems: 'center',
-                      pt: 4,
-                    }}
-                  >
-                    {console.log('trade:', message)}
-
-                    {!isWalletConnected ? (
-                      <button
-                        onClick={handleWalletConnection}
-                        className='bg-green-500 text-white text-xl font-bold rounded-lg shadow-lg hover:bg-green-600 w-96 h-14 mt-[10px]'
+                  {toggleTrade === 'pumpinator' ? (
+                    <React.Fragment>
+                      <Grid item xs={12}>
+                        <InputToken
+                          onValueChange={handleMessageChange}
+                          onSelectChange={handleMessageChange}
+                          message={message}
+                          currentInput={currentInput}
+                          setCurrentInput={setCurrentInput}
+                        />
+                      </Grid>
+                      <Grid
+                        item
+                        xs={12}
+                        align='center'
+                        style={{ margin: '-20px 0px', zIndex: 2 }}
                       >
-                        Connect Wallet
-                      </button>
-                    ) : (
-                      <button
-                        onClick={() => {
-                          console.log('Button clicked');
-                          if (!validateInputs()) {
-                            return;
-                          }
-                          if (allowance < message.amount) {
-                            approveToken?.();
-                          }
-                          signTypedData();
+                        <ToggleSwap
+                          selection={toggleSelection}
+                          setSelection={setToggleSelection}
+                          message={message}
+                          handleMessageChange={handleMessageChange}
+                          currentInput={currentInput}
+                          currentOutput={currentOutput}
+                          setCurrentInput={setCurrentInput}
+                          setCurrentOutput={setCurrentOutput}
+                        />
+                      </Grid>
+                      <Grid
+                        item
+                        xs={12}
+                        style={{
+                          marginTop: '-8px',
+                          marginBottom: '20px',
+                          zIndex: 1,
                         }}
-                        className='bg-green-500 text-white text-xl font-bold rounded-lg shadow-lg hover:bg-green-600 w-96 h-14 mt-[10px]'
                       >
-                        Start Automation
-                      </button>
-                    )}
-                  </Grid>
-                </React.Fragment>
-              ) : (
-                <Grid item xs={12} align='center'>
-                  <StyledTypography variant='h4'>Coming Soon!</StyledTypography>
-                </Grid>
-              )}
-            </Grid>
-          </Paper>
-        </Box>
+                        <OutputToken
+                          onValueChange={handleMessageChange}
+                          onSelectChange={handleMessageChange}
+                          message={message}
+                          currentOutput={currentOutput}
+                          setCurrentOutput={setCurrentOutput}
+                        />
+                      </Grid>
+                      <Grid item xs={4}>
+                        {toggleSelection === 'buy' ? (
+                          <InputPercent
+                            title='Percent Change'
+                            value={message.percentChange}
+                            onValueChange={handleMessageChange}
+                            isUpSelected={false} // Pass the derived state to the component
+                            placeHolder={'0%'}
+                          />
+                        ) : (
+                          <InputPercent
+                            title='Percent Change'
+                            value={message.percentChange}
+                            onValueChange={handleMessageChange}
+                            isUpSelected={true} // Pass the derived state to the component
+                            placeHolder={'0%'}
+                          />
+                        )}
+                      </Grid>
+                      <Grid item xs={4}>
+                        <InputBatches
+                          title='Batches'
+                          placeHolder={'5'}
+                          value={message.tranches}
+                          onValueChange={(e) =>
+                            handleMessageChange('tranches', e.target.value)
+                          }
+                        />
+                      </Grid>
+                      <Grid item xs={4}>
+                        <TradeSelector
+                          onTradeActionChange={handleMessageChange}
+                          title='Moving Avg.'
+                          tokenAddy={message.outputTokenAddress}
+                        />
+                      </Grid>
+                      <Grid item xs={6}>
+                        <DatePicker setSelectedDate={handleMessageChange} />
+                      </Grid>
 
-        {userInputError && <Alert severity='error'>{userInputError}</Alert>}
+                      <Grid item xs={6}>
+                        <TimeSelector
+                          onTradeActionChange={handleMessageChange}
+                          title='Time Between Batches'
+                        />
+                      </Grid>
+                      <Grid
+                        item
+                        xs={12}
+                        sx={{
+                          display: 'flex',
+                          justifyContent: 'center',
+                          alignItems: 'center',
+                          pt: 4,
+                        }}
+                      >
+                        {console.log('trade:', message)}
+
+                        {!isWalletConnected ? (
+                          <button
+                            onClick={handleWalletConnection}
+                            className='bg-green-500 text-white text-xl font-bold rounded-lg shadow-lg hover:bg-green-600 w-96 h-14 mt-[10px]'
+                          >
+                            Connect Wallet
+                          </button>
+                        ) : (
+                          <button
+                            onClick={() => {
+                              console.log('Button clicked');
+                              if (!validateInputs()) {
+                                return;
+                              }
+                              if (allowance < message.amount) {
+                                approveToken?.();
+                              }
+                              signTypedData();
+                            }}
+                            className='bg-green-500 text-white text-xl font-bold rounded-lg shadow-lg hover:bg-green-600 w-96 h-14 mt-[10px]'
+                          >
+                            Start Automation
+                          </button>
+                        )}
+                      </Grid>
+                    </React.Fragment>
+                  ) : (
+                    <Grid item xs={12} align='center'>
+                      <StyledTypography variant='h4'>
+                        Coming Soon!
+                      </StyledTypography>
+                    </Grid>
+                  )}
+                </Grid>
+              </Paper>
+            </Box>
+            {userInputError && <Alert severity='error'>{userInputError}</Alert>}
+          </div>
+
+          <div className='absolute right-0 pr-5'>
+            <TradeSummaryDropdown />
+          </div>
+        </div>
       </div>
     </LocalizationProvider>
   );
