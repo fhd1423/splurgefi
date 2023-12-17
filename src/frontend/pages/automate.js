@@ -45,6 +45,7 @@ export default function Automate() {
   const [toggleSelection, setToggleSelection] = useState('buy');
   const [toggleTrade, setToggleTrade] = useState('pumpinator');
   const [userInputError, setUserInputError] = useState('');
+  const [allInputsFilled, setInputsFilled] = useState(false);
 
   const [message, setMessage] = useState({
     inputTokenAddress: WETH_ADDRESS, // DEFAULT INPUT - WETH
@@ -112,6 +113,36 @@ export default function Automate() {
     }
     return true;
   };
+
+  const tradeEntered = () => {
+    const fields = [
+      'inputTokenAddress',
+      'outputTokenAddress',
+      'amount',
+      'tranches',
+      'percentChange',
+      'priceAvg',
+      'deadline',
+      'timeBwTrade',
+    ];
+
+    const isAnyFieldEmpty = fields.some((field) => !message[field]);
+
+    if (isAnyFieldEmpty) {
+      return false;
+    }
+
+    return true;
+  };
+
+  useEffect(() => {
+    // Directly call tradeEntered to check if all fields are filled
+    const allFilled = tradeEntered();
+    setInputsFilled(allFilled);
+
+    // Log for debugging purposes
+    console.log('All inputs filled:', allFilled);
+  }, [message]);
 
   //AUTH - DYNAMIC
   const { setShowAuthFlow, authToken, primaryWallet } = useDynamicContext();
@@ -185,7 +216,6 @@ export default function Automate() {
       message,
 
       async onSuccess(data, err) {
-        console.log('success');
         await supabase.from('Trades').insert([
           {
             user: primaryWallet.address,
@@ -274,7 +304,7 @@ export default function Automate() {
 
       <div className='h-screen bg-black flex justify-center items-center overflow-hidden relative'>
         <Head>
-          <title>Step One</title>
+          <title>Automate</title>
           <link rel='icon' href='/favicon.ico' />
         </Head>
 
@@ -407,7 +437,7 @@ export default function Automate() {
                           pt: 4,
                         }}
                       >
-                        {console.log('trade:', message)}
+                        {/* {console.log('trade:', message)} */}
 
                         {!isWalletConnected ? (
                           <button
@@ -419,7 +449,6 @@ export default function Automate() {
                         ) : (
                           <button
                             onClick={() => {
-                              console.log('Button clicked');
                               if (!validateInputs()) {
                                 return;
                               }
@@ -448,9 +477,19 @@ export default function Automate() {
             {userInputError && <Alert severity='error'>{userInputError}</Alert>}
           </div>
 
-          <div className='absolute right-0 pr-5'>
-            <TradeSummaryDropdown />
-          </div>
+          {allInputsFilled && (
+            <div className='absolute right-0 pr-5'>
+              <TradeSummaryDropdown
+                tradeEntered={allInputsFilled}
+                currentInput={currentInput.name}
+                currentOutput={currentOutput.name}
+                batches={message.tranches}
+                percentChange={message.percentChange}
+                movingAvg={message.priceAvg}
+                timeBwTrades={message.timeBwTrade}
+              />
+            </div>
+          )}
         </div>
       </div>
     </LocalizationProvider>

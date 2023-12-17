@@ -6,7 +6,6 @@ import GradientText from './GradientText';
 import Link from 'next/link';
 import { useRouter } from 'next/navigation';
 import NavBar from '../NavBar';
-import TradeSummaryDropdown from '../TradeSummaryDropdown';
 
 const LandingPage = () => {
   const router = useRouter();
