@@ -18,10 +18,10 @@ const CustomInputContainer = styled('div')({
 // Custom styles for the input component
 const CustomInput = styled(InputBase)({
   color: 'white',
-  fontSize: '1.75rem',
+  fontSize: '1.25rem',
   '& .MuiInputBase-input': {
-    textAlign: 'center',
-    padding: '0',
+    textAlign: 'left',
+    padding: '0 0 0 15px',
     width: '100%',
     height: '100%',
   },
@@ -40,7 +40,7 @@ export default function InputBatches({
         color='white'
         fontWeight='500'
         gutterBottom
-        style={{ marginBottom: '3px', fontSize: '1rem', textAlign: 'left' }}
+        style={{ marginBottom: '3px', fontSize: '.85rem', textAlign: 'left' }}
       >
         {title}
       </Typography>

@@ -60,6 +60,20 @@ export default function Automate() {
     salt: generateRandomSalt(),
   });
 
+  const [limitMessage, setLimitMessage] = useState({
+    inputTokenAddress: WETH_ADDRESS, // DEFAULT INPUT - WETH
+    outputTokenAddress: '0xd77b108d4f6cefaa0cae9506a934e825becca46e', // DEFAULT OUTPUT - WINR
+    recipient: null,
+    inputTokenAmount: null,
+    outputTokenAmount: null,
+    tranches: null,
+    percentChange: null,
+    priceAvg: null,
+    deadline: null,
+    timeBwTrade: null,
+    salt: generateRandomSalt(),
+  });
+
   const [currentInput, setCurrentInput] = useState({
     name: 'WETH',
     address: WETH_ADDRESS,
@@ -84,6 +98,12 @@ export default function Automate() {
     }));
   };
 
+  const handleLimitMessageChange = (field, value) => {
+    setMessage((prevMessage) => ({
+      ...prevMessage,
+      [field]: value,
+    }));
+  };
   const validateInputs = () => {
     const fields = [
       'inputTokenAddress',
@@ -136,11 +156,9 @@ export default function Automate() {
   };
 
   useEffect(() => {
-    // Directly call tradeEntered to check if all fields are filled
     const allFilled = tradeEntered();
     setInputsFilled(allFilled);
 
-    // Log for debugging purposes
     console.log('All inputs filled:', allFilled);
   }, [message]);
 
@@ -247,6 +265,7 @@ export default function Automate() {
     return supabase.from('Pairs').select('*');
   }
 
+  // Update token avgs
   useEffect(
     () => {
       fetchPairsData().then((response) => {
@@ -337,6 +356,7 @@ export default function Automate() {
                     />
                   </Grid>
                   {toggleTrade === 'pumpinator' ? (
+                    // Pumpinator Modal
                     <React.Fragment>
                       <Grid item xs={12}>
                         <InputToken
@@ -379,6 +399,7 @@ export default function Automate() {
                           message={message}
                           currentOutput={currentOutput}
                           setCurrentOutput={setCurrentOutput}
+                          limitOrder={false}
                         />
                       </Grid>
                       <Grid item xs={4}>
@@ -465,11 +486,123 @@ export default function Automate() {
                       </Grid>
                     </React.Fragment>
                   ) : (
-                    <Grid item xs={12} align='center'>
-                      <StyledTypography variant='h4'>
-                        Coming Soon!
-                      </StyledTypography>
-                    </Grid>
+                    // Limit Order Modal
+                    <React.Fragment>
+                      <Grid item xs={12}>
+                        <InputToken
+                          onValueChange={handleLimitMessageChange}
+                          onSelectChange={handleLimitMessageChange}
+                          message={limitMessage}
+                          currentInput={currentInput}
+                          setCurrentInput={setCurrentInput}
+                        />
+                      </Grid>
+                      <Grid
+                        item
+                        xs={12}
+                        align='center'
+                        style={{ margin: '-20px 0px', zIndex: 2 }}
+                      >
+                        <ToggleSwap
+                          selection={toggleSelection}
+                          setSelection={setToggleSelection}
+                          message={message}
+                          handleMessageChange={handleMessageChange}
+                          currentInput={currentInput}
+                          currentOutput={currentOutput}
+                          setCurrentInput={setCurrentInput}
+                          setCurrentOutput={setCurrentOutput}
+                        />
+                      </Grid>
+                      <Grid
+                        item
+                        xs={12}
+                        style={{
+                          marginTop: '-8px',
+                          marginBottom: '20px',
+                          zIndex: 1,
+                        }}
+                      >
+                        <OutputToken
+                          onValueChange={handleLimitMessageChange}
+                          onSelectChange={handleLimitMessageChange}
+                          message={limitMessage}
+                          currentOutput={currentOutput}
+                          setCurrentOutput={setCurrentOutput}
+                          limitOrder={true}
+                        />
+                      </Grid>
+                      <Grid item xs={6}>
+                        {toggleSelection === 'buy' ? (
+                          <InputPercent
+                            title='Percent Change'
+                            value={limitMessage.percentChange}
+                            onValueChange={handleMessageChange}
+                            isUpSelected={false}
+                            placeHolder={'0%'}
+                            limitOrder={true}
+                          />
+                        ) : (
+                          <InputPercent
+                            title='Percent Change'
+                            value={limitMessage.percentChange}
+                            onValueChange={handleMessageChange}
+                            isUpSelected={true} // Pass the derived state to the component
+                            placeHolder={'0%'}
+                            limitOrder={true}
+                          />
+                        )}
+                      </Grid>
+
+                      <Grid item xs={6}>
+                        <TradeSelector
+                          onTradeActionChange={handleLimitMessageChange}
+                          title='Moving Avg.'
+                          tokenAddy={limitMessage.outputTokenAddress}
+                          limitOrder={true}
+                        />
+                      </Grid>
+                      <Grid item xs={6}>
+                        <DatePicker
+                          setSelectedDate={handleLimitMessageChange}
+                          limitOrder={true}
+                        />
+                      </Grid>
+                      <Grid
+                        item
+                        xs={12}
+                        sx={{
+                          display: 'flex',
+                          justifyContent: 'center',
+                          alignItems: 'center',
+                          pt: 4,
+                        }}
+                      >
+                        {!isWalletConnected ? (
+                          <button
+                            onClick={handleWalletConnection}
+                            className='bg-green-500 text-white text-xl font-bold rounded-lg shadow-lg hover:bg-green-600 w-96 h-14 mt-[10px]'
+                          >
+                            Connect Wallet
+                          </button>
+                        ) : (
+                          <button
+                            onClick={() => {
+                              if (!validateInputs()) {
+                                return;
+                              }
+                              if (allowance < message.amount) {
+                                approveToken?.();
+                              }
+                              signTypedData();
+                            }}
+                            className='bg-green-500 text-white text-xl font-bold rounded-lg shadow-lg hover:bg-green-600 w-96 h-14 mt-[10px]'
+                          >
+                            Start Automation
+                          </button>
+                        )}
+                      </Grid>
+                    </React.Fragment>
                   )}
                 </Grid>
               </Paper>

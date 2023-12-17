@@ -29,17 +29,18 @@ const InfoIcon = styled(FontAwesomeIcon)({
 });
 
 // Custom styles for the form control
-const CustomFormControl = styled(FormControl)({
+const CustomFormControl = styled(FormControl)(({ limitOrder }) => ({
   backgroundColor: '#1B1B1B',
   borderRadius: '10px',
-  width: '130px',
+  width: limitOrder ? '205px' : '130px',
   height: '55px',
   display: 'flex',
   flexDirection: 'row',
-  alignItems: 'center',
+  alignItems: 'left',
   justifyContent: 'space-between',
   padding: '0 10px',
-});
+  position: 'relative',
+}));
 
 // Custom styles for the select component
 const CustomSelect = styled(Select)({
@@ -48,7 +49,7 @@ const CustomSelect = styled(Select)({
     lineHeight: '80px',
     paddingLeft: '10px',
     paddingRight: '32px',
-    fontSize: '1.2rem',
+    fontSize: '1.25rem',
   },
   '& .MuiSelect-icon': {
     display: 'none',
@@ -63,6 +64,7 @@ export default function TradeSelector({
   onTradeActionChange,
   title,
   tokenAddy,
+  limitOrder,
 }) {
   const [anchorEl, setAnchorEl] = useState(null);
   const [selectOpen, setSelectOpen] = useState(false);
@@ -91,7 +93,7 @@ export default function TradeSelector({
           color='white'
           fontWeight='500'
           gutterBottom
-          style={{ marginBottom: '3px', fontSize: '1rem', textAlign: 'left' }}
+          style={{ marginBottom: '3px', fontSize: '.85rem', textAlign: 'left' }}
         >
           {title}
         </Typography>
@@ -144,7 +146,7 @@ export default function TradeSelector({
           to visualize the moving average for this token on DEX Screener.
         </Typography>
       </Popover>
-      <CustomFormControl fullWidth>
+      <CustomFormControl fullWidth limitOrder={limitOrder}>
         <CustomSelect
           open={selectOpen}
           value={currentMovAvg}

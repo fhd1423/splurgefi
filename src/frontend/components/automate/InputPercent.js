@@ -6,23 +6,23 @@ import ArrowDropDownIcon from '@mui/icons-material/ArrowDropDown';
 import { Typography } from '@mui/material';
 
 // Entire input container (includes icon and textfield)
-const CustomInputContainer = styled('div')({
+const CustomInputContainer = styled('div')(({ limitOrder }) => ({
   display: 'flex',
   alignItems: 'center',
   backgroundColor: '#1B1B1B',
   borderRadius: '10px',
-  width: '130px',
+  width: limitOrder ? '205px' : '130px',
   height: '55px',
-});
+}));
 
 // Custom styles for textfield component
 const CustomInput = styled(InputBase)({
   color: 'white',
-  fontSize: '1.75rem',
+  fontSize: '1.25rem',
   '& .MuiInputBase-input': {
-    textAlign: 'center',
+    textAlign: 'left',
     padding: '0 10px',
-    width: 'calc(100% - 35px)', // Adjust the width as necessary
+    width: 'calc(100% - 35px)',
     height: '100%',
   },
 });
@@ -32,7 +32,8 @@ export default function InputPercent({
   placeHolder,
   value,
   onValueChange,
-  isUpSelected, // Boolean variable to determine the icon state
+  isUpSelected,
+  limitOrder,
 }) {
   return (
     <div>
@@ -41,11 +42,11 @@ export default function InputPercent({
         color='white'
         fontWeight='500'
         gutterBottom
-        style={{ marginBottom: '3px', fontSize: '1rem', textAlign: 'left' }}
+        style={{ marginBottom: '3px', fontSize: '0.85rem', textAlign: 'left' }}
       >
         {title}
       </Typography>
-      <CustomInputContainer>
+      <CustomInputContainer limitOrder={limitOrder}>
         {isUpSelected ? (
           <ArrowDropUpIcon fontSize='large' style={{ color: 'white' }} />
         ) : (
@@ -53,6 +54,7 @@ export default function InputPercent({
         )}
         <CustomInput
           placeholder={placeHolder}
+          limitOrder={limitOrder}
           value={value}
           onChange={(e) => onValueChange('percentChange', e.target.value)}
         />

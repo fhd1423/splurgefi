@@ -7,63 +7,63 @@ import {
   Typography,
 } from '@mui/material';
 
-const customDatePickerTheme = createTheme({
-  palette: {
-    primary: {
-      main: '#50D890',
-      contrastText: '#1B1B1B',
+const DatePicker = ({ selectedDate, setSelectedDate, limitOrder }) => {
+  const customDatePickerTheme = createTheme({
+    palette: {
+      primary: {
+        main: '#50D890',
+        contrastText: '#1B1B1B',
+      },
     },
-  },
-  components: {
-    MuiTextField: {
-      styleOverrides: {
-        root: {
-          input: {
-            color: '#ffffff',
-            height: '35px',
-            width: '160px',
-            padding: '10px 14px 10px 0',
-            fontSize: '1rem', // Adjust the font size as needed
-          },
-          '& .MuiInputLabel-root': {
-            color: '#ffffff',
-          },
-          '& .MuiInputBase-input': {
-            paddingRight: '0px', // Reduces padding on the right side of the input
-            paddingLeft: '10px',
-          },
-          '& .MuiOutlinedInput-root': {
-            backgroundColor: '#1B1B1B',
-            borderRadius: '10px',
-            '&.Mui-focused fieldset': {
-              borderColor: 'transparent',
+    components: {
+      MuiTextField: {
+        styleOverrides: {
+          root: {
+            input: {
+              color: '#ffffff',
+              height: '35px',
+              width: limitOrder ? '400px' : '160px',
+              padding: '10px 14px 10px 0',
+              fontSize: '1rem',
+            },
+            '& .MuiInputLabel-root': {
+              color: '#ffffff',
+            },
+            '& .MuiInputBase-input': {
+              paddingRight: '0px',
+              paddingLeft: '10px',
+            },
+            '& .MuiOutlinedInput-root': {
+              backgroundColor: '#1B1B1B',
+              borderRadius: '10px',
+              '&.Mui-focused fieldset': {
+                borderColor: 'transparent',
+              },
             },
           },
         },
       },
-    },
-    MuiInputAdornment: {
-      styleOverrides: {
-        // positionStart: {
-        //   marginRight: "-12px", // Adjust this value to bring the icon closer to the text
-        // },
-        root: {
-          marginLeft: '0px', // Reduces the default margin on the left side of the adornment
-          marginRight: '0px', // Optionally, reduces the margin on the right side if needed
+      MuiInputAdornment: {
+        styleOverrides: {
+          // positionStart: {
+          //   marginRight: "-12px", // Adjust this value to bring the icon closer to the text
+          // },
+          root: {
+            marginLeft: '0px', // Reduces the default margin on the left side of the adornment
+            marginRight: '0px', // Optionally, reduces the margin on the right side if needed
+          },
+        },
+      },
+      MuiSvgIcon: {
+        styleOverrides: {
+          root: {
+            color: '#ffffff',
+          },
         },
       },
     },
-    MuiSvgIcon: {
-      styleOverrides: {
-        root: {
-          color: '#ffffff',
-        },
-      },
-    },
-  },
-});
+  });
 
-const DatePicker = ({ selectedDate, setSelectedDate }) => {
   return (
     <ThemeProvider theme={customDatePickerTheme}>
       <Typography
@@ -71,7 +71,7 @@ const DatePicker = ({ selectedDate, setSelectedDate }) => {
         color='white'
         fontWeight='500'
         gutterBottom
-        style={{ marginBottom: '3px', textAlign: 'left' }}
+        style={{ marginBottom: '3px', textAlign: 'left', fontSize: '.85rem' }}
       >
         Deadline
       </Typography>

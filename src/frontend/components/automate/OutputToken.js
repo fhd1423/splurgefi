@@ -2,6 +2,7 @@ import { styled } from '@mui/system';
 import React, { useState, useEffect } from 'react';
 import OutlinedInput from '@mui/material/OutlinedInput';
 import TokenModal from './TokenListModal';
+import { parseEther } from 'viem';
 
 import {
   Typography,
@@ -10,6 +11,7 @@ import {
   InputBase,
   FormControl,
 } from '@mui/material';
+import { output } from '@/next.config';
 
 //STYLING
 const CustomInputContainer = styled('div')({
@@ -25,7 +27,7 @@ const CustomInputContainer = styled('div')({
 
 const CustomInput = styled(InputBase)(({ theme }) => ({
   color: 'white',
-  fontSize: '1.5rem',
+  fontSize: '1.25rem',
   '& .MuiInputBase-input': {
     padding: '20px 12px',
     flex: 1,
@@ -62,28 +64,6 @@ const DropdownArrow = styled('span')({
   transform: 'scale(0.8)', // Adjust the scale factor to make it less tall
 });
 
-// const CustomSelect = styled(Select)(({ theme }) => ({
-//   color: 'white',
-//   backgroundColor: '#27ae60',
-//   borderRadius: '20px',
-//   height: '30px',
-//   width: '140px',
-//   '& .MuiSelect-select': {
-//     '&[aria-label="placeholder"]': {
-//       color: 'white',
-//     },
-//     paddingRight: '30px',
-//     paddingLeft: '12px',
-//     display: 'flex',
-//   },
-//   '& .MuiSelect-icon': {
-//     color: 'white',
-//   },
-//   '& .MuiOutlinedInput-notchedOutline': {
-//     border: 'none',
-//   },
-// }));
-
 const CustomFormControl = styled(FormControl)({
   flexShrink: 0,
   '&&&:before': {
@@ -98,7 +78,7 @@ const CustomFormControl = styled(FormControl)({
   '&& .MuiInput-underline:hover:not(.Mui-disabled):before': {
     borderBottom: 'none',
   },
-  marginRight: '10px', // Right margin to keep space inside the container
+  marginRight: '10px',
 });
 
 const CustomMenuItem = styled(MenuItem)({
@@ -109,13 +89,15 @@ const CustomMenuItem = styled(MenuItem)({
 
 export default function OutputToken({
   title,
-  options,
   onSelectChange,
+  onValueChange,
   message,
   currentOutput,
   setCurrentOutput,
+  limitOrder,
 }) {
   //STATE
+  const [amount, setAmount] = useState('');
   const [selectedToken, setSelectedToken] = useState(currentOutput);
   const [isTokenModalOpen, setIsTokenModalOpen] = useState(false);
 
@@ -128,6 +110,17 @@ export default function OutputToken({
 
   const handleOpenTokenModal = () => {
     setIsTokenModalOpen(true);
+  };
+
+  const handleAmountChange = (event) => {
+    //Ensure input is numerical
+    const newValue = event.target.value.replace(/[^0-9.]/g, '');
+
+    const dotCount = (newValue.match(/\./g) || []).length;
+    if (dotCount > 1) return;
+
+    setAmount(newValue);
+    onValueChange('amount', String(parseEther(newValue)));
   };
 
   const handleCloseTokenModal = () => {
@@ -152,11 +145,20 @@ export default function OutputToken({
         {title}
       </Typography>
       <CustomInputContainer>
-        <CustomInput
-          placeholder='Token'
-          value={selectedToken.address}
-          readOnly
-        />
+        {limitOrder ? (
+          <CustomInput
+            placeholder='0.0'
+            value={amount}
+            onChange={handleAmountChange}
+          />
+        ) : (
+          <CustomInput
+            placeholder='Token'
+            value={selectedToken.name}
+            readOnly
+          />
+        )}
+
         <CustomFormControl variant='standard'>
           <CustomBlackCapsule onClick={handleOpenTokenModal}>
             <Logo src={selectedToken.logoURI} alt={selectedToken.name} />

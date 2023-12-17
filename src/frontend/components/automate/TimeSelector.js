@@ -57,7 +57,7 @@ export default function TimeSelector({
         color='white'
         fontWeight='500'
         gutterBottom
-        style={{ marginBottom: '3px', fontSize: '1rem', textAlign: 'left' }}
+        style={{ marginBottom: '3px', fontSize: '.85rem', textAlign: 'left' }}
       >
         {title}
       </Typography>

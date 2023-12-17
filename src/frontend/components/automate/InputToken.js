@@ -19,7 +19,7 @@ const CustomInputContainer = styled('div')({
 
 const CustomInput = styled(InputBase)(({ theme }) => ({
   color: 'white',
-  fontSize: '1.5rem',
+  fontSize: '1.25rem',
   '& .MuiInputBase-input': {
     padding: '20px 12px',
     flex: 1,
@@ -37,9 +37,9 @@ const CustomBlackCapsule = styled('div')({
   color: 'white',
   justifyContent: 'space-between',
   cursor: 'pointer',
-  transition: 'background-color 0.3s ease', // Add transition for smooth color change
+  transition: 'background-color 0.3s ease',
   '&:hover': {
-    backgroundColor: '#2B2B2B', // Change this to the desired whitish-grey color
+    backgroundColor: '#2B2B2B',
   },
 });
 
@@ -50,7 +50,7 @@ const Logo = styled('img')({
 
 const DropdownArrow = styled('span')({
   marginLeft: 'auto',
-  transform: 'scale(0.8)', // Adjust the scale factor to make it less tall
+  transform: 'scale(0.8)',
 });
 
 const CustomFormControl = styled(FormControl)({
@@ -58,7 +58,7 @@ const CustomFormControl = styled(FormControl)({
   marginRight: '10px',
 });
 
-// FUNCTION - REAL SHIT
+// FUNCTION
 export default function InputToken({
   title,
   onValueChange,
