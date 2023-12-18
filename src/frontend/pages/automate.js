@@ -44,7 +44,7 @@ export default function Automate() {
 
   //STATE
   const [toggleSelection, setToggleSelection] = useState('buy');
-  const [toggleTrade, setToggleTrade] = useState('pumpinator');
+  const [toggleTrade, setToggleTrade] = useState('pro');
   const [userInputError, setUserInputError] = useState('');
   const [allInputsFilled, setInputsFilled] = useState(false);
   const [isTradeSumAccordionExpanded, setIsTradeSumAccordionExpanded] =
@@ -55,20 +55,6 @@ export default function Automate() {
     outputTokenAddress: '0xd77b108d4f6cefaa0cae9506a934e825becca46e', // DEFAULT OUTPUT - WINR
     recipient: null,
     amount: null, // Input token scaled(18 decimal places)
-    tranches: null,
-    percentChange: null,
-    priceAvg: null,
-    deadline: null,
-    timeBwTrade: null,
-    salt: generateRandomSalt(),
-  });
-
-  const [limitMessage, setLimitMessage] = useState({
-    inputTokenAddress: WETH_ADDRESS, // DEFAULT INPUT - WETH
-    outputTokenAddress: '0xd77b108d4f6cefaa0cae9506a934e825becca46e', // DEFAULT OUTPUT - WINR
-    recipient: null,
-    inputTokenAmount: null,
-    outputTokenAmount: null,
     tranches: null,
     percentChange: null,
     priceAvg: null,
@@ -358,73 +344,72 @@ export default function Automate() {
                       setToggleTrade={setToggleTrade}
                     />
                   </Grid>
-                  {toggleTrade === 'pumpinator' ? (
-                    // Pumpinator Modal
-                    <React.Fragment>
-                      <Grid item xs={12}>
-                        <InputToken
+                  <React.Fragment>
+                    <Grid item xs={12}>
+                      <InputToken
+                        onValueChange={handleMessageChange}
+                        onSelectChange={handleMessageChange}
+                        message={message}
+                        currentInput={currentInput}
+                        setCurrentInput={setCurrentInput}
+                      />
+                    </Grid>
+                    <Grid
+                      item
+                      xs={12}
+                      align='center'
+                      style={{ margin: '-20px 0px', zIndex: 2 }}
+                    >
+                      <ToggleSwap
+                        selection={toggleSelection}
+                        setSelection={setToggleSelection}
+                        message={message}
+                        handleMessageChange={handleMessageChange}
+                        currentInput={currentInput}
+                        currentOutput={currentOutput}
+                        setCurrentInput={setCurrentInput}
+                        setCurrentOutput={setCurrentOutput}
+                      />
+                    </Grid>
+                    <Grid
+                      item
+                      xs={12}
+                      style={{
+                        marginTop: '-8px',
+                        marginBottom: '20px',
+                        zIndex: 1,
+                      }}
+                    >
+                      <OutputToken
+                        onValueChange={handleMessageChange}
+                        onSelectChange={handleMessageChange}
+                        message={message}
+                        currentOutput={currentOutput}
+                        setCurrentOutput={setCurrentOutput}
+                        limitOrder={false}
+                      />
+                    </Grid>
+                    <Grid item xs={4}>
+                      {toggleSelection === 'buy' ? (
+                        <InputPercent
+                          title='Percent Change'
+                          value={message.percentChange}
                           onValueChange={handleMessageChange}
-                          onSelectChange={handleMessageChange}
-                          message={message}
-                          currentInput={currentInput}
-                          setCurrentInput={setCurrentInput}
+                          isUpSelected={false} // Pass the derived state to the component
+                          placeHolder={'0%'}
                         />
-                      </Grid>
-                      <Grid
-                        item
-                        xs={12}
-                        align='center'
-                        style={{ margin: '-20px 0px', zIndex: 2 }}
-                      >
-                        <ToggleSwap
-                          selection={toggleSelection}
-                          setSelection={setToggleSelection}
-                          message={message}
-                          handleMessageChange={handleMessageChange}
-                          currentInput={currentInput}
-                          currentOutput={currentOutput}
-                          setCurrentInput={setCurrentInput}
-                          setCurrentOutput={setCurrentOutput}
-                        />
-                      </Grid>
-                      <Grid
-                        item
-                        xs={12}
-                        style={{
-                          marginTop: '-8px',
-                          marginBottom: '20px',
-                          zIndex: 1,
-                        }}
-                      >
-                        <OutputToken
+                      ) : (
+                        <InputPercent
+                          title='Percent Change'
+                          value={message.percentChange}
                           onValueChange={handleMessageChange}
-                          onSelectChange={handleMessageChange}
-                          message={message}
-                          currentOutput={currentOutput}
-                          setCurrentOutput={setCurrentOutput}
-                          limitOrder={false}
+                          isUpSelected={true} // Pass the derived state to the component
+                          placeHolder={'0%'}
                         />
-                      </Grid>
-                      <Grid item xs={4}>
-                        {toggleSelection === 'buy' ? (
-                          <InputPercent
-                            title='Percent Change'
-                            value={message.percentChange}
-                            onValueChange={handleMessageChange}
-                            isUpSelected={false} // Pass the derived state to the component
-                            placeHolder={'0%'}
-                          />
-                        ) : (
-                          <InputPercent
-                            title='Percent Change'
-                            value={message.percentChange}
-                            onValueChange={handleMessageChange}
-                            isUpSelected={true} // Pass the derived state to the component
-                            placeHolder={'0%'}
-                          />
-                        )}
-                      </Grid>
-                      <Grid item xs={4}>
+                      )}
+                    </Grid>
+                    <Grid item xs={4}>
+                      {toggleTrade == 'pro' && (
                         <InputBatches
                           title='Batches'
                           placeHolder={'5'}
@@ -433,180 +418,66 @@ export default function Automate() {
                             handleMessageChange('tranches', e.target.value)
                           }
                         />
-                      </Grid>
-                      <Grid item xs={4}>
+                      )}
+                    </Grid>
+                    <Grid item xs={4}>
+                      {toggleTrade == 'pro' && (
                         <TradeSelector
                           onTradeActionChange={handleMessageChange}
                           title='Moving Avg.'
                           tokenAddy={message.outputTokenAddress}
                         />
-                      </Grid>
-                      <Grid item xs={6}>
-                        <DatePicker setSelectedDate={handleMessageChange} />
-                      </Grid>
+                      )}
+                    </Grid>
+                    <Grid item xs={6}>
+                      <DatePicker setSelectedDate={handleMessageChange} />
+                    </Grid>
 
+                    {toggleTrade == 'pro' && (
                       <Grid item xs={6}>
                         <TimeSelector
                           onTradeActionChange={handleMessageChange}
                           title='Time Between Batches'
                         />
                       </Grid>
-                      <Grid
-                        item
-                        xs={12}
-                        sx={{
-                          display: 'flex',
-                          justifyContent: 'center',
-                          alignItems: 'center',
-                          pt: 4,
-                        }}
-                      >
-                        {/* {console.log('trade:', message)} */}
+                    )}
+                    <Grid
+                      item
+                      xs={12}
+                      sx={{
+                        display: 'flex',
+                        justifyContent: 'center',
+                        alignItems: 'center',
+                        pt: 4,
+                      }}
+                    >
+                      {/* {console.log('trade:', message)} */}
 
-                        {!isWalletConnected ? (
-                          <button
-                            onClick={handleWalletConnection}
-                            className='bg-green-500 text-white text-xl font-bold rounded-lg shadow-lg hover:bg-green-600 w-96 h-14 mt-[10px]'
-                          >
-                            Connect Wallet
-                          </button>
-                        ) : (
-                          <button
-                            onClick={() => {
-                              if (!validateInputs()) {
-                                return;
-                              }
-                              if (allowance < message.amount) {
-                                approveToken?.();
-                              }
-                              signTypedData();
-                            }}
-                            className='bg-green-500 text-white text-xl font-bold rounded-lg shadow-lg hover:bg-green-600 w-96 h-14 mt-[10px]'
-                          >
-                            Start Automation
-                          </button>
-                        )}
-                      </Grid>
-                    </React.Fragment>
-                  ) : (
-                    // Limit Order Modal
-                    <React.Fragment>
-                      <Grid item xs={12}>
-                        <InputToken
-                          onValueChange={handleLimitMessageChange}
-                          onSelectChange={handleLimitMessageChange}
-                          message={limitMessage}
-                          currentInput={currentInput}
-                          setCurrentInput={setCurrentInput}
-                        />
-                      </Grid>
-                      <Grid
-                        item
-                        xs={12}
-                        align='center'
-                        style={{ margin: '-20px 0px', zIndex: 2 }}
-                      >
-                        <ToggleSwap
-                          selection={toggleSelection}
-                          setSelection={setToggleSelection}
-                          message={message}
-                          handleMessageChange={handleMessageChange}
-                          currentInput={currentInput}
-                          currentOutput={currentOutput}
-                          setCurrentInput={setCurrentInput}
-                          setCurrentOutput={setCurrentOutput}
-                        />
-                      </Grid>
-                      <Grid
-                        item
-                        xs={12}
-                        style={{
-                          marginTop: '-8px',
-                          marginBottom: '20px',
-                          zIndex: 1,
-                        }}
-                      >
-                        <OutputToken
-                          onValueChange={handleLimitMessageChange}
-                          onSelectChange={handleLimitMessageChange}
-                          message={limitMessage}
-                          currentOutput={currentOutput}
-                          setCurrentOutput={setCurrentOutput}
-                          limitOrder={true}
-                        />
-                      </Grid>
-                      <Grid item xs={6}>
-                        {toggleSelection === 'buy' ? (
-                          <InputPercent
-                            title='Percent Change'
-                            value={limitMessage.percentChange}
-                            onValueChange={handleMessageChange}
-                            isUpSelected={false}
-                            placeHolder={'0%'}
-                            limitOrder={true}
-                          />
-                        ) : (
-                          <InputPercent
-                            title='Percent Change'
-                            value={limitMessage.percentChange}
-                            onValueChange={handleMessageChange}
-                            isUpSelected={true} // Pass the derived state to the component
-                            placeHolder={'0%'}
-                            limitOrder={true}
-                          />
-                        )}
-                      </Grid>
-
-                      <Grid item xs={6}>
-                        <TradeSelector
-                          onTradeActionChange={handleLimitMessageChange}
-                          title='Moving Avg.'
-                          tokenAddy={limitMessage.outputTokenAddress}
-                          limitOrder={true}
-                        />
-                      </Grid>
-                      <Grid item xs={6}>
-                        <DatePicker
-                          setSelectedDate={handleLimitMessageChange}
-                          limitOrder={true}
-                        />
-                      </Grid>
-                      <Grid
-                        item
-                        xs={12}
-                        sx={{
-                          display: 'flex',
-                          justifyContent: 'center',
-                          alignItems: 'center',
-                          pt: 4,
-                        }}
-                      >
-                        {!isWalletConnected ? (
-                          <button
-                            onClick={handleWalletConnection}
-                            className='bg-green-500 text-white text-xl font-bold rounded-lg shadow-lg hover:bg-green-600 w-96 h-14 mt-[10px]'
-                          >
-                            Connect Wallet
-                          </button>
-                        ) : (
-                          <button
-                            onClick={() => {
-                              if (!validateInputs()) {
-                                return;
-                              }
-                              if (allowance < message.amount) {
-                                approveToken?.();
-                              }
-                              signTypedData();
-                            }}
-                            className='bg-green-500 text-white text-xl font-bold rounded-lg shadow-lg hover:bg-green-600 w-96 h-14 mt-[10px]'
-                          >
-                            Start Automation
-                          </button>
-                        )}
-                      </Grid>
-                    </React.Fragment>
-                  )}
+                      {!isWalletConnected ? (
+                        <button
+                          onClick={handleWalletConnection}
+                          className='bg-green-500 text-white text-xl font-bold rounded-lg shadow-lg hover:bg-green-600 w-96 h-14 mt-[10px]'
+                        >
+                          Connect Wallet
+                        </button>
+                      ) : (
+                        <button
+                          onClick={() => {
+                            if (!validateInputs()) {
+                              return;
+                            }
+                            if (allowance < message.amount) {
+                              approveToken?.();
+                            }
+                            signTypedData();
+                          }}
+                          className='bg-green-500 text-white text-xl font-bold rounded-lg shadow-lg hover:bg-green-600 w-96 h-14 mt-[10px]'
+                        >
+                          Start Automation
+                        </button>
+                      )}
+                    </Grid>
+                  </React.Fragment>
                 </Grid>
               </Paper>
             </Box>
