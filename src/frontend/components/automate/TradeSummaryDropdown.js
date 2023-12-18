@@ -11,22 +11,24 @@ import {
 } from '@mui/material';
 
 // Custom styled components
-const CustomAccordion = styled(Accordion)(({ theme }) => ({
+const CustomAccordion = styled(Accordion)(({ theme, expanded }) => ({
   width: 290,
   backgroundColor: '#2B2B2B',
+  paddingBottom: expanded ? '50px' : '5px',
+  square: false,
 }));
 
 const CustomAccordionSummary = styled(AccordionSummary)(({ theme }) => ({
-  minHeight: 48,
+  minHeight: 35,
   '&.Mui-expanded': {
-    minHeight: 48,
+    minHeight: 35,
   },
 }));
 
 const CustomAccordionDetails = styled(AccordionDetails)(({ theme }) => ({
   backgroundColor: '#1B1B1B',
   padding: theme.spacing(2),
-  borderTop: '1px solid rgba(255, 255, 255, .125)',
+  // borderTop: '1px solid rgba(255, 255, 255, .125)',
   borderBottomLeftRadius: 5,
   borderBottomRightRadius: 5,
 }));
@@ -51,15 +53,18 @@ export default function TradeSummaryDropdown({
   percentChange,
   movingAvg,
   timeBwTrades,
+  expanded,
+  setExpanded,
 }) {
-  const [expanded, setExpanded] = useState(true);
-  const handleToggleAccordion = () => {
-    setExpanded(!expanded);
+  // const [expanded, setExpanded] = useState(true);
+
+  const handleAccordionChange = (event, isExpanded) => {
+    setExpanded(isExpanded);
   };
 
   return (
     <Box sx={{ height: 285, overflow: 'hidden' }}>
-      <CustomAccordion expanded={expanded} onChange={handleToggleAccordion}>
+      <CustomAccordion expanded={expanded} onChange={handleAccordionChange}>
         <CustomAccordionSummary
           expandIcon={<ExpandMoreIcon sx={{ color: 'white' }} />}
           aria-controls='panel1a-content'

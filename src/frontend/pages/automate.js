@@ -24,6 +24,7 @@ import TimeSelector from '@/components/automate/TimeSelector';
 import LimitPriceInput from '@/components/automate/limitPrice';
 import NavBar from '../components/NavBar';
 import TradeSummaryDropdown from '@/components/automate/TradeSummaryDropdown';
+import AvgPriceDropdown from '@/components/automate/AvgPriceDropdown';
 import {
   useSignTypedData,
   usePrepareContractWrite,
@@ -46,6 +47,8 @@ export default function Automate() {
   const [toggleTrade, setToggleTrade] = useState('pumpinator');
   const [userInputError, setUserInputError] = useState('');
   const [allInputsFilled, setInputsFilled] = useState(false);
+  const [isTradeSumAccordionExpanded, setIsTradeSumAccordionExpanded] =
+    useState(true);
 
   const [message, setMessage] = useState({
     inputTokenAddress: WETH_ADDRESS, // DEFAULT INPUT - WETH
@@ -612,15 +615,33 @@ export default function Automate() {
 
           {allInputsFilled && (
             <div className='absolute right-0 pr-5'>
-              <TradeSummaryDropdown
-                tradeEntered={allInputsFilled}
-                currentInput={currentInput.name}
-                currentOutput={currentOutput.name}
-                batches={message.tranches}
-                percentChange={message.percentChange}
-                movingAvg={message.priceAvg}
-                timeBwTrades={message.timeBwTrade}
-              />
+              <div
+                className={`${isTradeSumAccordionExpanded ? 'pb-10' : 'pb-2'}`}
+              >
+                <TradeSummaryDropdown
+                  tradeEntered={allInputsFilled}
+                  currentInput={currentInput.name}
+                  currentOutput={currentOutput.name}
+                  batches={message.tranches}
+                  percentChange={message.percentChange}
+                  movingAvg={message.priceAvg}
+                  timeBwTrades={message.timeBwTrade}
+                  expanded={isTradeSumAccordionExpanded}
+                  setExpanded={setIsTradeSumAccordionExpanded}
+                />
+              </div>
+
+              <div>
+                {currentInput.name === 'WETH' ? (
+                  // Get price on token you're going to buy
+                  <AvgPriceDropdown
+                    avgPrices={averageMap[currentOutput.name]}
+                  />
+                ) : (
+                  // Get price on token you're going to sell
+                  <AvgPriceDropdown avgPrices={averageMap[currentInput.name]} />
+                )}
+              </div>
             </div>
           )}
         </div>
