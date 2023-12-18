@@ -9,8 +9,7 @@ import router from 'next/router';
 // MUI Date Picker Imports
 import { LocalizationProvider } from '@mui/x-date-pickers/LocalizationProvider';
 import { AdapterDayjs } from '@mui/x-date-pickers/AdapterDayjs';
-import { styled } from '@mui/material/styles';
-import Container from '@mui/material';
+
 // Custom Component Imports
 import InputToken from '../components/automate/InputToken';
 import OutputToken from '../components/automate/OutputToken';
@@ -21,7 +20,6 @@ import InputBatches from '../components/automate/InputBatches';
 import TradeSelector from '../components/automate/TradeSelector';
 import DatePicker from '@/components/automate/DatePicker';
 import TimeSelector from '@/components/automate/TimeSelector';
-import LimitPriceInput from '@/components/automate/limitPrice';
 import NavBar from '../components/NavBar';
 import TradeSummaryDropdown from '@/components/automate/TradeSummaryDropdown';
 import AvgPriceDropdown from '@/components/automate/AvgPriceDropdown';
@@ -44,7 +42,7 @@ export default function Automate() {
 
   //STATE
   const [toggleSelection, setToggleSelection] = useState('buy');
-  const [toggleTrade, setToggleTrade] = useState('pumpinator');
+  const [toggleTrade, setToggleTrade] = useState('pro');
   const [userInputError, setUserInputError] = useState('');
   const [allInputsFilled, setInputsFilled] = useState(false);
   const [isTradeSumAccordionExpanded, setIsTradeSumAccordionExpanded] =
@@ -55,20 +53,6 @@ export default function Automate() {
     outputTokenAddress: '0xd77b108d4f6cefaa0cae9506a934e825becca46e', // DEFAULT OUTPUT - WINR
     recipient: null,
     amount: null, // Input token scaled(18 decimal places)
-    tranches: null,
-    percentChange: null,
-    priceAvg: null,
-    deadline: null,
-    timeBwTrade: null,
-    salt: generateRandomSalt(),
-  });
-
-  const [limitMessage, setLimitMessage] = useState({
-    inputTokenAddress: WETH_ADDRESS, // DEFAULT INPUT - WETH
-    outputTokenAddress: '0xd77b108d4f6cefaa0cae9506a934e825becca46e', // DEFAULT OUTPUT - WINR
-    recipient: null,
-    inputTokenAmount: null,
-    outputTokenAmount: null,
     tranches: null,
     percentChange: null,
     priceAvg: null,
@@ -101,12 +85,6 @@ export default function Automate() {
     }));
   };
 
-  const handleLimitMessageChange = (field, value) => {
-    setMessage((prevMessage) => ({
-      ...prevMessage,
-      [field]: value,
-    }));
-  };
   const validateInputs = () => {
     const fields = [
       'inputTokenAddress',
@@ -304,22 +282,6 @@ export default function Automate() {
     averageMap,
   );
 
-  //STYLING
-  const StyledTypography = styled(Typography)(({ theme }) => ({
-    color: '#D9D9D9',
-    padding: '6px 12px',
-    margin: '80px',
-    fontSize: '1.5rem',
-    lineHeight: 1.75,
-    fontFamily: 'Inter, sans-serif',
-    fontWeight: 'bold',
-    textTransform: 'capitalize',
-    fontWeight: 'normal',
-    border: 'none',
-    color: '#27ae60', // Green text color
-    transform: 'skewX(-20deg)', // Apply skew transformation
-  }));
-
   return (
     <LocalizationProvider dateAdapter={AdapterDayjs}>
       <NavBar inTradesPage={false} />
@@ -330,321 +292,198 @@ export default function Automate() {
           <link rel='icon' href='/favicon.ico' />
         </Head>
 
-        <div className='flex items-start'>
-          <div className='flex flex-row align-items-start'>
-            <Box
-              sx={{
-                width: 500,
-                // mx: 'auto',
-                // marginTop: '-30px',
-              }}
-            >
-              <Paper
-                elevation={3}
-                sx={{
-                  backgroundColor: '#2B2B2B',
-                  padding: 2,
-                  color: 'text.primary',
-                  maxWidth: '100%',
-                  mx: 'auto',
-                  borderRadius: '16px',
-                  boxShadow: '0 0 15px 5px rgba(255, 255, 255, 0.3)',
-                }}
-              >
-                <Grid container spacing={1.25} justify='center'>
-                  <Grid item xs={12}>
-                    <ToggleOrderType
-                      toggleTrade={toggleTrade}
-                      setToggleTrade={setToggleTrade}
+        <Box
+          sx={{
+            width: 500,
+            mx: 'auto',
+            // marginTop: '-30px',
+          }}
+        >
+          <Paper
+            elevation={3}
+            sx={{
+              backgroundColor: '#2B2B2B',
+              padding: 2,
+              color: 'text.primary',
+              maxWidth: '100%',
+              mx: 'auto',
+              borderRadius: '16px',
+              boxShadow: '0 0 15px 5px rgba(255, 255, 255, 0.3)',
+            }}
+          >
+            <Grid container spacing={1.25} justifyContent='center'>
+              <Grid item xs={12}>
+                <ToggleOrderType
+                  toggleTrade={toggleTrade}
+                  setToggleTrade={setToggleTrade}
+                />
+              </Grid>
+              <React.Fragment>
+                <Grid item xs={12}>
+                  <InputToken
+                    onValueChange={handleMessageChange}
+                    onSelectChange={handleMessageChange}
+                    message={message}
+                    currentInput={currentInput}
+                    setCurrentInput={setCurrentInput}
+                  />
+                </Grid>
+                <Grid
+                  item
+                  xs={12}
+                  align='center'
+                  style={{ margin: '-20px 0px', zIndex: 2 }}
+                >
+                  <ToggleSwap
+                    selection={toggleSelection}
+                    setSelection={setToggleSelection}
+                    message={message}
+                    handleMessageChange={handleMessageChange}
+                    currentInput={currentInput}
+                    currentOutput={currentOutput}
+                    setCurrentInput={setCurrentInput}
+                    setCurrentOutput={setCurrentOutput}
+                  />
+                </Grid>
+                <Grid
+                  item
+                  xs={12}
+                  style={{
+                    marginTop: '-8px',
+                    marginBottom: '20px',
+                    zIndex: 1,
+                  }}
+                >
+                  <OutputToken
+                    onValueChange={handleMessageChange}
+                    onSelectChange={handleMessageChange}
+                    message={message}
+                    currentOutput={currentOutput}
+                    setCurrentOutput={setCurrentOutput}
+                    limitOrder={false}
+                  />
+                </Grid>
+                <Grid item xs={4}>
+                  {toggleSelection === 'buy' ? (
+                    <InputPercent
+                      title='Percent Change'
+                      value={message.percentChange}
+                      onValueChange={handleMessageChange}
+                      isUpSelected={false} // Pass the derived state to the component
+                      placeHolder={'0%'}
                     />
-                  </Grid>
-                  {toggleTrade === 'pumpinator' ? (
-                    // Pumpinator Modal
-                    <React.Fragment>
-                      <Grid item xs={12}>
-                        <InputToken
-                          onValueChange={handleMessageChange}
-                          onSelectChange={handleMessageChange}
-                          message={message}
-                          currentInput={currentInput}
-                          setCurrentInput={setCurrentInput}
-                        />
-                      </Grid>
-                      <Grid
-                        item
-                        xs={12}
-                        align='center'
-                        style={{ margin: '-20px 0px', zIndex: 2 }}
-                      >
-                        <ToggleSwap
-                          selection={toggleSelection}
-                          setSelection={setToggleSelection}
-                          message={message}
-                          handleMessageChange={handleMessageChange}
-                          currentInput={currentInput}
-                          currentOutput={currentOutput}
-                          setCurrentInput={setCurrentInput}
-                          setCurrentOutput={setCurrentOutput}
-                        />
-                      </Grid>
-                      <Grid
-                        item
-                        xs={12}
-                        style={{
-                          marginTop: '-8px',
-                          marginBottom: '20px',
-                          zIndex: 1,
-                        }}
-                      >
-                        <OutputToken
-                          onValueChange={handleMessageChange}
-                          onSelectChange={handleMessageChange}
-                          message={message}
-                          currentOutput={currentOutput}
-                          setCurrentOutput={setCurrentOutput}
-                          limitOrder={false}
-                        />
-                      </Grid>
-                      <Grid item xs={4}>
-                        {toggleSelection === 'buy' ? (
-                          <InputPercent
-                            title='Percent Change'
-                            value={message.percentChange}
-                            onValueChange={handleMessageChange}
-                            isUpSelected={false} // Pass the derived state to the component
-                            placeHolder={'0%'}
-                          />
-                        ) : (
-                          <InputPercent
-                            title='Percent Change'
-                            value={message.percentChange}
-                            onValueChange={handleMessageChange}
-                            isUpSelected={true} // Pass the derived state to the component
-                            placeHolder={'0%'}
-                          />
-                        )}
-                      </Grid>
-                      <Grid item xs={4}>
-                        <InputBatches
-                          title='Batches'
-                          placeHolder={'5'}
-                          value={message.tranches}
-                          onValueChange={(e) =>
-                            handleMessageChange('tranches', e.target.value)
-                          }
-                        />
-                      </Grid>
-                      <Grid item xs={4}>
-                        <TradeSelector
-                          onTradeActionChange={handleMessageChange}
-                          title='Moving Avg.'
-                          tokenAddy={message.outputTokenAddress}
-                        />
-                      </Grid>
-                      <Grid item xs={6}>
-                        <DatePicker setSelectedDate={handleMessageChange} />
-                      </Grid>
-
-                      <Grid item xs={6}>
-                        <TimeSelector
-                          onTradeActionChange={handleMessageChange}
-                          title='Time Between Batches'
-                        />
-                      </Grid>
-                      <Grid
-                        item
-                        xs={12}
-                        sx={{
-                          display: 'flex',
-                          justifyContent: 'center',
-                          alignItems: 'center',
-                          pt: 4,
-                        }}
-                      >
-                        {/* {console.log('trade:', message)} */}
-
-                        {!isWalletConnected ? (
-                          <button
-                            onClick={handleWalletConnection}
-                            className='bg-green-500 text-white text-xl font-bold rounded-lg shadow-lg hover:bg-green-600 w-96 h-14 mt-[10px]'
-                          >
-                            Connect Wallet
-                          </button>
-                        ) : (
-                          <button
-                            onClick={() => {
-                              if (!validateInputs()) {
-                                return;
-                              }
-                              if (allowance < message.amount) {
-                                approveToken?.();
-                              }
-                              signTypedData();
-                            }}
-                            className='bg-green-500 text-white text-xl font-bold rounded-lg shadow-lg hover:bg-green-600 w-96 h-14 mt-[10px]'
-                          >
-                            Start Automation
-                          </button>
-                        )}
-                      </Grid>
-                    </React.Fragment>
                   ) : (
-                    // Limit Order Modal
-                    <React.Fragment>
-                      <Grid item xs={12}>
-                        <InputToken
-                          onValueChange={handleLimitMessageChange}
-                          onSelectChange={handleLimitMessageChange}
-                          message={limitMessage}
-                          currentInput={currentInput}
-                          setCurrentInput={setCurrentInput}
-                        />
-                      </Grid>
-                      <Grid
-                        item
-                        xs={12}
-                        align='center'
-                        style={{ margin: '-20px 0px', zIndex: 2 }}
-                      >
-                        <ToggleSwap
-                          selection={toggleSelection}
-                          setSelection={setToggleSelection}
-                          message={message}
-                          handleMessageChange={handleMessageChange}
-                          currentInput={currentInput}
-                          currentOutput={currentOutput}
-                          setCurrentInput={setCurrentInput}
-                          setCurrentOutput={setCurrentOutput}
-                        />
-                      </Grid>
-                      <Grid
-                        item
-                        xs={12}
-                        style={{
-                          marginTop: '-8px',
-                          marginBottom: '20px',
-                          zIndex: 1,
-                        }}
-                      >
-                        <OutputToken
-                          onValueChange={handleLimitMessageChange}
-                          onSelectChange={handleLimitMessageChange}
-                          message={limitMessage}
-                          currentOutput={currentOutput}
-                          setCurrentOutput={setCurrentOutput}
-                          limitOrder={true}
-                        />
-                      </Grid>
-                      <Grid item xs={6}>
-                        {toggleSelection === 'buy' ? (
-                          <InputPercent
-                            title='Percent Change'
-                            value={limitMessage.percentChange}
-                            onValueChange={handleMessageChange}
-                            isUpSelected={false}
-                            placeHolder={'0%'}
-                            limitOrder={true}
-                          />
-                        ) : (
-                          <InputPercent
-                            title='Percent Change'
-                            value={limitMessage.percentChange}
-                            onValueChange={handleMessageChange}
-                            isUpSelected={true} // Pass the derived state to the component
-                            placeHolder={'0%'}
-                            limitOrder={true}
-                          />
-                        )}
-                      </Grid>
-
-                      <Grid item xs={6}>
-                        <TradeSelector
-                          onTradeActionChange={handleLimitMessageChange}
-                          title='Moving Avg.'
-                          tokenAddy={limitMessage.outputTokenAddress}
-                          limitOrder={true}
-                        />
-                      </Grid>
-                      <Grid item xs={6}>
-                        <DatePicker
-                          setSelectedDate={handleLimitMessageChange}
-                          limitOrder={true}
-                        />
-                      </Grid>
-                      <Grid
-                        item
-                        xs={12}
-                        sx={{
-                          display: 'flex',
-                          justifyContent: 'center',
-                          alignItems: 'center',
-                          pt: 4,
-                        }}
-                      >
-                        {!isWalletConnected ? (
-                          <button
-                            onClick={handleWalletConnection}
-                            className='bg-green-500 text-white text-xl font-bold rounded-lg shadow-lg hover:bg-green-600 w-96 h-14 mt-[10px]'
-                          >
-                            Connect Wallet
-                          </button>
-                        ) : (
-                          <button
-                            onClick={() => {
-                              if (!validateInputs()) {
-                                return;
-                              }
-                              if (allowance < message.amount) {
-                                approveToken?.();
-                              }
-                              signTypedData();
-                            }}
-                            className='bg-green-500 text-white text-xl font-bold rounded-lg shadow-lg hover:bg-green-600 w-96 h-14 mt-[10px]'
-                          >
-                            Start Automation
-                          </button>
-                        )}
-                      </Grid>
-                    </React.Fragment>
+                    <InputPercent
+                      title='Percent Change'
+                      value={message.percentChange}
+                      onValueChange={handleMessageChange}
+                      isUpSelected={true} // Pass the derived state to the component
+                      placeHolder={'0%'}
+                    />
                   )}
                 </Grid>
-              </Paper>
-            </Box>
-            {userInputError && <Alert severity='error'>{userInputError}</Alert>}
-          </div>
+                <Grid item xs={4}>
+                  {toggleTrade == 'pro' && (
+                    <InputBatches
+                      title='Batches'
+                      placeHolder={'5'}
+                      value={message.tranches}
+                      onValueChange={(e) =>
+                        handleMessageChange('tranches', e.target.value)
+                      }
+                    />
+                  )}
+                </Grid>
+                <Grid item xs={4}>
+                  {toggleTrade == 'pro' && (
+                    <TradeSelector
+                      onTradeActionChange={handleMessageChange}
+                      title='Moving Avg.'
+                      tokenAddy={message.outputTokenAddress}
+                    />
+                  )}
+                </Grid>
+                <Grid item xs={6}>
+                  <DatePicker setSelectedDate={handleMessageChange} />
+                </Grid>
 
-          {allInputsFilled && (
-            <div className='absolute right-0 pr-5'>
-              <div
-                className={`${isTradeSumAccordionExpanded ? 'pb-10' : 'pb-2'}`}
-              >
-                <TradeSummaryDropdown
-                  tradeEntered={allInputsFilled}
-                  currentInput={currentInput.name}
-                  currentOutput={currentOutput.name}
-                  batches={message.tranches}
-                  percentChange={message.percentChange}
-                  movingAvg={message.priceAvg}
-                  timeBwTrades={message.timeBwTrade}
-                  expanded={isTradeSumAccordionExpanded}
-                  setExpanded={setIsTradeSumAccordionExpanded}
-                />
-              </div>
-
-              <div>
-                {currentInput.name === 'WETH' ? (
-                  // Get price on token you're going to buy
-                  <AvgPriceDropdown
-                    avgPrices={averageMap[currentOutput.name]}
-                  />
-                ) : (
-                  // Get price on token you're going to sell
-                  <AvgPriceDropdown avgPrices={averageMap[currentInput.name]} />
+                {toggleTrade == 'pro' && (
+                  <Grid item xs={6}>
+                    <TimeSelector
+                      onTradeActionChange={handleMessageChange}
+                      title='Time Between Batches'
+                    />
+                  </Grid>
                 )}
-              </div>
+                <Grid
+                  item
+                  xs={12}
+                  sx={{
+                    display: 'flex',
+                    justifyContent: 'center',
+                    alignItems: 'center',
+                    pt: 4,
+                  }}
+                >
+                  {!isWalletConnected ? (
+                    <button
+                      onClick={handleWalletConnection}
+                      className='bg-green-500 text-white text-xl font-bold rounded-lg shadow-lg hover:bg-green-600 w-96 h-14 mt-[10px]'
+                    >
+                      Connect Wallet
+                    </button>
+                  ) : (
+                    <button
+                      onClick={() => {
+                        if (!validateInputs()) {
+                          return;
+                        }
+                        if (allowance < message.amount) {
+                          approveToken?.();
+                        }
+                        signTypedData();
+                      }}
+                      className='bg-green-500 text-white text-xl font-bold rounded-lg shadow-lg hover:bg-green-600 w-96 h-14 mt-[10px]'
+                    >
+                      Start Automation
+                    </button>
+                  )}
+                </Grid>
+              </React.Fragment>
+            </Grid>
+          </Paper>
+        </Box>
+        {userInputError && <Alert severity='error'>{userInputError}</Alert>}
+
+        {allInputsFilled && (
+          <div className='absolute right-0 pr-5'>
+            <div
+              className={`${isTradeSumAccordionExpanded ? 'pb-10' : 'pb-2'}`}
+            >
+              <TradeSummaryDropdown
+                tradeEntered={allInputsFilled}
+                currentInput={currentInput.name}
+                currentOutput={currentOutput.name}
+                batches={message.tranches}
+                percentChange={message.percentChange}
+                movingAvg={message.priceAvg}
+                timeBwTrades={message.timeBwTrade}
+                expanded={isTradeSumAccordionExpanded}
+                setExpanded={setIsTradeSumAccordionExpanded}
+              />
             </div>
-          )}
-        </div>
+
+            <div>
+              {currentInput.name === 'WETH' ? (
+                // Get price on token you're going to buy
+                <AvgPriceDropdown avgPrices={averageMap[currentOutput.name]} />
+              ) : (
+                // Get price on token you're going to sell
+                <AvgPriceDropdown avgPrices={averageMap[currentInput.name]} />
+              )}
+            </div>
+          </div>
+        )}
       </div>
     </LocalizationProvider>
   );
