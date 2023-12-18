@@ -381,7 +381,7 @@ export default function Automate() {
                       value={message.percentChange}
                       onValueChange={handleMessageChange}
                       isUpSelected={toggleSelection !== 'buy'}
-                      placeHolder={'0%'}
+                      placeHolder={'0'}
                       limitOrder={true}
                     />
                   </Grid>
@@ -462,9 +462,9 @@ export default function Automate() {
         {userInputError && <Alert severity='error'>{userInputError}</Alert>}
 
         {allInputsFilled && (
-          <div className='absolute right-0 pr-5'>
+          <div className='absolute right-0 pr-5 space-y-1.25'>
             <div
-              className={`${isTradeSumAccordionExpanded ? 'pb-10' : 'pb-2'}`}
+              className={`${isTradeSumAccordionExpanded ? 'pb-10' : 'pb-5'}`}
             >
               <TradeSummaryDropdown
                 tradeEntered={allInputsFilled}

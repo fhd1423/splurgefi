@@ -14,7 +14,7 @@ import {
 const CustomAccordion = styled(Accordion)(({ theme, expanded }) => ({
   width: 290,
   backgroundColor: '#2B2B2B',
-  paddingBottom: expanded ? '50px' : '5px',
+  paddingBottom: '5px',
   square: false,
 }));
 
@@ -28,7 +28,6 @@ const CustomAccordionSummary = styled(AccordionSummary)(({ theme }) => ({
 const CustomAccordionDetails = styled(AccordionDetails)(({ theme }) => ({
   backgroundColor: '#1B1B1B',
   padding: theme.spacing(2),
-  // borderTop: '1px solid rgba(255, 255, 255, .125)',
   borderBottomLeftRadius: 5,
   borderBottomRightRadius: 5,
 }));
@@ -64,7 +63,11 @@ export default function TradeSummaryDropdown({
 
   return (
     <Box sx={{ height: 285, overflow: 'hidden' }}>
-      <CustomAccordion expanded={expanded} onChange={handleAccordionChange}>
+      <CustomAccordion
+        isExpanded={expanded}
+        expanded={expanded}
+        onChange={(event, isExpanded) => setExpanded(isExpanded)}
+      >
         <CustomAccordionSummary
           expandIcon={<ExpandMoreIcon sx={{ color: 'white' }} />}
           aria-controls='panel1a-content'

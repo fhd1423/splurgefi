@@ -27,7 +27,6 @@ const CustomAccordionSummary = styled(AccordionSummary)(({ theme }) => ({
 const CustomAccordionDetails = styled(AccordionDetails)(({ theme }) => ({
   backgroundColor: '#1B1B1B',
   padding: theme.spacing(2),
-  borderTop: '1px solid rgba(255, 255, 255, .125)',
   borderBottomLeftRadius: 5,
   borderBottomRightRadius: 5,
 }));

@@ -57,7 +57,7 @@ const DatePicker = ({ selectedDate, setSelectedDate, limitOrder }) => {
       MuiSvgIcon: {
         styleOverrides: {
           root: {
-            color: '#ffffff',
+            color: '#9F9F9F',
           },
         },
       },
