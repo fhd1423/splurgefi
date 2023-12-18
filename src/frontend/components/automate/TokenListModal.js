@@ -57,7 +57,7 @@ const TokenList = styled(List)(({ theme }) => ({
     width: '8px',
   },
   '&::-webkit-scrollbar-thumb': {
-    backgroundColor: 'white', // Changed to white
+    backgroundColor: 'gray', // Changed to white
     borderRadius: '10px',
   },
   '&::-webkit-scrollbar-track': {

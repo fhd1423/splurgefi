@@ -404,7 +404,7 @@ export default function Trades() {
           ) : (
             <h3 className='text-white p-4'>
               No trades linked to account. Please make sure you connect your
-              wallet.
+              wallet or refresh the page.
             </h3>
           )}
 

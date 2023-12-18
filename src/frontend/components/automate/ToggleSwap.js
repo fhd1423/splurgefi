@@ -17,8 +17,8 @@ export default function ToggleSwap({
   const handleToggle = () => {
     setIsClicked(true);
     setSelection(selection === 'buy' ? 'sell' : 'buy');
-    //LOGIC: swap pairs data
-    const inputTokenAddress = message.inputTokenAddress; //store current input in temp
+    // Swap pairs data logic
+    const inputTokenAddress = message.inputTokenAddress; // Store current input in temp
 
     handleMessageChange('inputTokenAddress', message.outputTokenAddress);
     handleMessageChange('outputTokenAddress', inputTokenAddress);
@@ -39,10 +39,9 @@ export default function ToggleSwap({
         border: '2px solid #000',
         padding: '5px',
         cursor: 'pointer',
-        transition: 'background-color 0.3s ease', // Add a CSS transition for a smoother effect
-        backgroundColor: isClicked ? '#fff' : '',
+        transition: 'background-color 0.3s ease, transform 0.3s ease',
       }}
-      className='bg-green-500'
+      className='bg-green-500 hover:bg-green-600 hover:scale-105'
       onClick={handleToggle}
       aria-label={selection}
     >

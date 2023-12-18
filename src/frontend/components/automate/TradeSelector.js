@@ -22,6 +22,12 @@ const IconContainer = styled('div')({
   backgroundColor: '#000000',
   borderRadius: '50%',
   alignSelf: 'center',
+  cursor: 'pointer',
+  transition: 'transform 0.3s ease',
+
+  '&:hover': {
+    transform: 'scale(1.1)',
+  },
 });
 
 // Custom styles for the form control
