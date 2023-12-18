@@ -1,6 +1,5 @@
 import React, { useState, useEffect } from 'react';
 import Head from 'next/head';
-import Trade from '../components/trades/Trade';
 import {
   DynamicContextProvider,
   DynamicWidget,
@@ -17,12 +16,16 @@ import TableHead from '@mui/material/TableHead';
 import TableRow from '@mui/material/TableRow';
 import Checkbox from '@mui/material/Checkbox';
 import { Paper } from '@mui/material';
-import { alpha } from '@mui/material/styles';
 import Tooltip from '@mui/material/Tooltip';
 import Toolbar from '@mui/material/Toolbar';
 import Typography from '@mui/material/Typography';
 import IconButton from '@mui/material/IconButton';
 import DeleteIcon from '@mui/icons-material/Delete';
+import Box from '@mui/material/Box';
+import Button from '@mui/material/Button';
+import Modal from '@mui/material/Modal';
+import CloseIcon from '@mui/icons-material/Close';
+
 const EnhancedTableToolbar = ({ numSelected, onDeleteSelected }) => (
   <Toolbar
     sx={{
@@ -42,7 +45,11 @@ const EnhancedTableToolbar = ({ numSelected, onDeleteSelected }) => (
       </Typography>
     ) : (
       <Typography
-        sx={{ flex: '1 1 100%', color: 'white' }}
+        sx={{
+          flex: '1 1 100%',
+          color: '#D9D9D9',
+          fontWeight: 'bold',
+        }}
         variant='h6'
         id='tableTitle'
         component='div'
@@ -60,10 +67,25 @@ const EnhancedTableToolbar = ({ numSelected, onDeleteSelected }) => (
   </Toolbar>
 );
 
+const style = {
+  position: 'absolute',
+  top: '50%',
+  left: '50%',
+  transform: 'translate(-50%, -50%)',
+  width: 400,
+  bgcolor: 'background.paper',
+  border: '2px solid #000',
+  borderRadius: 5,
+  boxShadow: 24,
+  p: 4,
+};
 export default function Trades() {
   const { setShowAuthFlow, primaryWallet } = useDynamicContext();
   const [userTrades, setUserTrades] = useState(new Map());
   const [selected, setSelected] = useState([]);
+  const [open, setOpen] = React.useState(false);
+  const handleOpen = () => setOpen(true);
+  const handleClose = () => setOpen(false);
 
   const getNameFromPair = async (pair) => {
     const { data: payingETH } = await supabase
@@ -101,11 +123,11 @@ export default function Trades() {
     setSelected(newSelected);
   };
 
-  const handleSelectAllClick = (event) => {
+  const handleSelectAllClick = async (event) => {
     if (event.target.checked) {
       const newSelected = tradeRows.map((n) => n.id);
       setSelected(newSelected);
-      newSelected.forEach((id) => updateTradeStatus(id)); // Update all selected trades
+      await Promise.all(newSelected.map((id) => updateTradeStatus(id))); // Use Promise.all to await all updateTradeStatus calls
       return;
     }
     setSelected([]);
@@ -124,13 +146,6 @@ export default function Trades() {
       console.error('Error updating trade:', error);
     }
   }
-
-  const handleDeleteSelected = () => {
-    selected.forEach((id) => {
-      updateTradeStatus(id);
-    });
-    setSelected([]);
-  };
 
   useEffect(() => {
     const fetchTrades = async () => {
@@ -155,6 +170,7 @@ export default function Trades() {
             trade.order.percentChange,
             trade.order.deadline,
             trade.remainingBatches,
+            trade.tradeStopped,
           ],
         }));
 
@@ -184,6 +200,7 @@ export default function Trades() {
         percentChange,
         deadline,
         remainingBatches,
+        tradeStopped,
       ],
     ]) => ({
       id,
@@ -195,6 +212,7 @@ export default function Trades() {
       status: complete
         ? 'Complete'
         : `Pending (${batches - remainingBatches}/${batches})`,
+      tradeStopped,
     }),
   );
 
@@ -224,11 +242,7 @@ export default function Trades() {
             />
           </div>
 
-          {/* <p className="text-white">{primaryWallet?.address || "Address null"}</p> */}
-          {/* <p className="text-white">{userTrades.size}</p> */}
-
           {userTrades.size > 0 ? (
-            // ADD TABLE HERE
             <div className='h-screen bg-black flex flex-col justify-start items-start pt-8 pl-5 pr-5'>
               <TableContainer
                 component={Paper}
@@ -242,7 +256,7 @@ export default function Trades() {
               >
                 <EnhancedTableToolbar
                   numSelected={selected.length}
-                  onDeleteSelected={handleDeleteSelected}
+                  onDeleteSelected={handleOpen}
                 />
 
                 <Table sx={{ minWidth: 1180 }} aria-label='customized table'>
@@ -339,7 +353,12 @@ export default function Trades() {
                           '&:nth-of-type(odd)': { bgcolor: '#1B1B1B' },
                           '&:nth-of-type(even)': { bgcolor: '#1B1B1B' },
                           '& td, & th': {
-                            borderColor: '#5D5D5D',
+                            borderColor:
+                              tradeRows.length === 1
+                                ? 'transparent'
+                                : '#5D5D5D',
+                            borderBottom:
+                              tradeRows.length === 1 ? 'none' : '1px solid',
                             color: 'white',
                           },
                         }}
@@ -373,7 +392,9 @@ export default function Trades() {
                         <TableCell>{row.batches}</TableCell>
                         <TableCell>{row.percentChange}</TableCell>
                         <TableCell>{row.date}</TableCell>
-                        <TableCell>{row.status}</TableCell>
+                        <TableCell>
+                          {row.tradeStopped ? 'Cancelled' : row.status}
+                        </TableCell>
                       </TableRow>
                     ))}
                   </TableBody>
@@ -386,6 +407,57 @@ export default function Trades() {
               wallet.
             </h3>
           )}
+
+          <div>
+            <Modal
+              open={open}
+              onClose={handleClose}
+              aria-labelledby='modal-modal-title'
+              aria-describedby='modal-modal-description'
+            >
+              <Box sx={style}>
+                <Box sx={{ position: 'absolute', top: 8, right: 8 }}>
+                  <Button
+                    onClick={handleClose}
+                    sx={{
+                      // Override the hover color
+                      '&:hover': {
+                        bgcolor: 'transparent',
+                        color: '#9F9F9F',
+                      },
+                      // Override the focus color
+                      '&:focus': {
+                        bgcolor: 'transparent',
+                        color: '#9F9F9F',
+                      },
+                    }}
+                  >
+                    {' '}
+                    <CloseIcon sx={{ color: '#9F9F9F' }} />
+                  </Button>
+                </Box>
+                <Typography id='modal-modal-title' variant='h6' component='h2'>
+                  Confirm trade cancellation.
+                </Typography>
+
+                <Typography id='modal-modal-description' sx={{ mt: 2 }}>
+                  Once you cancel your trade, your remaining batches will not
+                  execute.
+                </Typography>
+                <Button
+                  variant='outlined'
+                  color='error'
+                  sx={{ mt: 2 }}
+                  onClick={async () => {
+                    await handleSelectAllClick(); // Wait for handleSelectAllClick to complete
+                    handleClose();
+                  }}
+                >
+                  Stop Trade
+                </Button>
+              </Box>
+            </Modal>
+          </div>
         </DynamicContextProvider>
       </div>
     </div>
