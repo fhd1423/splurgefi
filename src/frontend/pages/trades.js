@@ -204,10 +204,12 @@ export default function Trades() {
       ],
     ]) => ({
       id,
-      sell: pair.split('-')[0],
-      buy: pair.split('-')[1],
+      sell: tokenName.split('-')[0],
+      buy: tokenName.split('-')[1],
       batches,
-      percentChange: `${percentChange}%`,
+      percentChange: `${
+        pair.split('-')[0] === 'ETH' ? `-${percentChange}` : `+${percentChange}`
+      }%`,
       date: new Date(deadline * 1000).toLocaleString(),
       status: complete
         ? 'Complete'
@@ -382,12 +384,12 @@ export default function Trades() {
                           />
                         </TableCell>
                         <TableCell component='th' scope='row'>
-                          {/* {row.sell} */}
-                          WETH
+                          {row.sell}
+                          {/* WETH */}
                         </TableCell>
                         <TableCell>
-                          {/* {row.buy} */}
-                          LINK
+                          {row.buy}
+                          {/* LINK */}
                         </TableCell>
                         <TableCell>{row.batches}</TableCell>
                         <TableCell>{row.percentChange}</TableCell>
