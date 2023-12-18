@@ -1,6 +1,7 @@
 import { styled } from '@mui/system';
 import React, { useState, useEffect } from 'react';
 import OutlinedInput from '@mui/material/OutlinedInput';
+import KeyboardArrowDownOutlinedIcon from '@mui/icons-material/KeyboardArrowDownOutlined';
 import TokenModal from './TokenListModal';
 import { parseEther } from 'viem';
 
@@ -165,7 +166,7 @@ export default function OutputToken({
             {selectedToken.name.length <= 10
               ? selectedToken.name
               : selectedToken.symbol}
-            <DropdownArrow>▼</DropdownArrow>
+            <KeyboardArrowDownOutlinedIcon />
           </CustomBlackCapsule>
         </CustomFormControl>
       </CustomInputContainer>

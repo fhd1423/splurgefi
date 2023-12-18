@@ -9,8 +9,9 @@ import KeyboardArrowDownIcon from '@mui/icons-material/KeyboardArrowDown';
 import Typography from '@mui/material/Typography';
 import Popover from '@mui/material/Popover';
 import LineChart from '../unused/LineChart';
-import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
-import { faInfo } from '@fortawesome/free-solid-svg-icons';
+// import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
+// import { faInfo } from '@fortawesome/free-solid-svg-icons';
+import InfoOutlinedIcon from '@mui/icons-material/InfoOutlined';
 
 const IconContainer = styled('div')({
   display: 'flex',
@@ -21,11 +22,6 @@ const IconContainer = styled('div')({
   backgroundColor: '#000000',
   borderRadius: '50%',
   alignSelf: 'center',
-});
-
-const InfoIcon = styled(FontAwesomeIcon)({
-  color: 'white',
-  fontSize: '0.8rem', // adjust this as needed
 });
 
 // Custom styles for the form control
@@ -102,7 +98,7 @@ export default function TradeSelector({
           variant='contained'
           onClick={handleClick}
         >
-          <InfoIcon icon={faInfo} style={{ fontSize: '0.8rem' }} />
+          <InfoOutlinedIcon style={{ color: '#FFFFFF' }} />
         </IconContainer>
       </div>
 

@@ -3,6 +3,8 @@ import { styled } from '@mui/system';
 import InputBase from '@mui/material/InputBase';
 import ArrowDropUpIcon from '@mui/icons-material/ArrowDropUp';
 import ArrowDropDownIcon from '@mui/icons-material/ArrowDropDown';
+import ArrowUpwardOutlinedIcon from '@mui/icons-material/ArrowUpwardOutlined';
+import ArrowDownwardOutlinedIcon from '@mui/icons-material/ArrowDownwardOutlined';
 import { Typography } from '@mui/material';
 
 // Entire input container (includes icon and textfield)
@@ -48,9 +50,15 @@ export default function InputPercent({
       </Typography>
       <CustomInputContainer limitOrder={limitOrder}>
         {isUpSelected ? (
-          <ArrowDropUpIcon fontSize='large' style={{ color: 'white' }} />
+          <ArrowUpwardOutlinedIcon
+            fontSize='small'
+            style={{ color: 'white' }}
+          />
         ) : (
-          <ArrowDropDownIcon fontSize='large' style={{ color: 'white' }} />
+          <ArrowDownwardOutlinedIcon
+            fontSize='medium'
+            style={{ color: 'white', paddingLeft: '10px' }}
+          />
         )}
         <CustomInput
           placeholder={placeHolder}

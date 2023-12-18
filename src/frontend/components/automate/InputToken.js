@@ -3,6 +3,7 @@ import React, { useState, useEffect } from 'react';
 import OutlinedInput from '@mui/material/OutlinedInput';
 import TokenModal from './TokenListModal';
 import { parseEther } from 'viem';
+import KeyboardArrowDownOutlinedIcon from '@mui/icons-material/KeyboardArrowDownOutlined';
 
 import { Typography, InputBase, FormControl } from '@mui/material';
 
@@ -110,7 +111,8 @@ export default function InputToken({
             {selectedToken.name.length <= 10
               ? selectedToken.name
               : selectedToken.symbol}
-            <DropdownArrow>▼</DropdownArrow>
+            {/* <DropdownArrow>▼</DropdownArrow> */}
+            <KeyboardArrowDownOutlinedIcon />
           </CustomBlackCapsule>
         </CustomFormControl>
       </CustomInputContainer>

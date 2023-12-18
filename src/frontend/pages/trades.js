@@ -32,6 +32,20 @@ export default function Trades() {
     }
   };
 
+  async function updateTradeStatus(tradeId) {
+    try {
+      const { data, error } = await supabase
+        .from('Trades')
+        .update({ ['tradeStopped']: true })
+        .eq('id', tradeId);
+
+      if (error) throw error;
+      console.log('Trade updated successfully:', data);
+    } catch (error) {
+      console.error('Error updating trade:', error);
+    }
+  }
+
   useEffect(() => {
     const fetchTrades = async () => {
       if (primaryWallet?.address) {
@@ -119,12 +133,14 @@ export default function Trades() {
                 ]) => (
                   <div key={id} className='first:mt-0 mt-3'>
                     <Trade
+                      id={id}
                       name={tokenName}
                       complete={complete}
                       batches={batches}
                       percentChange={`${percentChange}%`}
                       deadline={deadline}
                       remainingBatches={remainingBatches}
+                      onStopTrade={updateTradeStatus}
                     />
                   </div>
                 ),

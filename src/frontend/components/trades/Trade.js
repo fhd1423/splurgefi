@@ -5,12 +5,14 @@ import Button from '@mui/material/Button';
 import Typography from '@mui/material/Typography';
 
 export default function Trade({
+  id,
   name,
   complete,
   batches,
   percentChange,
   deadline,
   remainingBatches,
+  onStopTrade,
 }) {
   const labelStyle = {
     backgroundColor: '#50D890',
@@ -32,6 +34,10 @@ export default function Trade({
   const pendingStyle = {
     ...labelStyle,
     backgroundColor: 'transparent',
+  };
+
+  const handleStopTrade = () => {
+    onStopTrade(id);
   };
 
   return (
@@ -70,6 +76,14 @@ export default function Trade({
               </Typography>
             </Grid>
           </Grid>
+
+          <Button onClick={handleStopTrade}>
+            <Typography
+              style={{ fontWeight: 'medium', paddingTop: '15px', color: 'red' }}
+            >
+              Stop Trade
+            </Typography>
+          </Button>
         </Grid>
 
         {/* Right section with pending status */}
