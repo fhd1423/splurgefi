@@ -1,10 +1,10 @@
 import React from 'react';
 import { styled } from '@mui/system';
 import InputBase from '@mui/material/InputBase';
-import ArrowDropUpIcon from '@mui/icons-material/ArrowDropUp';
-import ArrowDropDownIcon from '@mui/icons-material/ArrowDropDown';
 import ArrowUpwardOutlinedIcon from '@mui/icons-material/ArrowUpwardOutlined';
 import ArrowDownwardOutlinedIcon from '@mui/icons-material/ArrowDownwardOutlined';
+import AddIcon from '@mui/icons-material/Add';
+import RemoveIcon from '@mui/icons-material/Remove';
 import { Typography } from '@mui/material';
 
 // Entire input container (includes icon and textfield)
@@ -15,6 +15,7 @@ const CustomInputContainer = styled('div')(({ limitOrder }) => ({
   borderRadius: '10px',
   width: limitOrder ? '205px' : '130px',
   height: '55px',
+  position: 'relative',
 }));
 
 // Custom styles for textfield component
@@ -24,9 +25,19 @@ const CustomInput = styled(InputBase)({
   '& .MuiInputBase-input': {
     textAlign: 'left',
     padding: '0 10px',
-    width: 'calc(100% - 35px)',
+    width: 'calc(100% - 50px)', // Reduced width to make room for percent symbol
     height: '100%',
   },
+});
+
+// Typography for the percent symbol
+const PercentSymbol = styled(Typography)({
+  position: 'absolute', // Position it absolutely within the parent container
+  right: 10, // Align to the right
+  color: 'white',
+  height: '100%',
+  display: 'flex',
+  alignItems: 'center',
 });
 
 export default function InputPercent({
@@ -50,12 +61,12 @@ export default function InputPercent({
       </Typography>
       <CustomInputContainer limitOrder={limitOrder}>
         {isUpSelected ? (
-          <ArrowUpwardOutlinedIcon
-            fontSize='small'
-            style={{ color: 'white' }}
+          <AddIcon
+            fontSize='medium'
+            style={{ color: 'white', paddingLeft: '10px' }}
           />
         ) : (
-          <ArrowDownwardOutlinedIcon
+          <RemoveIcon
             fontSize='medium'
             style={{ color: 'white', paddingLeft: '10px' }}
           />
@@ -66,6 +77,7 @@ export default function InputPercent({
           value={value}
           onChange={(e) => onValueChange('percentChange', e.target.value)}
         />
+        <PercentSymbol>%</PercentSymbol> {/* Percent symbol added here */}
       </CustomInputContainer>
     </div>
   );

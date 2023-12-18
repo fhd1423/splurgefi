@@ -22,7 +22,7 @@ const DatePicker = ({ selectedDate, setSelectedDate, limitOrder }) => {
             input: {
               color: '#ffffff',
               height: '35px',
-              width: limitOrder ? '400px' : '160px',
+              width: limitOrder ? '165px' : '160px',
               padding: '10px 14px 10px 0',
               fontSize: '1rem',
             },

@@ -360,30 +360,35 @@ export default function Automate() {
                     message={message}
                     currentOutput={currentOutput}
                     setCurrentOutput={setCurrentOutput}
-                    limitOrder={false}
+                    limitOrder={toggleTrade == 'pro' ? false : true}
                   />
                 </Grid>
-                <Grid item xs={4}>
-                  {toggleSelection === 'buy' ? (
+
+                {toggleTrade == 'pro' ? (
+                  <Grid item xs={4}>
                     <InputPercent
                       title='Percent Change'
                       value={message.percentChange}
                       onValueChange={handleMessageChange}
-                      isUpSelected={false} // Pass the derived state to the component
-                      placeHolder={'0%'}
+                      isUpSelected={toggleSelection !== 'buy'}
+                      placeHolder={'0'}
                     />
-                  ) : (
+                  </Grid>
+                ) : (
+                  <Grid item xs={6}>
                     <InputPercent
                       title='Percent Change'
                       value={message.percentChange}
                       onValueChange={handleMessageChange}
-                      isUpSelected={true} // Pass the derived state to the component
+                      isUpSelected={toggleSelection !== 'buy'}
                       placeHolder={'0%'}
+                      limitOrder={true}
                     />
-                  )}
-                </Grid>
-                <Grid item xs={4}>
-                  {toggleTrade == 'pro' && (
+                  </Grid>
+                )}
+
+                {toggleTrade == 'pro' && (
+                  <Grid item xs={4}>
                     <InputBatches
                       title='Batches'
                       placeHolder={'5'}
@@ -392,17 +397,18 @@ export default function Automate() {
                         handleMessageChange('tranches', e.target.value)
                       }
                     />
-                  )}
-                </Grid>
-                <Grid item xs={4}>
-                  {toggleTrade == 'pro' && (
+                  </Grid>
+                )}
+                {toggleTrade == 'pro' && (
+                  <Grid item xs={4}>
                     <TradeSelector
                       onTradeActionChange={handleMessageChange}
                       title='Moving Avg.'
                       tokenAddy={message.outputTokenAddress}
                     />
-                  )}
-                </Grid>
+                  </Grid>
+                )}
+
                 <Grid item xs={6}>
                   <DatePicker setSelectedDate={handleMessageChange} />
                 </Grid>

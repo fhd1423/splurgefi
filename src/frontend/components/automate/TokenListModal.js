@@ -7,6 +7,8 @@ import ListItem from '@mui/material/ListItem';
 import ListItemText from '@mui/material/ListItemText';
 import FileCopyIcon from '@mui/icons-material/FileCopy'; // Import the FileCopy icon
 import Box from '@mui/material/Box';
+import CloseIcon from '@mui/icons-material/Close';
+import Button from '@mui/material/Button';
 import { Tooltip } from '@mui/material';
 
 // Styling
@@ -18,39 +20,32 @@ const StyledModal = styled(Modal)(({ theme }) => ({
 }));
 
 const StyledBox = styled(Box)(({ theme }) => ({
-  backgroundColor: '#000000',
+  backgroundColor: '#1C1C1C',
   color: 'white',
-  borderRadius: '16px',
+  borderRadius: '8px',
   width: '418px',
   height: '600px',
   padding: '16px',
   position: 'relative',
-  boxShadow: '0 0 10px rgba(255, 255, 255, 0.5)',
-  overflow: 'hidden',
-  '&::before': {
-    content: '""',
-    position: 'absolute',
-    top: '0',
-    left: '0',
-    right: '0',
-    bottom: '0',
-    borderRadius: '16px',
-    border: '2px solid rgba(255, 255, 255, 0.5)',
-    pointerEvents: 'none',
+  boxShadow: '0 4px 20px rgba(0, 0, 0, 0.5)',
+  overflow: 'auto',
+  '&:focus': {
+    outline: 'none',
   },
 }));
 
 const SearchBar = styled(InputBase)(({ theme }) => ({
   backgroundColor: '#2B2B2B',
   borderRadius: '12px',
-  padding: '8px',
-  width: '80%',
+  padding: '12px',
+  width: '100%',
   marginBottom: '16px',
+  marginTop: '32px',
   marginLeft: 'auto',
   marginRight: 'auto',
   display: 'block',
   '& input::placeholder': {
-    color: '#FFFFFF', // Replace with the desired color
+    color: '#FFFFFF',
   },
   color: 'white',
 }));
@@ -62,7 +57,7 @@ const TokenList = styled(List)(({ theme }) => ({
     width: '8px',
   },
   '&::-webkit-scrollbar-thumb': {
-    backgroundColor: '#27ae60',
+    backgroundColor: 'white', // Changed to white
     borderRadius: '10px',
   },
   '&::-webkit-scrollbar-track': {
@@ -96,36 +91,38 @@ const TokenListItemText = styled(ListItemText)(({ theme }) => ({
   },
 }));
 
-const CloseButton = styled('button')(({ theme }) => ({
+const CloseButton = styled(Button)(({ theme }) => ({
   position: 'absolute',
-  top: '16px',
-  right: '16px',
-  backgroundColor: 'transparent',
-  color: 'gray',
-  border: 'none',
-  cursor: 'pointer',
-  fontSize: '20px',
+  top: 8,
+  right: 8,
+  color: 'white',
+  minWidth: 'auto',
+  padding: 5,
+  paddingBottom: 10,
   '&:hover': {
-    color: '#27ae60',
+    backgroundColor: 'transparent',
   },
 }));
 
 // Function to copy the text to clipboard
 const copyToClipboard = (text) => {
-  const textArea = document.createElement('textarea');
-  textArea.value = text;
-  document.body.appendChild(textArea);
-  textArea.select();
-  document.execCommand('copy');
-  document.body.removeChild(textArea);
+  navigator.clipboard.writeText(text).then(
+    () => {
+      console.log('Text copied to clipboard');
+    },
+    (err) => {
+      console.error('Error in copying text: ', err);
+    },
+  );
 };
+
 const CopyIcon = styled(FileCopyIcon)({
   color: 'gray',
-  fontSize: '1rem', // Adjust the size as needed
-  marginLeft: '4px', // Adjust the spacing from the text
+  fontSize: '1rem',
+  marginLeft: '4px',
 });
 
-// FUNCTION - REAL SHIT
+// FUNCTION
 const TokenModal = ({
   open,
   onClose,
@@ -152,15 +149,20 @@ const TokenModal = ({
     onClose(); // Close the modal after setting the selected token
   };
 
-  // Function to copy the text to clipboard
-  const copyToClipboard = (text) => {
-    const textArea = document.createElement('textarea');
-    textArea.value = text;
-    document.body.appendChild(textArea);
-    textArea.select();
-    document.execCommand('copy');
-    document.body.removeChild(textArea);
-  };
+  useEffect(() => {
+    const isTokenMatch = (token) => {
+      const searchTermLower = searchTerm.toLowerCase();
+      const nameMatch = token.name.toLowerCase().includes(searchTermLower);
+      const addressMatch = token.address
+        .toLowerCase()
+        .includes(searchTermLower);
+      return nameMatch || addressMatch;
+    };
+
+    // Filter tokens based on the search term
+    const filtered = tokens.filter(isTokenMatch);
+    setFilteredTokens(filtered);
+  }, [searchTerm, tokens]);
 
   useEffect(() => {
     const fetchData = async () => {
@@ -179,68 +181,57 @@ const TokenModal = ({
     fetchData();
   }, []);
 
-  useEffect(() => {
-    // Filter tokens based on the search term
-    setFilteredTokens(
-      tokens.filter(
-        (token) =>
-          token.name.toLowerCase().includes(searchTerm.toLowerCase()) ||
-          token.address.toLowerCase() === searchTerm.toLowerCase(),
-      ),
-    );
-  }, [searchTerm, tokens]);
-
   return (
-    <>
-      <StyledModal open={open} onClose={onClose}>
-        <StyledBox>
-          <CloseButton onClick={onClose}>X</CloseButton>
-          <SearchBar
-            placeholder='Search token or paste address'
-            value={searchTerm}
-            onChange={(e) => setSearchTerm(e.target.value)}
-          />
-          <TokenList>
-            {filteredTokens.map((token) => (
-              <TokenListItem
-                key={token.address}
-                onClick={() =>
-                  handleTokenClick({
-                    name: token.name,
-                    address: token.address,
-                    logoURI: token.logoURI,
-                    symbol: token.symbol,
-                  })
+    <StyledModal open={open} onClose={onClose}>
+      <StyledBox>
+        <CloseButton onClick={onClose}>
+          <CloseIcon sx={{ color: '#9F9F9F' }} />
+        </CloseButton>
+        <SearchBar
+          placeholder='Search token or paste address'
+          value={searchTerm}
+          onChange={(e) => setSearchTerm(e.target.value)}
+        />
+        <TokenList>
+          {filteredTokens.map((token) => (
+            <TokenListItem
+              key={token.address}
+              onClick={() =>
+                handleTokenClick({
+                  name: token.name,
+                  address: token.address,
+                  logoURI: token.logoURI,
+                  symbol: token.symbol,
+                })
+              }
+            >
+              <TokenListItemText
+                primary={
+                  <div style={{ display: 'flex', alignItems: 'center' }}>
+                    {token.logoURI && (
+                      <img
+                        className='logo'
+                        src={token.logoURI}
+                        alt={`${token.name} Logo`}
+                      />
+                    )}
+                    <span style={{ marginLeft: '8px' }}>{token.name}</span>
+                  </div>
                 }
-              >
-                <TokenListItemText
-                  primary={
-                    <div style={{ display: 'flex', alignItems: 'center' }}>
-                      {token.logoURI && (
-                        <img
-                          className='logo'
-                          src={token.logoURI}
-                          alt={`${token.name} Logo`}
-                        />
-                      )}
-                      <span style={{ marginLeft: '8px' }}>{token.name}</span>
-                    </div>
-                  }
+              />
+              <Tooltip title='Copy Address' arrow>
+                <CopyIcon
+                  onClick={(e) => {
+                    e.stopPropagation(); // Prevent the TokenListItem onClick from firing
+                    copyToClipboard(token.address);
+                  }}
                 />
-                <Tooltip title='Copy Address' arrow>
-                  <CopyIcon
-                    onClick={(e) => {
-                      e.stopPropagation(); // Prevent the TokenListItem onClick from firing
-                      copyToClipboard(token.address);
-                    }}
-                  />
-                </Tooltip>
-              </TokenListItem>
-            ))}
-          </TokenList>
-        </StyledBox>
-      </StyledModal>
-    </>
+              </Tooltip>
+            </TokenListItem>
+          ))}
+        </TokenList>
+      </StyledBox>
+    </StyledModal>
   );
 };
 

@@ -101,7 +101,7 @@ export default function InputToken({
     <div>
       <CustomInputContainer>
         <CustomInput
-          placeholder='0'
+          placeholder='0.0'
           value={amount}
           onChange={handleAmountChange}
         />

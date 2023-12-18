@@ -432,7 +432,6 @@ export default function Trades() {
                       },
                     }}
                   >
-                    {' '}
                     <CloseIcon sx={{ color: '#9F9F9F' }} />
                   </Button>
                 </Box>

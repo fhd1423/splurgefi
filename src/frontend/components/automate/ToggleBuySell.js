@@ -63,10 +63,10 @@ export default function ToggleOrderType({ toggleTrade, setToggleTrade }) {
       aria-label='pumpinator limit toggle'
     >
       <StyledToggleButton value='pro' aria-label='pro' className={'pro'}>
-        Pro
+        Automate
       </StyledToggleButton>
       <StyledToggleButton value='simple' aria-label='simple'>
-        Simple
+        Limit Order
       </StyledToggleButton>
     </StyledToggleButtonGroup>
   );
