@@ -9,10 +9,61 @@ import {
 import { EthereumWalletConnectors } from '@dynamic-labs/ethereum';
 import { supabase } from '../components/client';
 import NavBar from '../components/NavBar';
+import Table from '@mui/material/Table';
+import TableBody from '@mui/material/TableBody';
+import TableCell from '@mui/material/TableCell';
+import TableContainer from '@mui/material/TableContainer';
+import TableHead from '@mui/material/TableHead';
+import TableRow from '@mui/material/TableRow';
+import Checkbox from '@mui/material/Checkbox';
+import { Paper } from '@mui/material';
+import { alpha } from '@mui/material/styles';
+import Tooltip from '@mui/material/Tooltip';
+import Toolbar from '@mui/material/Toolbar';
+import Typography from '@mui/material/Typography';
+import IconButton from '@mui/material/IconButton';
+import DeleteIcon from '@mui/icons-material/Delete';
+const EnhancedTableToolbar = ({ numSelected, onDeleteSelected }) => (
+  <Toolbar
+    sx={{
+      pl: { sm: 2 },
+      pr: { xs: 1, sm: 1 },
+      bgcolor: numSelected > 0 ? 'rgba(80, 216, 144, 0.85)' : '#2B2B2B',
+    }}
+  >
+    {numSelected > 0 ? (
+      <Typography
+        sx={{ flex: '1 1 100%' }}
+        color='inherit'
+        variant='subtitle1'
+        component='div'
+      >
+        {numSelected} selected
+      </Typography>
+    ) : (
+      <Typography
+        sx={{ flex: '1 1 100%', color: 'white' }}
+        variant='h6'
+        id='tableTitle'
+        component='div'
+      >
+        Trade History
+      </Typography>
+    )}
+    {numSelected > 0 ? (
+      <Tooltip title='Delete'>
+        <IconButton onClick={onDeleteSelected}>
+          <DeleteIcon />
+        </IconButton>
+      </Tooltip>
+    ) : null}
+  </Toolbar>
+);
 
 export default function Trades() {
   const { setShowAuthFlow, primaryWallet } = useDynamicContext();
   const [userTrades, setUserTrades] = useState(new Map());
+  const [selected, setSelected] = useState([]);
 
   const getNameFromPair = async (pair) => {
     const { data: payingETH } = await supabase
@@ -20,16 +71,44 @@ export default function Trades() {
       .select('tokenName')
       .eq('path', pair);
 
-    if (payingETH[0]) return `ETH -> ${payingETH[0].tokenName}`;
+    if (payingETH[0]) return `ETH-${payingETH[0].tokenName}`;
     else {
       const { data: payingToken } = await supabase
         .from('Pairs')
         .select('tokenName')
         .eq('path', `${pair.split('-')[1]}-${pair.split('-')[0]}`);
 
-      if (payingToken[0]) return `${payingToken[0].tokenName} -> ETH`;
+      if (payingToken[0]) return `${payingToken[0].tokenName}-ETH`;
       return `Unkown Trade Pair`;
     }
+  };
+
+  const handleSelect = (event, id) => {
+    event.stopPropagation();
+    const selectedIndex = selected.indexOf(id);
+    let newSelected = [];
+
+    if (selectedIndex === -1) {
+      newSelected = newSelected.concat(selected, id);
+      updateTradeStatus(id); // Call updateTradeStatus for the selected trade
+    } else {
+      newSelected = newSelected.concat(
+        selected.slice(0, selectedIndex),
+        selected.slice(selectedIndex + 1),
+      );
+      // Optionally handle deselection case here
+    }
+    setSelected(newSelected);
+  };
+
+  const handleSelectAllClick = (event) => {
+    if (event.target.checked) {
+      const newSelected = tradeRows.map((n) => n.id);
+      setSelected(newSelected);
+      newSelected.forEach((id) => updateTradeStatus(id)); // Update all selected trades
+      return;
+    }
+    setSelected([]);
   };
 
   async function updateTradeStatus(tradeId) {
@@ -45,6 +124,13 @@ export default function Trades() {
       console.error('Error updating trade:', error);
     }
   }
+
+  const handleDeleteSelected = () => {
+    selected.forEach((id) => {
+      updateTradeStatus(id);
+    });
+    setSelected([]);
+  };
 
   useEffect(() => {
     const fetchTrades = async () => {
@@ -87,6 +173,31 @@ export default function Trades() {
     fetchTrades();
   }, [primaryWallet?.address]);
 
+  const tradeRows = Array.from(userTrades).map(
+    ([
+      id,
+      [
+        tokenName,
+        pair,
+        complete,
+        batches,
+        percentChange,
+        deadline,
+        remainingBatches,
+      ],
+    ]) => ({
+      id,
+      sell: pair.split('-')[0],
+      buy: pair.split('-')[1],
+      batches,
+      percentChange: `${percentChange}%`,
+      date: new Date(deadline * 1000).toLocaleString(),
+      status: complete
+        ? 'Complete'
+        : `Pending (${batches - remainingBatches}/${batches})`,
+    }),
+  );
+
   return (
     <div className='h-screen bg-black flex flex-col'>
       <NavBar inTradesPage={true} />
@@ -117,34 +228,157 @@ export default function Trades() {
           {/* <p className="text-white">{userTrades.size}</p> */}
 
           {userTrades.size > 0 ? (
-            <div className='flex flex-col overflow-y-auto space-y-5 pb-10 w-full'>
-              {Array.from(userTrades).map(
-                ([
-                  id,
-                  [
-                    tokenName,
-                    pair,
-                    complete,
-                    batches,
-                    percentChange,
-                    deadline,
-                    remainingBatches,
-                  ],
-                ]) => (
-                  <div key={id} className='first:mt-0 mt-3'>
-                    <Trade
-                      id={id}
-                      name={tokenName}
-                      complete={complete}
-                      batches={batches}
-                      percentChange={`${percentChange}%`}
-                      deadline={deadline}
-                      remainingBatches={remainingBatches}
-                      onStopTrade={updateTradeStatus}
-                    />
-                  </div>
-                ),
-              )}
+            // ADD TABLE HERE
+            <div className='h-screen bg-black flex flex-col justify-start items-start pt-8 pl-5 pr-5'>
+              <TableContainer
+                component={Paper}
+                sx={{
+                  width: '1360px',
+                  margin: 'auto',
+                  mt: 4,
+                  align: 'left',
+                  bgcolor: '#1B1B1B',
+                }}
+              >
+                <EnhancedTableToolbar
+                  numSelected={selected.length}
+                  onDeleteSelected={handleDeleteSelected}
+                />
+
+                <Table sx={{ minWidth: 1180 }} aria-label='customized table'>
+                  <TableHead>
+                    <TableRow sx={{ bgcolor: '#2B2B2B' }}>
+                      <TableCell
+                        padding='checkbox'
+                        sx={{ borderBottom: 'none' }}
+                      >
+                        <Checkbox
+                          indeterminate={
+                            selected.length > 0 &&
+                            selected.length < tradeRows.length
+                          }
+                          checked={
+                            tradeRows.length > 0 &&
+                            selected.length === tradeRows.length
+                          }
+                          onChange={(event) => handleSelectAllClick(event)}
+                          sx={{
+                            color: 'white',
+                            '&.Mui-checked': {
+                              color: '#50D890',
+                              opacity: '0.85',
+                            },
+                            '&.MuiCheckbox-indeterminate': {
+                              color: '#50D890',
+                              opacity: '0.85',
+                            },
+                          }}
+                        />
+                      </TableCell>
+                      <TableCell
+                        sx={{
+                          color: 'white',
+                          borderBottom: 'none',
+                          fontWeight: 'bold',
+                        }}
+                      >
+                        Sell
+                      </TableCell>
+                      <TableCell
+                        sx={{
+                          color: 'white',
+                          borderBottom: 'none',
+                          fontWeight: 'bold',
+                        }}
+                      >
+                        Buy
+                      </TableCell>
+                      <TableCell
+                        sx={{
+                          color: 'white',
+                          borderBottom: 'none',
+                          fontWeight: 'bold',
+                        }}
+                      >
+                        Batches
+                      </TableCell>
+                      <TableCell
+                        sx={{
+                          color: 'white',
+                          borderBottom: 'none',
+                          fontWeight: 'bold',
+                        }}
+                      >
+                        Percent Change
+                      </TableCell>
+                      <TableCell
+                        sx={{
+                          color: 'white',
+                          borderBottom: 'none',
+                          fontWeight: 'bold',
+                        }}
+                      >
+                        Date
+                      </TableCell>
+                      <TableCell
+                        sx={{
+                          color: 'white',
+                          borderBottom: 'none',
+                          fontWeight: 'bold',
+                        }}
+                      >
+                        Status
+                      </TableCell>
+                    </TableRow>
+                  </TableHead>
+                  <TableBody>
+                    {tradeRows.map((row) => (
+                      <TableRow
+                        key={row.id}
+                        sx={{
+                          '&:nth-of-type(odd)': { bgcolor: '#1B1B1B' },
+                          '&:nth-of-type(even)': { bgcolor: '#1B1B1B' },
+                          '& td, & th': {
+                            borderColor: '#5D5D5D',
+                            color: 'white',
+                          },
+                        }}
+                      >
+                        <TableCell padding='checkbox'>
+                          <Checkbox
+                            color='primary'
+                            checked={selected.indexOf(row.id) !== -1}
+                            onClick={(event) => handleSelect(event, row.id)}
+                            sx={{
+                              color: 'white',
+                              '&.Mui-checked': {
+                                color: '#50D890',
+                                opacity: '0.85',
+                              },
+                              '&.MuiCheckbox-indeterminate': {
+                                color: '#50D890',
+                                opacity: '0.85',
+                              },
+                            }}
+                          />
+                        </TableCell>
+                        <TableCell component='th' scope='row'>
+                          {/* {row.sell} */}
+                          WETH
+                        </TableCell>
+                        <TableCell>
+                          {/* {row.buy} */}
+                          LINK
+                        </TableCell>
+                        <TableCell>{row.batches}</TableCell>
+                        <TableCell>{row.percentChange}</TableCell>
+                        <TableCell>{row.date}</TableCell>
+                        <TableCell>{row.status}</TableCell>
+                      </TableRow>
+                    ))}
+                  </TableBody>
+                </Table>
+              </TableContainer>
             </div>
           ) : (
             <h3 className='text-white p-4'>
