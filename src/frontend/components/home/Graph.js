@@ -1,9 +1,8 @@
 import { Grid, Typography, useMediaQuery, useTheme } from '@mui/material';
+import TradeSummaryView from './TradeSummaryView';
 
 const Graph = () => {
-  // Access theme to use breakpoints
   const theme = useTheme();
-  // Use media queries to adjust styles based on screen size
   const isMobile = useMediaQuery(theme.breakpoints.down('md'));
 
   return (
@@ -16,82 +15,37 @@ const Graph = () => {
       }}
     >
       <Grid container spacing={2} alignItems='center' justifyContent='center'>
-        {/* Text Section */}
         <Grid item xs={12} md={6}>
-          {/* Pumpinator Heading */}
           <Typography
-            variant={isMobile ? 'h3' : 'h2'}
+            variant={isMobile ? 'h4' : 'h2'}
             component='h2'
-            style={{
+            sx={{
               fontWeight: 'bold',
-              marginBottom: '20px',
-              marginLeft: isMobile ? '10px' : '25px',
               color: '#50D890',
+              mb: 2,
+              ml: isMobile ? 1 : 3,
             }}
           >
             The Pumpinator
           </Typography>
-
-          {/* Introductory Text */}
           <Typography
-            variant={isMobile ? 'h4' : 'h3'}
-            component='h3'
-            style={{
-              marginTop: '20px',
-              marginBottom: '20px',
-              marginLeft: isMobile ? '10px' : '25px',
+            variant={isMobile ? 'h5' : 'h3'}
+            component='h3' // 'h8' is not a valid component. You should use 'h2' - 'h6' or 'p'.
+            sx={{
+              mt: 1,
+              mb: 2,
+              ml: isMobile ? 1 : 4,
+              fontSize: isMobile ? '1rem' : '2rem', // Adjust the font size as needed
+              color: '#9F9F9F', // Setting the color to the specified grey
             }}
           >
-            Never miss a pump.
-          </Typography>
-
-          {/* Numbered Text Instructions */}
-          <Typography
-            variant={isMobile ? 'h6' : 'h5'}
-            component='h5'
-            style={{
-              marginLeft: isMobile ? '10px' : '25px',
-              marginTop: '10px',
-              marginBottom: '20px',
-            }}
-          >
-            Set your conditions:
-          </Typography>
-          <Typography
-            variant={isMobile ? 'body1' : 'h5'}
-            style={{ marginLeft: isMobile ? '20px' : '45px' }}
-          >
-            1. Trade 69,000 $JOE for $WETH
-          </Typography>
-          <Typography
-            variant={isMobile ? 'body1' : 'h5'}
-            style={{ marginLeft: isMobile ? '20px' : '45px' }}
-          >
-            2. 3 batches/tranches
-          </Typography>
-          <Typography
-            variant={isMobile ? 'body1' : 'h5'}
-            style={{
-              marginLeft: isMobile ? '20px' : '45px',
-              marginBottom: '10px',
-            }}
-          >
-            3. Sell every time it pumps 10% above moving avg
+            Never miss a pump
           </Typography>
 
-          {/* Outro Text */}
-          <Typography
-            variant={isMobile ? 'h6' : 'h5'}
-            component='h5'
-            style={{
-              marginTop: '25px',
-              marginLeft: isMobile ? '10px' : '25px',
-            }}
-          >
-            Sit back and let us automate your gains. 💪
-          </Typography>
+          <div className='pt-5 pl-2'>
+            <TradeSummaryView />
+          </div>
         </Grid>
-        {/* Image Section */}
         <Grid item xs={12} md={6}>
           <img
             src='/assets/Graph.png'
