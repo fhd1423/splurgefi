@@ -102,7 +102,7 @@ export default function Automate() {
     const isValidSwap = fields.some((field) => message[field] == WETH_ADDRESS);
 
     if (!isValidSwap) {
-      setUserInputError(`Either input or output must be WETH ${WETH_ADDRESS}`);
+      setUserInputError(`Either input or output must be WETH`);
       return false;
     }
 
@@ -112,6 +112,8 @@ export default function Automate() {
       setUserInputError('Please make sure all inputs are filled.');
       return false;
     }
+
+    setUserInputError('');
     return true;
   };
 
@@ -137,6 +139,8 @@ export default function Automate() {
 
   useEffect(() => {
     const allFilled = tradeEntered();
+
+    validateInputs();
     setInputsFilled(allFilled);
 
     console.log('All inputs filled:', allFilled);
@@ -301,6 +305,10 @@ export default function Automate() {
             justifyContent: 'center',
           }}
         >
+          <div className='mb-10'>
+            {userInputError && <Alert severity='error'>{userInputError}</Alert>}
+          </div>
+
           <Paper
             elevation={16}
             sx={{
@@ -443,7 +451,6 @@ export default function Automate() {
             </Grid>
           </Paper>
         </Box>
-        {userInputError && <Alert severity='error'>{userInputError}</Alert>}
 
         {allInputsFilled && (
           <div className='absolute right-0 pr-5 space-y-1.25'>
