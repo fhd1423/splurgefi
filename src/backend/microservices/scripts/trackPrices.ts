@@ -102,11 +102,13 @@ function checkTime() {
 
   const withinPeriod = isWithinGracePeriod(0);
   const zeroMinutes = minutes === 0;
+  const is5Minutes = minutes % 5 === 0 && withinPeriod;
   const is15Minutes = minutes % 15 === 0 && withinPeriod;
   const is1Hours = hours % 1 === 0 && zeroMinutes && withinPeriod;
   const is4Hours = hours % 4 === 0 && zeroMinutes && withinPeriod;
   const is24Hours = hours === 0 && zeroMinutes && withinPeriod;
 
+  if (is5Minutes) intervals.push(`5min_avg`);
   if (is15Minutes) intervals.push(`15min_avg`);
   if (is1Hours) intervals.push(`60min_avg`); // 8 hours in minutes
   if (is4Hours) intervals.push(`${4 * 60}min_avg`); // 4 hours in minutes
