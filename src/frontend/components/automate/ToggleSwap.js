@@ -1,6 +1,9 @@
 import * as React from 'react';
-import ToggleButtonGroup from '@mui/material/ToggleButtonGroup';
 import PropTypes from 'prop-types';
+import { Paper } from '@mui/material';
+import ImportExportRoundedIcon from '@mui/icons-material/ImportExportRounded';
+import Stack from '@mui/material/Stack';
+import IconButton from '@mui/material/IconButton';
 
 export default function ToggleSwap({
   selection,
@@ -32,33 +35,31 @@ export default function ToggleSwap({
   };
 
   return (
-    <div
-      style={{
-        display: 'inline-block',
-        borderRadius: '10px',
-        border: '2px solid #000',
-        padding: '5px',
-        cursor: 'pointer',
-        transition: 'background-color 0.3s ease, transform 0.3s ease',
-      }}
-      className='bg-green-500 hover:bg-green-600 hover:scale-105'
-      onClick={handleToggle}
-      aria-label={selection}
-    >
-      <svg
-        xmlns='http://www.w3.org/2000/svg'
-        width='24'
-        height='24'
-        viewBox='0 0 24 24'
-        fill='none'
-        stroke='currentColor'
-        strokeWidth='2'
-        strokeLinecap='round'
-        strokeLinejoin='round'
+    <div>
+      <Stack
+        direction='column'
+        justifyContent='center'
+        alignItems='center'
+        sx={{ width: 35, height: 35 }}
       >
-        <line x1='12' y1='5' x2='12' y2='19'></line>
-        <polyline points='19 12 12 19 5 12'></polyline>
-      </svg>
+        <Paper
+          elevation={3}
+          sx={{
+            borderRadius: '50%',
+            backgroundColor: '#000000',
+            height: 35,
+            width: 35,
+          }}
+        />
+
+        <IconButton
+          sx={{ color: 'white', position: 'absolute' }}
+          aria-label='icon'
+          onClick={handleToggle}
+        >
+          <ImportExportRoundedIcon />
+        </IconButton>
+      </Stack>
     </div>
   );
 }

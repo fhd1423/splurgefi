@@ -36,7 +36,7 @@ const StyledListItem = styled(ListItem)(({ theme }) => ({
 const TradeSummaryView = () => {
   return (
     <Box display='flex' justifyContent='left'>
-      <CustomCard elevation={3}>
+      <CustomCard elevation={16}>
         <CardContent>
           <Typography variant='h6' component='h3' sx={{ fontWeight: 'bold' }}>
             Trade Summary

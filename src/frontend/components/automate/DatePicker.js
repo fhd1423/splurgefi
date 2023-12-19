@@ -7,7 +7,7 @@ import {
   Typography,
 } from '@mui/material';
 
-const DatePicker = ({ selectedDate, setSelectedDate, limitOrder }) => {
+const DatePicker = ({ selectedDate, setSelectedDate, limitOrder, title }) => {
   const customDatePickerTheme = createTheme({
     palette: {
       primary: {
@@ -22,7 +22,7 @@ const DatePicker = ({ selectedDate, setSelectedDate, limitOrder }) => {
             input: {
               color: '#ffffff',
               height: '35px',
-              width: limitOrder ? '165px' : '160px',
+              width: '170px',
               padding: '10px 14px 10px 0',
               fontSize: '1rem',
             },
@@ -36,8 +36,14 @@ const DatePicker = ({ selectedDate, setSelectedDate, limitOrder }) => {
             '& .MuiOutlinedInput-root': {
               backgroundColor: '#1B1B1B',
               borderRadius: '10px',
+              '& fieldset': {
+                borderColor: 'transparent', // Set the border color to transparent
+              },
               '&.Mui-focused fieldset': {
-                borderColor: 'transparent',
+                borderColor: 'transparent', // Remove outline
+              },
+              '&:hover fieldset': {
+                borderColor: 'transparent', // Remove hover effect
               },
             },
           },
@@ -45,9 +51,6 @@ const DatePicker = ({ selectedDate, setSelectedDate, limitOrder }) => {
       },
       MuiInputAdornment: {
         styleOverrides: {
-          // positionStart: {
-          //   marginRight: "-12px", // Adjust this value to bring the icon closer to the text
-          // },
           root: {
             marginLeft: '0px', // Reduces the default margin on the left side of the adornment
             marginRight: '0px', // Optionally, reduces the margin on the right side if needed
@@ -69,11 +72,11 @@ const DatePicker = ({ selectedDate, setSelectedDate, limitOrder }) => {
       <Typography
         variant='subtitle1'
         color='white'
-        fontWeight='500'
+        fontWeight='600'
         gutterBottom
         style={{ marginBottom: '3px', textAlign: 'left', fontSize: '.85rem' }}
       >
-        Deadline
+        {title}
       </Typography>
       <DatePicker_mui
         value={selectedDate}

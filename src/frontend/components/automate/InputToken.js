@@ -99,6 +99,19 @@ export default function InputToken({
 
   return (
     <div>
+      <Typography
+        variant='subtitle1'
+        color='white'
+        fontWeight='600'
+        gutterBottom
+        style={{
+          marginBottom: '3px',
+          fontSize: '0.85rem',
+          textAlign: 'left',
+        }}
+      >
+        {title}
+      </Typography>
       <CustomInputContainer>
         <CustomInput
           placeholder='0.0'
@@ -111,7 +124,6 @@ export default function InputToken({
             {selectedToken.name.length <= 10
               ? selectedToken.name
               : selectedToken.symbol}
-            {/* <DropdownArrow>▼</DropdownArrow> */}
             <KeyboardArrowDownOutlinedIcon />
           </CustomBlackCapsule>
         </CustomFormControl>

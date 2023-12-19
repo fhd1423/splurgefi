@@ -13,7 +13,7 @@ const CustomInputContainer = styled('div')(({ limitOrder }) => ({
   alignItems: 'center',
   backgroundColor: '#1B1B1B',
   borderRadius: '10px',
-  width: limitOrder ? '205px' : '130px',
+  width: '215px',
   height: '55px',
   position: 'relative',
 }));
@@ -47,30 +47,22 @@ export default function InputPercent({
   onValueChange,
   isUpSelected,
   limitOrder,
+  inputToken,
+  outputToken,
 }) {
   return (
     <div>
       <Typography
         variant='subtitle1'
         color='white'
-        fontWeight='500'
+        fontWeight='600'
         gutterBottom
         style={{ marginBottom: '3px', fontSize: '0.85rem', textAlign: 'left' }}
       >
-        {title}
+        When {isUpSelected ? 'input' : 'output'}'s price{' '}
+        {isUpSelected ? 'rises' : 'drops'} by
       </Typography>
       <CustomInputContainer limitOrder={limitOrder}>
-        {isUpSelected ? (
-          <AddIcon
-            fontSize='medium'
-            style={{ color: 'white', paddingLeft: '10px' }}
-          />
-        ) : (
-          <RemoveIcon
-            fontSize='medium'
-            style={{ color: 'white', paddingLeft: '10px' }}
-          />
-        )}
         <CustomInput
           placeholder={placeHolder}
           limitOrder={limitOrder}

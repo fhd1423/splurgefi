@@ -21,6 +21,8 @@ const CustomInputContainer = styled('div')({
   backgroundColor: '#1B1B1B',
   borderRadius: '10px',
   padding: '0 10px',
+  margin: 0,
+  paddingTop: 0,
   width: '455px',
   height: '80px',
   justifyContent: 'space-between',
@@ -58,11 +60,6 @@ const CustomBlackCapsule = styled('div')({
 const Logo = styled('img')({
   width: '20px',
   marginRight: '8px',
-});
-
-const DropdownArrow = styled('span')({
-  marginLeft: 'auto',
-  transform: 'scale(0.8)', // Adjust the scale factor to make it less tall
 });
 
 const CustomFormControl = styled(FormControl)({
@@ -137,11 +134,15 @@ export default function OutputToken({
   return (
     <div>
       <Typography
-        variant='h6'
+        variant='subtitle1'
         color='white'
-        fontWeight='500'
+        fontWeight='600'
         gutterBottom
-        style={{ marginBottom: '3px', fontSize: '1rem' }}
+        style={{
+          marginBottom: '3px',
+          fontSize: '0.85rem',
+          textAlign: 'left',
+        }}
       >
         {title}
       </Typography>

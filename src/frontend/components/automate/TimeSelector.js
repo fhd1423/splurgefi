@@ -12,7 +12,7 @@ import Typography from '@mui/material/Typography';
 const CustomFormControl = styled(FormControl)({
   backgroundColor: '#1B1B1B',
   borderRadius: '10px',
-  width: '205px',
+  width: '220px',
   height: '55px',
   display: 'flex',
   flexDirection: 'row',
@@ -55,7 +55,7 @@ export default function TimeSelector({
       <Typography
         variant='subtitle1'
         color='white'
-        fontWeight='500'
+        fontWeight='600'
         gutterBottom
         style={{ marginBottom: '3px', fontSize: '.85rem', textAlign: 'left' }}
       >

@@ -122,7 +122,6 @@ export default function Automate() {
       'amount',
       'tranches',
       'percentChange',
-      'priceAvg',
       'deadline',
       'timeBwTrade',
     ];
@@ -303,26 +302,26 @@ export default function Automate() {
           }}
         >
           <Paper
-            elevation={3}
+            elevation={16}
             sx={{
               width: '100%',
               backgroundColor: '#2B2B2B',
               padding: { xs: 2, sm: 3 },
               color: 'text.primary',
               borderRadius: '16px',
-              boxShadow: '0 0 15px 5px rgba(255, 255, 255, 0.3)',
+              boxShadow: `
+  0 35px 100px -10px rgba(3, 201, 136, 0.2),
+  0 30px 80px -10px rgba(3, 201, 136, 0.15),
+  0 -25px 60px -10px rgba(3, 201, 136, 0.1),
+  0 -35px 100px -10px rgba(3, 201, 136, 0.1)
+`,
             }}
           >
-            <Grid container spacing={1.25} justifyContent='center'>
-              <Grid item xs={12}>
-                <ToggleOrderType
-                  toggleTrade={toggleTrade}
-                  setToggleTrade={setToggleTrade}
-                />
-              </Grid>
+            <Grid container spacing={2} justifyContent='center'>
               <React.Fragment>
                 <Grid item xs={12}>
                   <InputToken
+                    title='I want to allocate'
                     onValueChange={handleMessageChange}
                     onSelectChange={handleMessageChange}
                     message={message}
@@ -333,8 +332,11 @@ export default function Automate() {
                 <Grid
                   item
                   xs={12}
-                  align='center'
-                  style={{ margin: '-20px 0px', zIndex: 2 }}
+                  container
+                  direction='column'
+                  alignItems='center'
+                  justifyContent='center'
+                  style={{ marginBottom: '-15px' }}
                 >
                   <ToggleSwap
                     selection={toggleSelection}
@@ -347,82 +349,52 @@ export default function Automate() {
                     setCurrentOutput={setCurrentOutput}
                   />
                 </Grid>
-                <Grid
-                  item
-                  xs={12}
-                  style={{
-                    marginTop: '-8px',
-                    marginBottom: '20px',
-                    zIndex: 1,
-                  }}
-                >
+                <Grid item xs={12}>
                   <OutputToken
+                    title='To recieve'
                     onValueChange={handleMessageChange}
                     onSelectChange={handleMessageChange}
                     message={message}
                     currentOutput={currentOutput}
                     setCurrentOutput={setCurrentOutput}
-                    limitOrder={toggleTrade == 'pro' ? false : true}
                   />
                 </Grid>
 
-                {toggleTrade == 'pro' ? (
-                  <Grid item xs={4}>
-                    <InputPercent
-                      title='Percent Change'
-                      value={message.percentChange}
-                      onValueChange={handleMessageChange}
-                      isUpSelected={toggleSelection !== 'buy'}
-                      placeHolder={'0'}
-                    />
-                  </Grid>
-                ) : (
-                  <Grid item xs={6}>
-                    <InputPercent
-                      title='Percent Change'
-                      value={message.percentChange}
-                      onValueChange={handleMessageChange}
-                      isUpSelected={toggleSelection !== 'buy'}
-                      placeHolder={'0'}
-                      limitOrder={true}
-                    />
-                  </Grid>
-                )}
-
-                {toggleTrade == 'pro' && (
-                  <Grid item xs={4}>
-                    <InputBatches
-                      title='Batches'
-                      placeHolder={'5'}
-                      value={message.tranches}
-                      onValueChange={(e) =>
-                        handleMessageChange('tranches', e.target.value)
-                      }
-                    />
-                  </Grid>
-                )}
-                {toggleTrade == 'pro' && (
-                  <Grid item xs={4}>
-                    <TradeSelector
-                      onTradeActionChange={handleMessageChange}
-                      title='Moving Avg.'
-                      tokenAddy={message.outputTokenAddress}
-                    />
-                  </Grid>
-                )}
-
                 <Grid item xs={6}>
-                  <DatePicker setSelectedDate={handleMessageChange} />
+                  <InputBatches
+                    title='Split into'
+                    placeHolder={'5'}
+                    value={message.tranches}
+                    onValueChange={(e) =>
+                      handleMessageChange('tranches', e.target.value)
+                    }
+                  />
                 </Grid>
 
-                {toggleTrade == 'pro' && (
-                  <Grid item xs={6}>
-                    <TimeSelector
-                      onTradeActionChange={handleMessageChange}
-                      title='Time Between Batches'
-                    />
-                  </Grid>
-                )}
+                <Grid item xs={6}>
+                  <TimeSelector
+                    onTradeActionChange={handleMessageChange}
+                    title='Every'
+                  />
+                </Grid>
+
+                <Grid item xs={6}>
+                  <InputPercent
+                    title='When profit increases by'
+                    value={message.percentChange}
+                    onValueChange={handleMessageChange}
+                    isUpSelected={toggleSelection !== 'buy'}
+                    placeHolder={'0'}
+                  />
+                </Grid>
+
+                <Grid item xs={6}>
+                  <DatePicker
+                    title='Until'
+                    setSelectedDate={handleMessageChange}
+                  />
+                </Grid>
+
                 <Grid
                   item
                   xs={12}

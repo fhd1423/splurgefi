@@ -10,7 +10,7 @@ const CustomInputContainer = styled('div')({
   justifyContent: 'center',
   backgroundColor: '#1B1B1B',
   borderRadius: '10px',
-  width: '130px',
+  width: '215px',
   height: '55px',
   padding: '0',
 });
@@ -38,7 +38,7 @@ export default function InputBatches({
       <Typography
         variant='subtitle1'
         color='white'
-        fontWeight='500'
+        fontWeight='600'
         gutterBottom
         style={{ marginBottom: '3px', fontSize: '.85rem', textAlign: 'left' }}
       >

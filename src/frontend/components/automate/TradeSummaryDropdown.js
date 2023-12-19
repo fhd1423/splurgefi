@@ -112,7 +112,7 @@ export default function TradeSummaryDropdown({
                 Trade {currentInput} for {currentOutput} in {batches} batches
                 when the price of {currentOutput}{' '}
                 {tradeType === 'buy' ? 'drops' : 'rises'} by {percentChange}%
-                over the {convertedTime(60 * movingAvg)} moving average.
+                over the 5 min moving average.
               </Typography>
             </li>
 
