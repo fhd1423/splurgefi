@@ -107,7 +107,7 @@ const interateThroughTrades = async (
       console.log(
         `trade ${trade.id} is outputting ${currentOutput} currently and targeting ${buyOutputOver}`,
       );
-      if (currentOutput >= buyOutputOver) {
+      if (currentOutput >= buyOutputOver && !trade.tradeStopped) {
         const callData = await encodeInput(
           trade.order as SwapDataStruct,
           trade.signature,
