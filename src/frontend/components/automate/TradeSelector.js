@@ -127,7 +127,9 @@ export default function TradeSelector({
             marginBottom: '3px',
             fontSize: '1rem',
             textAlign: 'left',
-            padding: '5px',
+            padding: '10px',
+            paddingLeft: '15px',
+            paddingRight: '15px',
           }}
         >
           Use this

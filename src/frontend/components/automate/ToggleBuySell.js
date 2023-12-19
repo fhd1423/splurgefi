@@ -41,9 +41,9 @@ const StyledToggleButton = styled(ToggleButton)(({ theme }) => ({
   },
   // Custom styles for the "Pumpinator" button
   '&.Mui-selected.Pumpinator': {
-    color: '#27ae60', // Green text color
-    transform: 'skewX(-20deg)', // Apply skew transformation
-    boxShadow: '0 4px 6px rgba(0, 0, 0, 0.1)', // Add a subtle shadow
+    color: '#03C988', // Green text color
+    transform: 'skewX(-20deg)',
+    boxShadow: '0 4px 6px rgba(0, 0, 0, 0.1)',
   },
 }));
 

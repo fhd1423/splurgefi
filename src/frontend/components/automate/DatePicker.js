@@ -11,7 +11,7 @@ const DatePicker = ({ selectedDate, setSelectedDate, limitOrder }) => {
   const customDatePickerTheme = createTheme({
     palette: {
       primary: {
-        main: '#50D890',
+        main: '#03C988',
         contrastText: '#1B1B1B',
       },
     },

@@ -2,6 +2,7 @@ import React from 'react';
 import { useState } from 'react';
 import { styled } from '@mui/material/styles';
 import ExpandMoreIcon from '@mui/icons-material/ExpandMore';
+import AttachMoneyOutlinedIcon from '@mui/icons-material/AttachMoneyOutlined';
 import {
   Accordion,
   AccordionSummary,
@@ -44,9 +45,24 @@ export default function AvgPriceDropdown({ avgPrices }) {
           aria-controls='panel1a-content'
           id='panel1a-header'
         >
-          <Typography sx={{ color: 'white', fontWeight: 'bold' }}>
-            Avg. Prices
-          </Typography>
+          <Grid
+            container
+            spacing={1}
+            alignItems='center'
+            justifyContent='flex-start'
+          >
+            <Grid item>
+              <AttachMoneyOutlinedIcon sx={{ color: '#03C988' }} />
+            </Grid>
+
+            <Grid item>
+              <Typography
+                sx={{ color: 'white', fontWeight: 'bold', fontSize: '1rem' }}
+              >
+                Moving Avg. Prices
+              </Typography>
+            </Grid>
+          </Grid>
         </CustomAccordionSummary>
         <CustomAccordionDetails>
           <Grid container spacing={2}>

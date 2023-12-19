@@ -31,7 +31,7 @@ const EnhancedTableToolbar = ({ numSelected, onDeleteSelected }) => (
     sx={{
       pl: { sm: 2 },
       pr: { xs: 1, sm: 1 },
-      bgcolor: numSelected > 0 ? 'rgba(80, 216, 144, 0.85)' : '#2B2B2B',
+      bgcolor: numSelected > 0 ? '#03C988' : '#2B2B2B',
     }}
   >
     {numSelected > 0 ? (

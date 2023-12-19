@@ -7,19 +7,19 @@ function FeaturesSection() {
       <div className='w-full sm:w-1/2 lg:w-1/3 mb-6 lg:mb-0'>
         <Feature
           title='Automated Trades'
-          description='Don’t waste time staring at charts.'
+          description='Don’t waste time staring at charts'
         />
       </div>
       <div className='w-full sm:w-1/2 lg:w-1/3 mb-6 lg:mb-0'>
         <Feature
           title='Gasless'
-          description="Don't worry about gas after the approval."
+          description="Don't worry about gas after the approval"
         />
       </div>
       <div className='w-full sm:w-1/2 lg:w-1/3'>
         <Feature
           title='Maximize Returns'
-          description='Split your automated trade into batches.'
+          description='Split your automated trade into batches'
         />
       </div>
     </div>

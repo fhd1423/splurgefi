@@ -25,13 +25,13 @@ const CustomFormControl = styled(FormControl)({
 const CustomSelect = styled(Select)({
   '& .MuiSelect-select': {
     color: 'white',
-    lineHeight: '80px', // Center the text vertically
-    paddingLeft: '10px', // Give some space from the left side
-    paddingRight: '32px', // Make room for the icon
+    lineHeight: '80px',
+    paddingLeft: '10px',
+    paddingRight: '32px',
     fontSize: '1.2rem',
   },
   '& .MuiSelect-icon': {
-    display: 'none', // Hide the default icon
+    display: 'none',
   },
   '& .MuiOutlinedInput-notchedOutline': {
     border: 'none',
@@ -74,7 +74,7 @@ export default function TimeSelector({
           }
         >
           <MenuItem value={900}>15 mins</MenuItem>
-          <MenuItem value={3600}>1 hrs</MenuItem>
+          <MenuItem value={3600}>1 hr</MenuItem>
           <MenuItem value={14400}>4 hrs</MenuItem>
           <MenuItem value={57600}>24 hrs</MenuItem>
         </CustomSelect>

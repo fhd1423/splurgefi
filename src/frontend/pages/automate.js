@@ -296,17 +296,19 @@ export default function Automate() {
           sx={{
             width: 500,
             mx: 'auto',
-            // marginTop: '-30px',
+            display: 'flex',
+            flexDirection: 'column',
+            alignItems: 'center',
+            justifyContent: 'center',
           }}
         >
           <Paper
             elevation={3}
             sx={{
+              width: '100%',
               backgroundColor: '#2B2B2B',
-              padding: 2,
+              padding: { xs: 2, sm: 3 },
               color: 'text.primary',
-              maxWidth: '100%',
-              mx: 'auto',
               borderRadius: '16px',
               boxShadow: '0 0 15px 5px rgba(255, 255, 255, 0.3)',
             }}
@@ -433,13 +435,23 @@ export default function Automate() {
                 >
                   {!isWalletConnected ? (
                     <button
+                      style={{
+                        backgroundColor: '#03C988',
+                        transition:
+                          'transform 0.3s ease, background-color 0.3s ease, box-shadow 0.3s ease',
+                      }}
                       onClick={handleWalletConnection}
-                      className='bg-green-500 text-white text-xl font-bold rounded-lg shadow-lg hover:bg-green-600 w-96 h-14 mt-[10px]'
+                      className='text-white text-xl font-semibold rounded-lg shadow-lg hover:bg-green-600 hover:scale-[1.02] hover:shadow-md w-96 h-14 mt-[15px]'
                     >
                       Connect Wallet
                     </button>
                   ) : (
                     <button
+                      style={{
+                        backgroundColor: '#03C988',
+                        transition:
+                          'transform 0.3s ease, background-color 0.3s ease, box-shadow 0.3s ease',
+                      }}
                       onClick={() => {
                         if (!validateInputs()) {
                           return;
@@ -449,7 +461,7 @@ export default function Automate() {
                         }
                         signTypedData();
                       }}
-                      className='bg-green-500 text-white text-xl font-bold rounded-lg shadow-lg hover:bg-green-600 w-96 h-14 mt-[10px]'
+                      className='text-white text-xl font-semibold rounded-lg shadow-lg hover:bg-green-600 hover:scale-[1.02] hover:shadow-md w-96 h-14 mt-[15px]'
                     >
                       Start Automation
                     </button>
@@ -476,6 +488,7 @@ export default function Automate() {
                 timeBwTrades={message.timeBwTrade}
                 expanded={isTradeSumAccordionExpanded}
                 setExpanded={setIsTradeSumAccordionExpanded}
+                tradeType={toggleSelection}
               />
             </div>
 

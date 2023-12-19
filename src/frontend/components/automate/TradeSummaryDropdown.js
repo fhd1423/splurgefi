@@ -9,12 +9,18 @@ import {
   Typography,
   Box,
 } from '@mui/material';
+import SummarizeOutlinedIcon from '@mui/icons-material/SummarizeOutlined';
+import Grid from '@mui/material/Grid';
 
 // Custom styled components
 const CustomAccordion = styled(Accordion)(({ theme, expanded }) => ({
   width: 290,
   backgroundColor: '#2B2B2B',
-  paddingBottom: '5px',
+  boxShadow: 'none',
+  border: 'none',
+  '&:before': {
+    display: 'none',
+  },
   square: false,
 }));
 
@@ -54,6 +60,7 @@ export default function TradeSummaryDropdown({
   timeBwTrades,
   expanded,
   setExpanded,
+  tradeType,
 }) {
   // const [expanded, setExpanded] = useState(true);
 
@@ -73,9 +80,24 @@ export default function TradeSummaryDropdown({
           aria-controls='panel1a-content'
           id='panel1a-header'
         >
-          <Typography sx={{ color: 'white', fontWeight: 'bold' }}>
-            Trade Summary
-          </Typography>
+          <Grid
+            container
+            spacing={1}
+            alignItems='center'
+            justifyContent='flex-start'
+          >
+            <Grid item>
+              <SummarizeOutlinedIcon sx={{ color: '#03C988' }} />
+            </Grid>
+
+            <Grid item>
+              <Typography
+                sx={{ color: 'white', fontWeight: 'bold', fontSize: '1rem' }}
+              >
+                Trade Summary
+              </Typography>
+            </Grid>
+          </Grid>
         </CustomAccordionSummary>
         <CustomAccordionDetails>
           <ul style={{ listStyleType: 'disc', paddingLeft: '20px' }}>
@@ -89,8 +111,8 @@ export default function TradeSummaryDropdown({
               >
                 Trade {currentInput} for {currentOutput} in {batches} batches
                 when the price of {currentOutput}{' '}
-                {currentInput === 'WETH' ? 'drops' : 'rises'} by {percentChange}
-                % over the {convertedTime(60 * movingAvg)} moving average.
+                {tradeType === 'buy' ? 'drops' : 'rises'} by {percentChange}%
+                over the {convertedTime(60 * movingAvg)} moving average.
               </Typography>
             </li>
 

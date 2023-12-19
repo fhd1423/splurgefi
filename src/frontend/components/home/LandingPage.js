@@ -44,32 +44,24 @@ const LandingPage = () => {
           />
         </Head>
 
-        {/* Navigation Bar */}
-        {/* <header className="w-full py-6 px-6 flex justify-between items-center">
-          <h2 className="text-xl text-white font-bold">SplurgeFi</h2>
-
-          <button onClick={handleAuthFlow} className="bg-green-500 text-white text-sm font-semibold py-2 px-4 rounded-md shadow-lg hover:bg-green-600">
-            Log In
-          </button>
-          {/* <button onClick={() => router.push('/trades')} className="bg-green-500 text-white text-sm font-semibold py-2 px-4 rounded-md shadow-lg hover:bg-green-600">
-            Log In
-          </button> */}
-
-        {/* </header> */}
-
         <div className='text-center w-full max-w-2xl m-auto'>
           <h1 className='text-4xl sm:text-5xl md:text-6xl mb-4 text-white font-bold tracking-wide leading-tight'>
             <GradientText>Automate your trades on DEXs seamlessly</GradientText>
           </h1>
 
           <p className='text-2xl mb-10 text-gray-400 tracking-wide'>
-            Best trading experience ever.
+            Best trading experience ever
           </p>
 
-          {/* <TradeSummaryDropdown /> */}
-
           <Link href='/automate' passHref>
-            <button className='bg-green-500 text-white text-xl font-semibold rounded-lg shadow-lg hover:bg-green-600 w-64 h-14'>
+            <button
+              style={{
+                backgroundColor: '#03C988',
+                transition:
+                  'transform 0.3s ease, background-color 0.3s ease, box-shadow 0.3s ease',
+              }}
+              className='text-white text-xl font-semibold rounded-lg shadow-lg hover:bg-green-700 hover:scale-105 hover:shadow-xl w-64 h-14'
+            >
               Get Started
             </button>
           </Link>

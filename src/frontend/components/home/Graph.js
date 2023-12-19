@@ -7,7 +7,7 @@ const Graph = () => {
 
   return (
     <div
-      className='mt-10 mb-44 px-4 sm:px-6 md:px-8'
+      className='mt-10 mb-10 sm:mb-44 px-4 sm:px-6 md:px-8'
       style={{
         borderRadius: '16px',
         padding: '20px',
@@ -21,28 +21,29 @@ const Graph = () => {
             component='h2'
             sx={{
               fontWeight: 'bold',
-              color: '#50D890',
+              color: '#03C988',
               mb: 2,
               ml: isMobile ? 1 : 3,
+              fontSize: isMobile ? '2.5rem' : '3rem',
             }}
           >
             The Pumpinator
           </Typography>
           <Typography
             variant={isMobile ? 'h5' : 'h3'}
-            component='h3' // 'h8' is not a valid component. You should use 'h2' - 'h6' or 'p'.
+            component='h3'
             sx={{
               mt: 1,
               mb: 2,
-              ml: isMobile ? 1 : 4,
-              fontSize: isMobile ? '1rem' : '2rem', // Adjust the font size as needed
-              color: '#9F9F9F', // Setting the color to the specified grey
+              ml: isMobile ? 1 : 3,
+              fontSize: isMobile ? '1.5rem' : '2rem',
+              color: '#9F9F9F',
             }}
           >
             Never miss a pump
           </Typography>
 
-          <div className='pt-5 pl-2'>
+          <div style={{ marginLeft: isMobile ? '-16px' : '7px' }}>
             <TradeSummaryView />
           </div>
         </Grid>
