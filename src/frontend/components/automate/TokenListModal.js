@@ -9,7 +9,8 @@ import FileCopyIcon from '@mui/icons-material/FileCopy'; // Import the FileCopy 
 import Box from '@mui/material/Box';
 import CloseIcon from '@mui/icons-material/Close';
 import Button from '@mui/material/Button';
-import { Tooltip } from '@mui/material';
+import { Tooltip, Typography } from '@mui/material';
+import { Diversity1TwoTone } from '@mui/icons-material';
 
 // Styling
 const StyledModal = styled(Modal)(({ theme }) => ({
@@ -49,6 +50,31 @@ const SearchBar = styled(InputBase)(({ theme }) => ({
   },
   color: 'white',
 }));
+
+const CustomButton = styled(Button)({
+  backgroundColor: '#03C988',
+  color: 'white',
+  fontSize: '0.875rem',
+  fontWeight: 'normal',
+  textTransform: 'none',
+  borderRadius: 4,
+  width: '12rem',
+  height: '1.75rem',
+  marginTop: '15px',
+  '&:hover': {
+    backgroundColor: '#03C988',
+    boxShadow: 'none',
+    transform: 'scale(1.01)',
+  },
+  '&:focus': {
+    backgroundColor: '#03C988',
+    boxShadow: 'none',
+  },
+  '&:active': {
+    backgroundColor: '#03C988',
+  },
+  transition: 'transform 0.2s ease',
+});
 
 const TokenList = styled(List)(({ theme }) => ({
   maxHeight: 'calc(80vh - 40px)',
@@ -104,6 +130,12 @@ const CloseButton = styled(Button)(({ theme }) => ({
   },
 }));
 
+const ParentContainer = styled('div')({
+  display: 'flex',
+  justifyContent: 'center',
+  alignItems: 'center',
+});
+
 // Function to copy the text to clipboard
 const copyToClipboard = (text) => {
   navigator.clipboard.writeText(text).then(
@@ -135,6 +167,7 @@ const TokenModal = ({
   const [tokens, setTokens] = useState([]);
   const [filteredTokens, setFilteredTokens] = useState(tokens);
   const [searchTerm, setSearchTerm] = useState('');
+  const [newTokenError, setNewTokenError] = useState('');
 
   // HANDLERS
   const handleTokenClick = (selectedToken) => {
@@ -148,6 +181,32 @@ const TokenModal = ({
     }
     onClose(); // Close the modal after setting the selected token
   };
+
+  function handleTradeUnlistedToken() {
+    // Check if valid format
+    const re = /^0x[a-fA-F0-9]{40}$/;
+    const testResult = re.test(searchTerm);
+
+    if (!testResult) {
+      setNewTokenError('Please enter a valid contract address.');
+    } else {
+      // Set this as the token to trade
+      const customToken = {
+        name: 'Unknown Token',
+        address: searchTerm,
+        logoURI: '',
+        symbol: 'UNKNOWN',
+      };
+      setSelectedToken(customToken);
+      onSelectChange(
+        isInput ? 'inputTokenAddress' : 'outputTokenAddress',
+        searchTerm,
+      );
+      tokenSetter(customToken);
+
+      onClose();
+    }
+  }
 
   useEffect(() => {
     const isTokenMatch = (token) => {
@@ -192,44 +251,57 @@ const TokenModal = ({
           value={searchTerm}
           onChange={(e) => setSearchTerm(e.target.value)}
         />
-        <TokenList>
-          {filteredTokens.map((token) => (
-            <TokenListItem
-              key={token.address}
-              onClick={() =>
-                handleTokenClick({
-                  name: token.name,
-                  address: token.address,
-                  logoURI: token.logoURI,
-                  symbol: token.symbol,
-                })
-              }
-            >
-              <TokenListItemText
-                primary={
-                  <div style={{ display: 'flex', alignItems: 'center' }}>
-                    {token.logoURI && (
-                      <img
-                        className='logo'
-                        src={token.logoURI}
-                        alt={`${token.name} Logo`}
-                      />
-                    )}
-                    <span style={{ marginLeft: '8px' }}>{token.name}</span>
-                  </div>
+
+        {filteredTokens.length === 0 ? (
+          <div>
+            <ParentContainer>
+              <CustomButton onClick={handleTradeUnlistedToken}>
+                Add New Token
+              </CustomButton>
+            </ParentContainer>
+
+            {newTokenError && <p>{newTokenError}</p>}
+          </div>
+        ) : (
+          <TokenList>
+            {filteredTokens.map((token) => (
+              <TokenListItem
+                key={token.address}
+                onClick={() =>
+                  handleTokenClick({
+                    name: token.name,
+                    address: token.address,
+                    logoURI: token.logoURI,
+                    symbol: token.symbol,
+                  })
                 }
-              />
-              <Tooltip title='Copy Address' arrow>
-                <CopyIcon
-                  onClick={(e) => {
-                    e.stopPropagation(); // Prevent the TokenListItem onClick from firing
-                    copyToClipboard(token.address);
-                  }}
+              >
+                <TokenListItemText
+                  primary={
+                    <div style={{ display: 'flex', alignItems: 'center' }}>
+                      {token.logoURI && (
+                        <img
+                          className='logo'
+                          src={token.logoURI}
+                          alt={`${token.name} Logo`}
+                        />
+                      )}
+                      <span style={{ marginLeft: '8px' }}>{token.name}</span>
+                    </div>
+                  }
                 />
-              </Tooltip>
-            </TokenListItem>
-          ))}
-        </TokenList>
+                <Tooltip title='Copy Address' arrow>
+                  <CopyIcon
+                    onClick={(e) => {
+                      e.stopPropagation(); // Prevent the TokenListItem onClick from firing
+                      copyToClipboard(token.address);
+                    }}
+                  />
+                </Tooltip>
+              </TokenListItem>
+            ))}
+          </TokenList>
+        )}
       </StyledBox>
     </StyledModal>
   );

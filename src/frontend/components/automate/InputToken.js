@@ -120,10 +120,21 @@ export default function InputToken({
         />
         <CustomFormControl variant='standard'>
           <CustomBlackCapsule onClick={handleOpenTokenModal}>
-            <Logo src={selectedToken.logoURI} alt={selectedToken.name} />
-            {selectedToken.name.length <= 10
-              ? selectedToken.name
-              : selectedToken.symbol}
+            {selectedToken.name === 'Unknown Token' ? (
+              <>
+                <span>{selectedToken.symbol}</span>
+              </>
+            ) : (
+              <>
+                <Logo src={selectedToken.logoURI} alt={selectedToken.name} />
+                <span>
+                  {selectedToken.name.length <= 10
+                    ? selectedToken.name
+                    : selectedToken.symbol}
+                </span>
+              </>
+            )}
+
             <KeyboardArrowDownOutlinedIcon />
           </CustomBlackCapsule>
         </CustomFormControl>

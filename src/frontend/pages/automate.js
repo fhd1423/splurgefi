@@ -140,8 +140,11 @@ export default function Automate() {
   useEffect(() => {
     const allFilled = tradeEntered();
 
-    validateInputs();
     setInputsFilled(allFilled);
+
+    if (validateInputs) {
+      setUserInputError('');
+    }
 
     console.log('All inputs filled:', allFilled);
   }, [message]);
@@ -309,6 +312,7 @@ export default function Automate() {
             {userInputError && <Alert severity='error'>{userInputError}</Alert>}
           </div>
 
+          {/* <p>{message.inputTokenAddress}</p> */}
           <Paper
             elevation={16}
             sx={{
