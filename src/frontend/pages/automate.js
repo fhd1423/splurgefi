@@ -51,6 +51,8 @@ export default function Automate() {
   const [isTradeSumAccordionExpanded, setIsTradeSumAccordionExpanded] =
     useState(true);
   const [tokenBalance, setTokenBalance] = useState(null);
+  const [averagePrice, setAveragePrice] = useState(null);
+  const [profit, setProfit] = useState(null);
 
   const [message, setMessage] = useState({
     inputTokenAddress: WETH_ADDRESS, // DEFAULT INPUT - WETH
@@ -80,6 +82,63 @@ export default function Automate() {
       'https://assets.coingecko.com/coins/images/29340/thumb/WINR.png?1696528290',
     symbol: 'WINR',
   });
+
+  // PRICE DATA METHODS
+  const getHistoricalPriceData = async (tokenAddress) => {
+    const axios = require('axios');
+    const apiUrl = 'https://coins.llama.fi/prices/historical/';
+
+    const currentTimestampInSeconds = Math.floor(new Date().getTime() / 1000);
+    const timestamp = currentTimestampInSeconds - 50 * 60; // UNIX timestamp of 50 mins ago
+    // const coins = 'arbitrum:0x82af49447d8a07e3bd95bd0d56f35241523fbab1'; // WETH on Arbitrum chain
+    const coins = 'arbitrum:' + tokenAddress;
+    const increment = 5 * 60;
+    try {
+      const numberOfDataPoints = Math.ceil(
+        (currentTimestampInSeconds - timestamp) / increment,
+      );
+
+      const fetchPriceData = (time) => {
+        const url = `${apiUrl}${time}/${coins}`;
+        return axios
+          .get(url)
+          .then((response) => response.data.coins[coins].price);
+      };
+
+      const priceDataPromises = Array.from(
+        { length: numberOfDataPoints },
+        (_, index) => {
+          const time = timestamp + index * increment;
+          return fetchPriceData(time);
+        },
+      );
+
+      const priceData = await Promise.all(priceDataPromises);
+      return priceData;
+    } catch (error) {
+      console.error('Error fetching historical price data:', error);
+      throw error;
+    }
+  };
+
+  const getCurrentPriceData = async (tokenAddress) => {
+    const axios = require('axios');
+    const apiUrl = 'https://coins.llama.fi/prices/current/';
+    const coins = 'arbitrum:' + tokenAddress;
+
+    // Fomrat: /prices/current/{coins}
+    const fetchPriceData = (time) => {
+      const url = `${apiUrl}/${coins}`;
+      return axios
+        .get(url)
+        .then((response) => response.data.coins[coins].price);
+    };
+  };
+
+  const getFiveMinAvg = async (priceData) => {
+    const total = priceData.reduce((acc, price) => acc + price, 0);
+    return total / priceData.length;
+  };
 
   // HANDLERS
   const handleMessageChange = (field, value) => {
@@ -176,7 +235,71 @@ export default function Automate() {
     }
 
     console.log('All inputs filled:', allFilled);
+
+    if (correctTokens) {
+      if (currentInput.name === 'WETH') {
+        getHistoricalPriceData(currentOutput.address)
+          .then((priceData) => getFiveMinAvg(priceData))
+          .then((avg) => setAveragePrice(avg))
+          .catch((error) =>
+            console.error('Error calculating average price:', error),
+          );
+        getCurrentPriceData(currentOutput.address)
+          .then((currentPriceData) =>
+            calcBuyProfit(
+              averagePrice,
+              currentPriceData,
+              message.percentChange,
+              message.amount,
+            ),
+          )
+          .then((resultingProfit) => setProfit(resultingProfit));
+      } else {
+        getHistoricalPriceData(currentInput.address)
+          .then((priceData) => getFiveMinAvg(priceData))
+          .then((avg) => setAveragePrice(avg))
+          .catch((error) =>
+            console.error('Error calculating average price:', error),
+          );
+
+        getCurrentPriceData(currentInput.address)
+          .then((currentPriceData) =>
+            calcSellProfit(
+              averagePrice,
+              currentPriceData,
+              message.percentChange,
+              message.amount,
+            ),
+          )
+          .then((resultingProfit) => setProfit(resultingProfit));
+      }
+    }
   }, [message]);
+
+  // Need previous avg. price of token to buy and current price of that token (sellPrice)
+  function calcBuyProfit(avgPrice, sellPrice, percentChange, amountWETH) {
+    // Calc buy price
+    const buyPrice = avgPrice * (1 - percentChange / 100);
+
+    // Calc profit
+    const amountOfBuyToken = amountWETH / buyPrice;
+
+    // Profit in terms of buy token
+    const profit = amountOfBuyToken * (sellPrice - buyPrice);
+
+    return profit;
+  }
+
+  function calcSellProfit(avgPrice, buyPrice, percentChange, amountOfToken) {
+    // Calculate sell price as a percentage above the average price
+    const sellPrice = avgPrice * (1 + percentChange / 100);
+
+    // Calculate profit
+    // Profit is calculated based on the difference between the sell price and the buy price
+    const profit = amountOfToken * (sellPrice - buyPrice);
+
+    return profit;
+  }
 
   //AUTH - DYNAMIC
   const { setShowAuthFlow, authToken, primaryWallet } = useDynamicContext();
@@ -407,7 +530,6 @@ export default function Automate() {
                     setCurrentOutput={setCurrentOutput}
                   />
                 </Grid>
-
                 <Grid item xs={6}>
                   <InputBatches
                     title='Split into'
@@ -530,5 +652,12 @@ export default function Automate() {
         )}
       </div>
     </LocalizationProvider>
+
+    // {averagePrice && (
+    //   <Typography variant='body1' sx={{ color: 'white' }}>
+    //     Average Price for {currentInput.name}:{' '}
+    //     {averagePrice.toFixed(2)}
+    //   </Typography>
+    // )}
   );
 }
