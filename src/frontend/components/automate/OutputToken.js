@@ -24,7 +24,7 @@ const CustomInputContainer = styled('div')({
   margin: 0,
   paddingTop: 0,
   width: '455px',
-  height: '80px',
+  height: '90px',
   justifyContent: 'space-between',
 });
 

@@ -3,25 +3,21 @@ import { styled } from '@mui/system';
 import InputBase from '@mui/material/InputBase';
 import Typography from '@mui/material/Typography';
 
-// Custom styles for the input container
 const CustomInputContainer = styled('div')({
   display: 'flex',
   alignItems: 'center',
-  justifyContent: 'center',
   backgroundColor: '#1B1B1B',
   borderRadius: '10px',
   width: '215px',
   height: '55px',
-  padding: '0',
+  padding: '0 15px',
 });
 
-// Custom styles for the input component
 const CustomInput = styled(InputBase)({
   color: 'white',
   fontSize: '1.25rem',
   '& .MuiInputBase-input': {
     textAlign: 'left',
-    padding: '0 0 0 15px',
     width: '100%',
     height: '100%',
   },
@@ -38,9 +34,9 @@ export default function InputBatches({
       <Typography
         variant='subtitle1'
         color='white'
-        fontWeight='600'
+        fontWeight={600}
         gutterBottom
-        style={{ marginBottom: '3px', fontSize: '.85rem', textAlign: 'left' }}
+        style={{ marginBottom: '8px', fontSize: '0.85rem' }} // Adjusted margin and font size
       >
         {title}
       </Typography>
@@ -50,6 +46,15 @@ export default function InputBatches({
           value={value}
           onChange={onValueChange}
         />
+        <Typography
+          sx={{
+            color: 'white',
+            fontWeight: 500,
+            marginLeft: 'auto', // Pushes 'batches' to the right
+          }}
+        >
+          batches
+        </Typography>
       </CustomInputContainer>
     </div>
   );

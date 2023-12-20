@@ -118,7 +118,6 @@ export default function Trades() {
         selected.slice(0, selectedIndex),
         selected.slice(selectedIndex + 1),
       );
-      // Optionally handle deselection case here
     }
     setSelected(newSelected);
   };
@@ -171,6 +170,7 @@ export default function Trades() {
             trade.order.deadline,
             trade.remainingBatches,
             trade.tradeStopped,
+            trade.failedSimulation,
           ],
         }));
 
@@ -201,6 +201,7 @@ export default function Trades() {
         deadline,
         remainingBatches,
         tradeStopped,
+        failedSimulation,
       ],
     ]) => ({
       id,
@@ -215,6 +216,7 @@ export default function Trades() {
         ? 'Complete'
         : `Pending (${batches - remainingBatches}/${batches})`,
       tradeStopped,
+      failedSimulation,
     }),
   );
 
@@ -395,7 +397,11 @@ export default function Trades() {
                         <TableCell>{row.percentChange}</TableCell>
                         <TableCell>{row.date}</TableCell>
                         <TableCell>
-                          {row.tradeStopped ? 'Cancelled' : row.status}
+                          {row.tradeStopped
+                            ? 'Cancelled'
+                            : row.failedSimulation
+                            ? 'Failed Simulation'
+                            : row.status}
                         </TableCell>
                       </TableRow>
                     ))}

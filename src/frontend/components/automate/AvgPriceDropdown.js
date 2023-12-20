@@ -11,6 +11,7 @@ import {
   Box,
   Grid,
 } from '@mui/material';
+import Button from '@mui/material/Button';
 
 // Custom styled components
 const CustomAccordion = styled(Accordion)(({ theme }) => ({
@@ -32,7 +33,7 @@ const CustomAccordionDetails = styled(AccordionDetails)(({ theme }) => ({
   borderBottomRightRadius: 5,
 }));
 
-export default function AvgPriceDropdown({ prices }) {
+export default function AvgPriceDropdown({ prices, tokenAddy }) {
   const [expanded, setExpanded] = useState(true);
   const handleToggleAccordion = () => {
     setExpanded(!expanded);
@@ -115,6 +116,39 @@ export default function AvgPriceDropdown({ prices }) {
                     ? '$' + prices[1].toFixed(2)
                     : 'N/A'}
                 </Typography>
+              </div>
+            </Grid>
+
+            {/* <a
+              href={`https://dexscreener.com/arbitrum/${tokenAddy}`}
+              target='_blank'
+              rel='noopener noreferrer'
+              style={{
+                color: '#50d890',
+                textDecoration: 'none',
+                fontWeight: 'bold',
+                marginLeft: '4px',
+                marginRight: '4px',
+              }}
+            >
+              link
+            </a> */}
+            <Grid item xs={12}>
+              <div>
+                <a
+                  href={`https://dexscreener.com/arbitrum/${tokenAddy}`}
+                  target='_blank'
+                  rel='noopener noreferrer'
+                  style={{
+                    color: '#50d890',
+                    textDecoration: 'none',
+                    fontWeight: 'bold',
+                    marginLeft: '3px',
+                    marginRight: '4px',
+                  }}
+                >
+                  View Chart
+                </a>
               </div>
             </Grid>
 

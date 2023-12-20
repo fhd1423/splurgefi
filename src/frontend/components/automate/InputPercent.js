@@ -59,7 +59,7 @@ export default function InputPercent({
         gutterBottom
         style={{ marginBottom: '3px', fontSize: '0.85rem', textAlign: 'left' }}
       >
-        When {isUpSelected ? 'input' : 'output'}'s price{' '}
+        When {isUpSelected ? 'input' : 'output'}{' '}
         {isUpSelected ? 'rises' : 'drops'} by
       </Typography>
       <CustomInputContainer limitOrder={limitOrder}>

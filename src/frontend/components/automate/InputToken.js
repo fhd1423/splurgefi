@@ -1,21 +1,30 @@
 import { styled } from '@mui/system';
 import React, { useState, useEffect } from 'react';
-import OutlinedInput from '@mui/material/OutlinedInput';
+import { Typography, InputBase, FormControl } from '@mui/material';
+import KeyboardArrowDownOutlinedIcon from '@mui/icons-material/KeyboardArrowDownOutlined';
 import TokenModal from './TokenListModal';
 import { parseEther } from 'viem';
-import KeyboardArrowDownOutlinedIcon from '@mui/icons-material/KeyboardArrowDownOutlined';
 
-import { Typography, InputBase, FormControl } from '@mui/material';
-
-const CustomInputContainer = styled('div')({
+const CustomInputContainer = styled('div')(({ address }) => ({
   display: 'flex',
-  alignItems: 'center',
+  flexDirection: 'column', // Stack children vertically
+  justifyContent: 'space-between', // Distribute space between items
+  alignItems: 'flex-start', // Align items to the start of the container
   backgroundColor: '#1B1B1B',
   borderRadius: '10px',
-  padding: '0 10px',
+  padding: '10px',
   width: '455px',
-  height: '80px',
-  justifyContent: 'space-between',
+  height: '90px',
+  position: 'relative', // Set to relative
+}));
+
+const InputRow = styled('div')({
+  display: 'flex',
+  flexDirection: 'row', // Align children in a row
+  justifyContent: 'space-between', // Space between the input and the capsule
+  width: '100%', // Take full width of the container
+  alignItems: 'center', // Align items vertically in the center
+  paddingRight: '7px',
 });
 
 const CustomInput = styled(InputBase)(({ theme }) => ({
@@ -27,7 +36,7 @@ const CustomInput = styled(InputBase)(({ theme }) => ({
   },
 }));
 
-const CustomBlackCapsule = styled('div')({
+const CustomBlackCapsule = styled('div')(({ address }) => ({
   display: 'flex',
   alignItems: 'center',
   backgroundColor: 'black',
@@ -42,7 +51,16 @@ const CustomBlackCapsule = styled('div')({
   '&:hover': {
     backgroundColor: '#2B2B2B',
   },
-});
+}));
+
+const BalanceText = styled(Typography)(({ address }) => ({
+  color: '#9F9F9F',
+  fontSize: '0.75rem',
+  fontWeight: '550',
+  position: 'absolute', // Position the balance text absolutely to the bottom right
+  bottom: '5px',
+  right: '60px',
+}));
 
 const Logo = styled('img')({
   width: '20px',
@@ -55,7 +73,6 @@ const DropdownArrow = styled('span')({
 });
 
 const CustomFormControl = styled(FormControl)({
-  flexShrink: 0,
   marginRight: '10px',
 });
 
@@ -67,15 +84,15 @@ export default function InputToken({
   message,
   currentInput,
   setCurrentInput,
+  tokenBalance,
+  address,
 }) {
   const [amount, setAmount] = useState('');
   const [selectedToken, setSelectedToken] = useState(currentInput);
   const [isTokenModalOpen, setIsTokenModalOpen] = useState(false);
 
   const handleAmountChange = (event) => {
-    //Ensure input is numerical
     const newValue = event.target.value.replace(/[^0-9.]/g, '');
-
     const dotCount = (newValue.match(/\./g) || []).length;
     if (dotCount > 1) return;
 
@@ -112,13 +129,13 @@ export default function InputToken({
       >
         {title}
       </Typography>
-      <CustomInputContainer>
-        <CustomInput
-          placeholder='0.0'
-          value={amount}
-          onChange={handleAmountChange}
-        />
-        <CustomFormControl variant='standard'>
+      <CustomInputContainer address={address}>
+        <InputRow>
+          <CustomInput
+            placeholder='0.0'
+            value={amount}
+            onChange={handleAmountChange}
+          />
           <CustomBlackCapsule onClick={handleOpenTokenModal}>
             {selectedToken.name === 'Unknown Token' ? (
               <>
@@ -132,17 +149,19 @@ export default function InputToken({
                     ? selectedToken.name
                     : selectedToken.symbol}
                 </span>
+                <KeyboardArrowDownOutlinedIcon />
               </>
             )}
-
-            <KeyboardArrowDownOutlinedIcon />
           </CustomBlackCapsule>
-        </CustomFormControl>
+        </InputRow>
+        {address && (
+          <BalanceText address={address}>Balance: {tokenBalance}</BalanceText>
+        )}
       </CustomInputContainer>
 
       <TokenModal
         open={isTokenModalOpen}
-        onClose={() => setIsTokenModalOpen(false)}
+        onClose={handleCloseTokenModal}
         setSelectedToken={setSelectedToken}
         onSelectChange={onSelectChange}
         isInput={true}

@@ -23,6 +23,8 @@ import TimeSelector from '@/components/automate/TimeSelector';
 import NavBar from '../components/NavBar';
 import TradeSummaryDropdown from '@/components/automate/TradeSummaryDropdown';
 import AvgPriceDropdown from '@/components/automate/AvgPriceDropdown';
+import Popover from '@mui/material/Popover';
+
 import {
   useSignTypedData,
   usePrepareContractWrite,
@@ -42,11 +44,13 @@ export default function Automate() {
 
   //STATE
   const [toggleSelection, setToggleSelection] = useState('buy');
-  const [toggleTrade, setToggleTrade] = useState('pro');
+  // const [toggleTrade, setToggleTrade] = useState('pro');
   const [userInputError, setUserInputError] = useState('');
   const [allInputsFilled, setInputsFilled] = useState(false);
+  const [correctTokensFilled, setCorrectTokensFilled] = useState(false);
   const [isTradeSumAccordionExpanded, setIsTradeSumAccordionExpanded] =
     useState(true);
+  const [tokenBalance, setTokenBalance] = useState(null);
 
   const [message, setMessage] = useState({
     inputTokenAddress: WETH_ADDRESS, // DEFAULT INPUT - WETH
@@ -77,7 +81,7 @@ export default function Automate() {
     symbol: 'WINR',
   });
 
-  //HANDLERS
+  // HANDLERS
   const handleMessageChange = (field, value) => {
     setMessage((prevMessage) => ({
       ...prevMessage,
@@ -137,12 +141,37 @@ export default function Automate() {
     return true;
   };
 
+  const validateInputAndOutput = () => {
+    const fields = ['inputTokenAddress', 'outputTokenAddress'];
+
+    const isWETHIncluded = fields.some(
+      (field) => message[field] === WETH_ADDRESS,
+    );
+    if (!isWETHIncluded) {
+      return false;
+    }
+
+    return true;
+  };
+
   useEffect(() => {
     const allFilled = tradeEntered();
-
     setInputsFilled(allFilled);
 
-    if (validateInputs) {
+    const correctTokens = validateInputAndOutput();
+    setCorrectTokensFilled(correctTokens);
+
+    if (validateInputs()) {
+      setUserInputError('');
+    }
+
+    if (!correctTokens) {
+      setUserInputError('Please make sure either input or output is WETH.');
+    } else {
+      console.log('INSIDE ELSE');
+      console.log('INPUT ADDY:', message.inputTokenAddress);
+      console.log('Output ADDY:', message.outputTokenAddress);
+
       setUserInputError('');
     }
 
@@ -168,13 +197,15 @@ export default function Automate() {
   }, [primaryWallet?.address, authToken]);
 
   //ON-CHAIN INTERACTIONS
-  const { data: allowance } = useContractRead({
+  const { data: balance } = useContractRead({
     address: message.inputTokenAddress,
     abi: ERC20abi,
-    functionName: 'allowance',
-    args: [primaryWallet?.address, SPLURGE_ADDRESS],
+    functionName: 'balanceOf',
+    args: [primaryWallet?.address],
     chainId: 42161,
     onSuccess(data) {
+      console.log('Balance:', data.toString());
+      setTokenBalance(data.toString());
       return data;
     },
   });
@@ -316,7 +347,6 @@ export default function Automate() {
             {userInputError && <Alert severity='error'>{userInputError}</Alert>}
           </div>
 
-          {/* <p>{message.inputTokenAddress}</p> */}
           <Paper
             elevation={16}
             sx={{
@@ -343,6 +373,8 @@ export default function Automate() {
                     message={message}
                     currentInput={currentInput}
                     setCurrentInput={setCurrentInput}
+                    tokenBalance={tokenBalance}
+                    address={primaryWallet?.address}
                   />
                 </Grid>
                 <Grid
@@ -482,10 +514,16 @@ export default function Automate() {
             <div>
               {currentInput.name === 'WETH' ? (
                 // Get price on token you're going to buy
-                <AvgPriceDropdown prices={pricesMap[currentOutput.name]} />
+                <AvgPriceDropdown
+                  prices={pricesMap[currentOutput.name]}
+                  tokenAddy={currentOutput.address}
+                />
               ) : (
                 // Get price on token you're going to sell
-                <AvgPriceDropdown prices={pricesMap[currentInput.name]} />
+                <AvgPriceDropdown
+                  prices={pricesMap[currentInput.name]}
+                  tokenAddy={currentInput.address}
+                />
               )}
             </div>
           </div>
