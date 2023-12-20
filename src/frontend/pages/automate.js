@@ -247,7 +247,7 @@ export default function Automate() {
     });
 
   //SUPABASE - PAIRS
-  const [averageMap, setAverageMap] = useState();
+  const [pricesMap, setPricesMap] = useState();
   function fetchPairsData() {
     return supabase.from('Pairs').select('*');
   }
@@ -264,19 +264,22 @@ export default function Automate() {
           );
         }
 
-        const averageMap = {};
+        const pricesMap = {};
 
         pairs.forEach((pair) => {
           const { tokenName } = pair;
-          const avg15min = calculateAverage(pair['15min_avg'].close_prices);
-          const avg60min = calculateAverage(pair['60min_avg'].close_prices);
-          const avg240min = calculateAverage(pair['240min_avg'].close_prices);
-          const avg1440min = calculateAverage(pair['1440min_avg'].close_prices);
+          const avg5min = calculateAverage(pair['5min_avg'].close_prices);
 
-          averageMap[tokenName] = [avg15min, avg60min, avg240min, avg1440min];
+          // const avg15min = calculateAverage(pair['15min_avg'].close_prices);
+          // const avg60min = calculateAverage(pair['60min_avg'].close_prices);
+          // const avg240min = calculateAverage(pair['240min_avg'].close_prices);
+          // const avg1440min = calculateAverage(pair['1440min_avg'].close_prices);
+
+          // averageMap[tokenName] = [avg15min, avg60min, avg240min, avg1440min];
+          pricesMap[tokenName] = [pair['current_price'], avg5min];
         });
 
-        setAverageMap(averageMap);
+        setPricesMap(pricesMap);
 
         if (error) {
           console.error('Error fetching pairs data:', error);
@@ -285,7 +288,7 @@ export default function Automate() {
       });
     },
 
-    averageMap,
+    pricesMap,
   );
 
   return (
@@ -302,6 +305,7 @@ export default function Automate() {
           sx={{
             width: 500,
             mx: 'auto',
+            mt: '-60px',
             display: 'flex',
             flexDirection: 'column',
             alignItems: 'center',
@@ -478,10 +482,10 @@ export default function Automate() {
             <div>
               {currentInput.name === 'WETH' ? (
                 // Get price on token you're going to buy
-                <AvgPriceDropdown avgPrices={averageMap[currentOutput.name]} />
+                <AvgPriceDropdown prices={pricesMap[currentOutput.name]} />
               ) : (
                 // Get price on token you're going to sell
-                <AvgPriceDropdown avgPrices={averageMap[currentInput.name]} />
+                <AvgPriceDropdown prices={pricesMap[currentInput.name]} />
               )}
             </div>
           </div>

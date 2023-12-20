@@ -32,7 +32,7 @@ const CustomAccordionDetails = styled(AccordionDetails)(({ theme }) => ({
   borderBottomRightRadius: 5,
 }));
 
-export default function AvgPriceDropdown({ avgPrices }) {
+export default function AvgPriceDropdown({ prices }) {
   const [expanded, setExpanded] = useState(true);
   const handleToggleAccordion = () => {
     setExpanded(!expanded);
@@ -76,8 +76,9 @@ export default function AvgPriceDropdown({ avgPrices }) {
                     mb: 0,
                   }}
                 >
-                  15 min avg.
+                  Current Price
                 </Typography>
+
                 <Typography
                   sx={{
                     color: 'white',
@@ -85,8 +86,8 @@ export default function AvgPriceDropdown({ avgPrices }) {
                     fontWeight: 'bold',
                   }}
                 >
-                  {Array.isArray(avgPrices) && avgPrices.length > 0
-                    ? avgPrices[0].toFixed(2)
+                  {Array.isArray(prices) && prices.length > 1
+                    ? prices[0].toFixed(2)
                     : 'N/A'}
                 </Typography>
               </div>
@@ -101,9 +102,8 @@ export default function AvgPriceDropdown({ avgPrices }) {
                     mb: 0,
                   }}
                 >
-                  1 hour avg.
+                  5 min avg.
                 </Typography>
-
                 <Typography
                   sx={{
                     color: 'white',
@@ -111,13 +111,14 @@ export default function AvgPriceDropdown({ avgPrices }) {
                     fontWeight: 'bold',
                   }}
                 >
-                  {Array.isArray(avgPrices) && avgPrices.length > 1
-                    ? avgPrices[1].toFixed(2)
+                  {Array.isArray(prices) && prices.length > 0
+                    ? prices[1].toFixed(2)
                     : 'N/A'}
                 </Typography>
               </div>
             </Grid>
-            <Grid item xs={6}>
+
+            {/* <Grid item xs={6}>
               <div>
                 <Typography
                   sx={{
@@ -168,7 +169,7 @@ export default function AvgPriceDropdown({ avgPrices }) {
                     : 'N/A'}
                 </Typography>
               </div>
-            </Grid>
+            </Grid> */}
           </Grid>
         </CustomAccordionDetails>
       </CustomAccordion>
