@@ -59,7 +59,7 @@ export default function AvgPriceDropdown({ prices }) {
               <Typography
                 sx={{ color: 'white', fontWeight: 'bold', fontSize: '1rem' }}
               >
-                Moving Avg. Prices
+                Prices
               </Typography>
             </Grid>
           </Grid>
@@ -87,7 +87,7 @@ export default function AvgPriceDropdown({ prices }) {
                   }}
                 >
                   {Array.isArray(prices) && prices.length > 1
-                    ? prices[0].toFixed(2)
+                    ? '$' + prices[0].toFixed(2)
                     : 'N/A'}
                 </Typography>
               </div>
@@ -112,7 +112,7 @@ export default function AvgPriceDropdown({ prices }) {
                   }}
                 >
                   {Array.isArray(prices) && prices.length > 0
-                    ? prices[1].toFixed(2)
+                    ? '$' + prices[1].toFixed(2)
                     : 'N/A'}
                 </Typography>
               </div>
