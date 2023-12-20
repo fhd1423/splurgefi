@@ -11,6 +11,7 @@ import CloseIcon from '@mui/icons-material/Close';
 import Button from '@mui/material/Button';
 import { Tooltip, Typography } from '@mui/material';
 import { Diversity1TwoTone } from '@mui/icons-material';
+import Alert from '@mui/material/Alert';
 
 // Styling
 const StyledModal = styled(Modal)(({ theme }) => ({
@@ -21,6 +22,9 @@ const StyledModal = styled(Modal)(({ theme }) => ({
 }));
 
 const StyledBox = styled(Box)(({ theme }) => ({
+  display: 'flex',
+  flexDirection: 'column',
+  justifyContent: 'space-between', // Distributes space between children
   backgroundColor: '#1C1C1C',
   color: 'white',
   borderRadius: '8px',
@@ -51,8 +55,32 @@ const SearchBar = styled(InputBase)(({ theme }) => ({
   color: 'white',
 }));
 
+// const CustomButton = styled(Button)({
+//   backgroundColor: '#03C988',
+//   color: 'white',
+//   fontSize: '0.875rem',
+//   fontWeight: 'normal',
+//   textTransform: 'none',
+//   borderRadius: 4,
+//   width: '12rem',
+//   height: '1.75rem',
+//   marginTop: '15px',
+//   '&:hover': {
+//     backgroundColor: '#03C988',
+//     boxShadow: 'none',
+//     transform: 'scale(1.01)',
+//   },
+//   '&:focus': {
+//     backgroundColor: '#03C988',
+//     boxShadow: 'none',
+//   },
+//   '&:active': {
+//     backgroundColor: '#03C988',
+//   },
+//   transition: 'transform 0.2s ease',
+// });
+
 const CustomButton = styled(Button)({
-  backgroundColor: '#03C988',
   color: 'white',
   fontSize: '0.875rem',
   fontWeight: 'normal',
@@ -61,19 +89,12 @@ const CustomButton = styled(Button)({
   width: '12rem',
   height: '1.75rem',
   marginTop: '15px',
-  '&:hover': {
-    backgroundColor: '#03C988',
-    boxShadow: 'none',
-    transform: 'scale(1.01)',
-  },
-  '&:focus': {
-    backgroundColor: '#03C988',
-    boxShadow: 'none',
-  },
-  '&:active': {
-    backgroundColor: '#03C988',
-  },
+  backgroundColor: 'transparent',
   transition: 'transform 0.2s ease',
+  // Hover and Focus state
+  '&:hover, &:focus': {
+    transform: 'translateY(-3px)', // Move the button up slightly
+  },
 });
 
 const TokenList = styled(List)(({ theme }) => ({
@@ -130,12 +151,6 @@ const CloseButton = styled(Button)(({ theme }) => ({
   },
 }));
 
-const ParentContainer = styled('div')({
-  display: 'flex',
-  justifyContent: 'center',
-  alignItems: 'center',
-});
-
 // Function to copy the text to clipboard
 const copyToClipboard = (text) => {
   navigator.clipboard.writeText(text).then(
@@ -154,6 +169,22 @@ const CopyIcon = styled(FileCopyIcon)({
   marginLeft: '4px',
 });
 
+const AlertContainer = styled('div')({
+  padding: '16px', // Adjust padding as needed
+  display: 'flex',
+  justifyContent: 'center',
+});
+
+const ButtonContainer = styled('div')({
+  position: 'absolute',
+  top: '100px',
+  left: '50%',
+  transform: 'translateX(-50%)',
+  width: '100%',
+  display: 'flex',
+  justifyContent: 'center',
+  padding: '10px 15px',
+});
 // FUNCTION
 const TokenModal = ({
   open,
@@ -254,13 +285,24 @@ const TokenModal = ({
 
         {filteredTokens.length === 0 ? (
           <div>
-            <ParentContainer>
-              <CustomButton onClick={handleTradeUnlistedToken}>
+            <ButtonContainer>
+              <CustomButton
+                sx={{ color: '#03C988' }}
+                onClick={handleTradeUnlistedToken}
+              >
                 Add New Token
               </CustomButton>
-            </ParentContainer>
+            </ButtonContainer>
 
-            {newTokenError && <p>{newTokenError}</p>}
+            <AlertContainer>
+              {newTokenError ? (
+                <Alert severity='error'>{newTokenError}</Alert>
+              ) : (
+                <Alert severity='warning'>
+                  Please be careful when trading unlisted tokens.
+                </Alert>
+              )}
+            </AlertContainer>
           </div>
         ) : (
           <TokenList>
