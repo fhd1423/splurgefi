@@ -329,7 +329,8 @@ export default function Automate() {
   };
   useEffect(() => {
     if (primaryWallet?.address && authToken) {
-      const jwtData = parseJwt(authToken);
+      console.log("SEX", authToken)
+      // const jwtData = parseJwt(authToken);
 
       uploadUserData(primaryWallet?.address, jwtData);
       handleMessageChange('recipient', primaryWallet?.address);
