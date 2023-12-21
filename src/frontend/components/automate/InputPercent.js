@@ -1,10 +1,6 @@
 import React from 'react';
 import { styled } from '@mui/system';
 import InputBase from '@mui/material/InputBase';
-import ArrowUpwardOutlinedIcon from '@mui/icons-material/ArrowUpwardOutlined';
-import ArrowDownwardOutlinedIcon from '@mui/icons-material/ArrowDownwardOutlined';
-import AddIcon from '@mui/icons-material/Add';
-import RemoveIcon from '@mui/icons-material/Remove';
 import { Typography } from '@mui/material';
 
 // Entire input container (includes icon and textfield)
@@ -45,10 +41,7 @@ export default function InputPercent({
   placeHolder,
   value,
   onValueChange,
-  isUpSelected,
   limitOrder,
-  inputToken,
-  outputToken,
 }) {
   return (
     <div>
@@ -59,8 +52,7 @@ export default function InputPercent({
         gutterBottom
         style={{ marginBottom: '3px', fontSize: '0.85rem', textAlign: 'left' }}
       >
-        When {isUpSelected ? 'input' : 'output'}{' '}
-        {isUpSelected ? 'rises' : 'drops'} by
+        {title}
       </Typography>
       <CustomInputContainer limitOrder={limitOrder}>
         <CustomInput
