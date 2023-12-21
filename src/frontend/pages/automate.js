@@ -339,6 +339,17 @@ export default function Automate() {
   }, [primaryWallet?.address, authToken]);
 
   //ON-CHAIN INTERACTIONS
+
+  const { data: allowance } = useContractRead({
+    address: message.inputTokenAddress,
+    abi: ERC20abi,
+    functionName: 'allowance',
+    args: [primaryWallet?.address, SPLURGE_ADDRESS],
+    chainId: 42161,
+    onSuccess(data) {
+      return data;
+    },
+  });
   const { data: balance } = useContractRead({
     address: message.inputTokenAddress,
     abi: ERC20abi,
