@@ -60,7 +60,7 @@ export default function ProfitDropdown({ profit, tradeType }) {
               <Typography
                 sx={{ color: 'white', fontWeight: 'bold', fontSize: '1rem' }}
               >
-                Prices
+                Profit Estimation
               </Typography>
             </Grid>
           </Grid>
@@ -77,7 +77,7 @@ export default function ProfitDropdown({ profit, tradeType }) {
                     mb: 0,
                   }}
                 >
-                  Current Price
+                  Profit
                 </Typography>
 
                 <Typography
@@ -87,13 +87,11 @@ export default function ProfitDropdown({ profit, tradeType }) {
                     fontWeight: 'bold',
                   }}
                 >
-                  {Array.isArray(prices) && prices.length > 1
-                    ? '$' + prices[0].toFixed(2)
-                    : 'N/A'}
+                  {profit}
                 </Typography>
               </div>
             </Grid>
-            <Grid item xs={6}>
+            {/* <Grid item xs={6}>
               <div>
                 <Typography
                   sx={{
@@ -117,7 +115,7 @@ export default function ProfitDropdown({ profit, tradeType }) {
                     : 'N/A'}
                 </Typography>
               </div>
-            </Grid>
+            </Grid> */}
 
             {/* <a
               href={`https://dexscreener.com/arbitrum/${tokenAddy}`}
@@ -133,7 +131,7 @@ export default function ProfitDropdown({ profit, tradeType }) {
             >
               link
             </a> */}
-            <Grid item xs={12}>
+            {/* <Grid item xs={12}>
               <div>
                 <a
                   href={`https://dexscreener.com/arbitrum/${tokenAddy}`}
@@ -150,7 +148,7 @@ export default function ProfitDropdown({ profit, tradeType }) {
                   View Chart
                 </a>
               </div>
-            </Grid>
+            </Grid> */}
 
             {/* <Grid item xs={6}>
               <div>

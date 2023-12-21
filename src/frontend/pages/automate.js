@@ -37,6 +37,7 @@ import { useDynamicContext } from '@dynamic-labs/sdk-react-core';
 import { supabase } from '../components/client';
 import { uploadUserData, generateRandomSalt, parseJwt } from '@/helpers/utils';
 import { ERC20abi } from '@/helpers/ERC20';
+import ProfitDropdown from '@/components/automate/ProfitDropdown';
 
 export default function Automate() {
   const SPLURGE_ADDRESS = '0xe3345D0cca4c478cf16cDd0B7D7363ba223c87AF';
@@ -126,13 +127,14 @@ export default function Automate() {
     const apiUrl = 'https://coins.llama.fi/prices/current/';
     const coins = 'arbitrum:' + tokenAddress;
 
-    // Fomrat: /prices/current/{coins}
-    const fetchPriceData = (time) => {
-      const url = `${apiUrl}/${coins}`;
-      return axios
-        .get(url)
-        .then((response) => response.data.coins[coins].price);
-    };
+    const url = `${apiUrl}${coins}`;
+    try {
+      const response = await axios.get(url);
+      return response.data.coins[coins].price;
+    } catch (error) {
+      console.error('Error fetching current price data:', error);
+      throw error;
+    }
   };
 
   const getFiveMinAvg = async (priceData) => {
@@ -238,22 +240,35 @@ export default function Automate() {
 
     if (correctTokens) {
       if (currentInput.name === 'WETH') {
+        console.log('INSIDE CALC PROFIT FOR INPUT WETH');
+
+        // Fetch the 5-min average price
         getHistoricalPriceData(currentOutput.address)
           .then((priceData) => getFiveMinAvg(priceData))
-          .then((avg) => setAveragePrice(avg))
-          .catch((error) =>
-            console.error('Error calculating average price:', error),
-          );
-        getCurrentPriceData(currentOutput.address)
-          .then((currentPriceData) =>
-            calcBuyProfit(
-              averagePrice,
-              currentPriceData,
-              message.percentChange,
-              message.amount,
-            ),
-          )
-          .then((resultingProfit) => setProfit(resultingProfit));
+          .then((avgPrice) => {
+            setAveragePrice(avgPrice);
+            console.log('Average Price:', avgPrice); // WORKS
+
+            console.log('Output Address:', currentOutput.address);
+            // Now fetch the current price
+            return getCurrentPriceData(currentOutput.address).then(
+              (currentPriceData) => {
+                console.log('Current Price:', currentPriceData);
+
+                // Calculate and set profit based on average and current prices
+                const resultingProfit = calcBuyProfit(
+                  avgPrice,
+                  currentPriceData,
+                  message.percentChange,
+                  message.amount,
+                );
+                setProfit(resultingProfit);
+                console.log('Calculated Profit:', resultingProfit);
+                return resultingProfit;
+              },
+            );
+          })
+          .catch((error) => console.error('Error:', error));
       } else {
         getHistoricalPriceData(currentInput.address)
           .then((priceData) => getFiveMinAvg(priceData))
@@ -278,17 +293,35 @@ export default function Automate() {
 
   // Need previous avg. price of token to buy and current price of that token (sellPrice)
   function calcBuyProfit(avgPrice, sellPrice, percentChange, amountWETH) {
+    // console.log('Avg Price inside:', avgPrice);
+    // console.log('Avg Price inside:', sellPrice);
+    // console.log('Avg Price inside:', percentChange);
+    // console.log('Avg Price inside:', amountWETH);
+    const amountWETHInEther = amountWETH / 1e18;
+
     // Calc buy price
     const buyPrice = avgPrice * (1 - percentChange / 100);
 
     // Calc profit
-    const amountOfBuyToken = amountWETH / buyPrice;
+    const amountOfBuyToken = amountWETHInEther / buyPrice;
 
     // Profit in terms of buy token
     const profit = amountOfBuyToken * (sellPrice - buyPrice);
 
-    return profit;
+    return profit.toFixed(2);
   }
+
+  // function calcBuyProfit(avgPrice, sellPrice, percentChange, amountWETH) {
+  //   const newavgPrice = 0.12293519999999998;
+  //   const newsellPrice = 0.124725;
+  //   const newpercentChange = 3;
+  //   const newamountWETH = 500;
+
+  //   const buyPrice = newavgPrice * (1 - newpercentChange / 100);
+  //   const amountOfBuyToken = newamountWETH / buyPrice;
+  //   const profit = amountOfBuyToken * (newsellPrice - buyPrice);
+  //   return profit;
+  // }
 
   function calcSellProfit(avgPrice, buyPrice, percentChange, amountOfToken) {
     // Calculate sell price as a percentage above the average price
@@ -565,6 +598,29 @@ export default function Automate() {
                   />
                 </Grid>
 
+                {allInputsFilled && (
+                  <Grid item xs={12}>
+                    <Typography
+                      sx={{
+                        display: 'inline',
+                        color: 'white',
+                        fontWeight: 'medium',
+                      }}
+                    >
+                      {'Estimated Profit: '}
+                    </Typography>
+                    <Typography
+                      sx={{
+                        display: 'inline',
+                        color: '#03C988',
+                        fontWeight: 'bold',
+                      }}
+                    >
+                      {profit + ' ' + currentOutput.name}
+                    </Typography>
+                  </Grid>
+                )}
+
                 <Grid
                   item
                   xs={12}
@@ -652,12 +708,5 @@ export default function Automate() {
         )}
       </div>
     </LocalizationProvider>
-
-    // {averagePrice && (
-    //   <Typography variant='body1' sx={{ color: 'white' }}>
-    //     Average Price for {currentInput.name}:{' '}
-    //     {averagePrice.toFixed(2)}
-    //   </Typography>
-    // )}
   );
 }
