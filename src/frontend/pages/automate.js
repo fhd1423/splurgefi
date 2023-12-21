@@ -294,10 +294,6 @@ export default function Automate() {
 
   // Need previous avg. price of token to buy and current price of that token (sellPrice)
   function calcBuyProfit(avgPrice, sellPrice, percentChange, amountWETH) {
-    // console.log('Avg Price inside:', avgPrice);
-    // console.log('Avg Price inside:', sellPrice);
-    // console.log('Avg Price inside:', percentChange);
-    // console.log('Avg Price inside:', amountWETH);
     const amountWETHInEther = amountWETH / 1e18;
 
     // Calc buy price
@@ -312,27 +308,16 @@ export default function Automate() {
     return profit.toFixed(2);
   }
 
-  // function calcBuyProfit(avgPrice, sellPrice, percentChange, amountWETH) {
-  //   const newavgPrice = 0.12293519999999998;
-  //   const newsellPrice = 0.124725;
-  //   const newpercentChange = 3;
-  //   const newamountWETH = 500;
-
-  //   const buyPrice = newavgPrice * (1 - newpercentChange / 100);
-  //   const amountOfBuyToken = newamountWETH / buyPrice;
-  //   const profit = amountOfBuyToken * (newsellPrice - buyPrice);
-  //   return profit;
-  // }
-
   function calcSellProfit(avgPrice, buyPrice, percentChange, amountOfToken) {
+    const amountOfTokenInEther = amountOfToken / 1e18;
     // Calculate sell price as a percentage above the average price
     const sellPrice = avgPrice * (1 + percentChange / 100);
 
     // Calculate profit
-    // Profit is calculated based on the difference between the sell price and the buy price
-    const profit = amountOfToken * (sellPrice - buyPrice);
+    // Based on the difference between the sell price and the buy price
+    const profit = amountOfTokenInEther * (sellPrice - buyPrice);
 
-    return profit;
+    return profit.toFixed(2);
   }
 
   //AUTH - DYNAMIC
