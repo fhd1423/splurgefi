@@ -489,7 +489,7 @@ export default function Automate() {
 
         <Box
           sx={{
-            width: 500,
+            width: { xs: '85%', md: '500px' },
             mx: 'auto',
             mt: '-60px',
             display: 'flex',
