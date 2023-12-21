@@ -6,7 +6,7 @@ import {
   useDynamicContext,
 } from '@dynamic-labs/sdk-react-core';
 import { EthereumWalletConnectors } from '@dynamic-labs/ethereum';
-import { supabase } from '../components/client';
+import { supabase } from '../components/supabase/client';
 import NavBar from '../components/NavBar';
 import Table from '@mui/material/Table';
 import TableBody from '@mui/material/TableBody';

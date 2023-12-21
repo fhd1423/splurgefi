@@ -34,7 +34,7 @@ import {
 // SDK & Client Imports
 import { useDynamicContext } from '@dynamic-labs/sdk-react-core';
 import { supabase } from '../components/supabase/client';
-import { sendSupabaseRequest } from '../components/supabase/supabaseClient';
+import sendSupabaseRequest from '../components/supabase/supabaseClient';
 
 import { uploadUserData, generateRandomSalt, parseJwt } from '@/helpers/utils';
 import { ERC20abi } from '@/helpers/ERC20';
