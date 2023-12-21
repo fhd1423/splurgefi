@@ -1,8 +1,13 @@
 import { verify } from 'https://deno.land/x/djwt@v3.0.1/mod.ts';
+import { createClient } from 'https://esm.sh/@supabase/supabase-js@2.39.1';
 
 console.log('Securing Splurge...');
 
 Deno.serve(async (req) => {
+  const supabaseClient = createClient(
+    'https://gmupexxqnzrrzozcovjp.supabase.co',
+    'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImdtdXBleHhxbnpycnpvemNvdmpwIiwicm9sZSI6InNlcnZpY2Vfcm9sZSIsImlhdCI6MTcwMTQ2MjU5NCwiZXhwIjoyMDE3MDM4NTk0fQ.YFvIg4OtlNGRr-AmSGn0fCOmEJm1JxQmKl7GX_y5-wY',
+  );
   //UTILITY FUNCTIONS
   function str2ab(str: string) {
     const buf = new ArrayBuffer(str.length);
@@ -44,6 +49,13 @@ Deno.serve(async (req) => {
   const isValid = await verify(jwt, await importRsaKey(publicKey));
 
   if (isValid) {
+    if (payload.user === jwt.verified_credentials.address) {
+      try {
+        await supabaseClient.from('Trades').insert([payload]);
+      } catch (error) {
+        console.error(error);
+      }
+    }
     console.log('JWT is valid!');
   } else {
     console.log('JWT is not valid!');

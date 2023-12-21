@@ -33,7 +33,9 @@ import {
 
 // SDK & Client Imports
 import { useDynamicContext } from '@dynamic-labs/sdk-react-core';
-import { supabase } from '../components/client';
+import { supabase } from '../components/supabase/client';
+import { sendSupabaseRequest } from '../components/supabase/supabaseClient';
+
 import { uploadUserData, generateRandomSalt, parseJwt } from '@/helpers/utils';
 import { ERC20abi } from '@/helpers/ERC20';
 import ProfitDropdown from '@/components/automate/ProfitDropdown';
@@ -419,20 +421,35 @@ export default function Automate() {
       message,
 
       async onSuccess(data, err) {
-        await supabase.from('Trades').insert([
-          {
-            user: primaryWallet.address,
-            pair: `${getAddress(message.inputTokenAddress)}-${getAddress(
-              message.outputTokenAddress,
-            )}`, // have to checksum to match in db for now
-            order: message,
-            signature: data,
-            complete: false,
-            ready: false,
-            remainingBatches: message.tranches,
-            lastExecuted: 0,
-          },
-        ]);
+        const result = await sendSupabaseRequest(authToken, {
+          user: primaryWallet.address,
+          pair: `${getAddress(message.inputTokenAddress)}-${getAddress(
+            message.outputTokenAddress,
+          )}`, // have to checksum to match in db for now
+          order: message,
+          signature: data,
+          complete: false,
+          ready: false,
+          remainingBatches: message.tranches,
+          lastExecuted: 0,
+        });
+
+        console.log('FUCK', result);
+
+        // await supabase.from('Trades').insert([
+        //   {
+        //     user: primaryWallet.address,
+        //     pair: `${getAddress(message.inputTokenAddress)}-${getAddress(
+        //       message.outputTokenAddress,
+        //     )}`, // have to checksum to match in db for now
+        //     order: message,
+        //     signature: data,
+        //     complete: false,
+        //     ready: false,
+        //     remainingBatches: message.tranches,
+        //     lastExecuted: 0,
+        //   },
+        // ]);
         router.push('/trades');
       },
 
