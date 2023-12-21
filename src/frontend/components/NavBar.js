@@ -3,7 +3,7 @@ import { Button } from '@mui/material';
 import Typography from '@mui/material/Typography';
 const NavBar = ({ inTradesPage }) => {
   return (
-    <nav className='flex justify-between items-center px-8 pt-5 bg-black'>
+    <nav className='flex justify-between items-center px-8 pt-5'>
       <Link href='/' passHref>
         <button
           style={{ color: '#03C988' }}

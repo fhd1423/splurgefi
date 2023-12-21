@@ -507,240 +507,240 @@ export default function Automate() {
   );
 
   return (
-    <LocalizationProvider dateAdapter={AdapterDayjs}>
-      <NavBar inTradesPage={false} />
+    <div className='bg-gradient-to-br from-stone-900 to-emerald-900'>
+      <LocalizationProvider dateAdapter={AdapterDayjs}>
+        <NavBar inTradesPage={false} />
 
-      <div className='h-screen bg-black flex justify-center items-center overflow-hidden relative'>
-        <Head>
-          <title>Automate</title>
-          <link rel='icon' href='/favicon.ico' />
-        </Head>
+        <div className='h-screen flex justify-center items-center overflow-hidden relative'>
+          <Head>
+            <title>Automate</title>
+            <link rel='icon' href='/favicon.ico' />
+          </Head>
 
-        <Box
-          sx={{
-            width: { xs: '85%', md: '500px' },
-            mx: 'auto',
-            mt: '-60px',
-            display: 'flex',
-            flexDirection: 'column',
-            alignItems: 'center',
-            justifyContent: 'center',
-          }}
-        >
-          <div className='mb-10'>
-            {userInputError && <Alert severity='error'>{userInputError}</Alert>}
-          </div>
-
-          <Paper
-            elevation={16}
+          <Box
             sx={{
-              width: '100%',
-              backgroundColor: '#2B2B2B',
-              padding: { xs: 2, sm: 3 },
-              color: 'text.primary',
-              borderRadius: '16px',
-              boxShadow: `
-  0 35px 100px -10px rgba(3, 201, 136, 0.2),
-  0 30px 80px -10px rgba(3, 201, 136, 0.15),
-  0 -25px 60px -10px rgba(3, 201, 136, 0.1),
-  0 -35px 100px -10px rgba(3, 201, 136, 0.1)
-`,
+              width: { xs: '85%', md: '500px' },
+              mx: 'auto',
+              mt: '-60px',
+              display: 'flex',
+              flexDirection: 'column',
+              alignItems: 'center',
+              justifyContent: 'center',
             }}
           >
-            <Grid container spacing={2} justifyContent='center'>
-              <React.Fragment>
-                <Grid item xs={12}>
-                  <InputToken
-                    title='I want to allocate'
-                    onValueChange={handleMessageChange}
-                    onSelectChange={handleMessageChange}
-                    message={message}
-                    currentInput={currentInput}
-                    setCurrentInput={setCurrentInput}
-                    tokenBalance={tokenBalance}
-                    address={primaryWallet?.address}
-                  />
-                </Grid>
-                <Grid
-                  item
-                  xs={12}
-                  container
-                  direction='column'
-                  alignItems='center'
-                  justifyContent='center'
-                  style={{ marginBottom: '-15px' }}
-                >
-                  <ToggleSwap
-                    selection={toggleSelection}
-                    setSelection={setToggleSelection}
-                    message={message}
-                    handleMessageChange={handleMessageChange}
-                    currentInput={currentInput}
-                    currentOutput={currentOutput}
-                    setCurrentInput={setCurrentInput}
-                    setCurrentOutput={setCurrentOutput}
-                  />
-                </Grid>
-                <Grid item xs={12}>
-                  <OutputToken
-                    title='To recieve'
-                    onValueChange={handleMessageChange}
-                    onSelectChange={handleMessageChange}
-                    message={message}
-                    currentOutput={currentOutput}
-                    setCurrentOutput={setCurrentOutput}
-                  />
-                </Grid>
-                <Grid item xs={6}>
-                  <InputBatches
-                    title='Split into'
-                    placeHolder={'5'}
-                    value={message.tranches}
-                    onValueChange={(e) =>
-                      handleMessageChange('tranches', e.target.value)
-                    }
-                  />
-                </Grid>
-
-                <Grid item xs={6} style={{ marginTop: '5px' }}>
-                  <TimeSelector
-                    onTradeActionChange={handleMessageChange}
-                    title='Every'
-                  />
-                </Grid>
-
-                <Grid item xs={6}>
-                  <InputPercent
-                    title='When profit increases by'
-                    value={message.percentChange}
-                    onValueChange={handleMessageChange}
-                    isUpSelected={toggleSelection !== 'buy'}
-                    placeHolder={'0'}
-                  />
-                </Grid>
-
-                <Grid item xs={6}>
-                  <DatePicker
-                    title='Until'
-                    setSelectedDate={handleMessageChange}
-                  />
-                </Grid>
-
-                {allInputsFilled && (
-                  <Grid item xs={12}>
-                    <Typography
-                      sx={{
-                        display: 'inline',
-                        color: 'white',
-                        fontWeight: 'medium',
-                      }}
-                    >
-                      {'Estimated Profit: '}
-                    </Typography>
-                    <Typography
-                      sx={{
-                        display: 'inline',
-                        color: '#03C988',
-                        fontWeight: 'bold',
-                      }}
-                    >
-                      {profit + ' ' + currentOutput.name}
-                    </Typography>
-                  </Grid>
-                )}
-
-                <Grid
-                  item
-                  xs={12}
-                  sx={{
-                    display: 'flex',
-                    justifyContent: 'center',
-                    alignItems: 'center',
-                    pt: 4,
-                  }}
-                >
-                  {!isWalletConnected ? (
-                    <button
-                      style={{
-                        backgroundColor: '#03C988',
-                        transition:
-                          'transform 0.3s ease, background-color 0.3s ease, box-shadow 0.3s ease',
-                      }}
-                      onClick={handleWalletConnection}
-                      className='text-white text-xl font-semibold rounded-lg shadow-lg hover:bg-green-600 hover:scale-[1.02] hover:shadow-md w-96 h-14 mt-[15px]'
-                    >
-                      Connect Wallet
-                    </button>
-                  ) : (
-                    <button
-                      style={{
-                        backgroundColor: '#03C988',
-                        transition:
-                          'transform 0.3s ease, background-color 0.3s ease, box-shadow 0.3s ease',
-                      }}
-                      onClick={() => {
-                        if (!validateInputs()) {
-                          return;
-                        }
-                        if (allowance < message.amount) {
-                          approveToken?.();
-                        }
-                        signTypedData();
-                      }}
-                      className='text-white text-xl font-semibold rounded-lg shadow-lg hover:bg-green-600 hover:scale-[1.02] hover:shadow-md w-96 h-14 mt-[15px]'
-                    >
-                      Start Automation
-                    </button>
-                  )}
-                </Grid>
-              </React.Fragment>
-            </Grid>
-          </Paper>
-        </Box>
-
-        {allInputsFilled && (
-          <div className='absolute right-0 pr-5 space-y-1.25'>
-            <div
-              className={`${isTradeSumAccordionExpanded ? 'pb-10' : 'pb-5'}`}
-            >
-              <TradeSummaryDropdown
-                tradeEntered={allInputsFilled}
-                currentInput={currentInput.name}
-                currentOutput={currentOutput.name}
-                batches={message.tranches}
-                percentChange={message.percentChange}
-                movingAvg={message.priceAvg}
-                timeBwTrades={message.timeBwTrade}
-                expanded={isTradeSumAccordionExpanded}
-                setExpanded={setIsTradeSumAccordionExpanded}
-                tradeType={toggleSelection}
-              />
-            </div>
-
-            <div>
-              {currentInput.name === 'WETH' ? (
-                // Get price on token you're going to buy
-                <AvgPriceDropdown
-                  prices={pricesMap[currentOutput.name]}
-                  tokenAddy={currentOutput.address}
-                />
-              ) : (
-                // Get price on token you're going to sell
-                <AvgPriceDropdown
-                  prices={pricesMap[currentInput.name]}
-                  tokenAddy={currentInput.address}
-                />
+            <div className='mb-10'>
+              {userInputError && (
+                <Alert severity='error'>{userInputError}</Alert>
               )}
             </div>
-          </div>
-        )}
 
-        {isLargeScreen && (
-          <div style={{ position: 'absolute', bottom: '100px', left: '30px' }}>
-            <CommunityPopUp />
-          </div>
-        )}
-      </div>
-    </LocalizationProvider>
+            <Paper
+              elevation={16}
+              sx={{
+                width: '100%',
+                backgroundColor: '#2B2B2B',
+                padding: { xs: 2, sm: 3 },
+                color: 'text.primary',
+                borderRadius: '16px',
+              }}
+            >
+              <Grid container spacing={2} justifyContent='center'>
+                <React.Fragment>
+                  <Grid item xs={12}>
+                    <InputToken
+                      title='I want to allocate'
+                      onValueChange={handleMessageChange}
+                      onSelectChange={handleMessageChange}
+                      message={message}
+                      currentInput={currentInput}
+                      setCurrentInput={setCurrentInput}
+                      tokenBalance={tokenBalance}
+                      address={primaryWallet?.address}
+                    />
+                  </Grid>
+                  <Grid
+                    item
+                    xs={12}
+                    container
+                    direction='column'
+                    alignItems='center'
+                    justifyContent='center'
+                    style={{ marginBottom: '-15px' }}
+                  >
+                    <ToggleSwap
+                      selection={toggleSelection}
+                      setSelection={setToggleSelection}
+                      message={message}
+                      handleMessageChange={handleMessageChange}
+                      currentInput={currentInput}
+                      currentOutput={currentOutput}
+                      setCurrentInput={setCurrentInput}
+                      setCurrentOutput={setCurrentOutput}
+                    />
+                  </Grid>
+                  <Grid item xs={12}>
+                    <OutputToken
+                      title='To recieve'
+                      onValueChange={handleMessageChange}
+                      onSelectChange={handleMessageChange}
+                      message={message}
+                      currentOutput={currentOutput}
+                      setCurrentOutput={setCurrentOutput}
+                    />
+                  </Grid>
+                  <Grid item xs={6}>
+                    <InputBatches
+                      title='Split into'
+                      placeHolder={'5'}
+                      value={message.tranches}
+                      onValueChange={(e) =>
+                        handleMessageChange('tranches', e.target.value)
+                      }
+                    />
+                  </Grid>
+
+                  <Grid item xs={6} style={{ marginTop: '5px' }}>
+                    <TimeSelector
+                      onTradeActionChange={handleMessageChange}
+                      title='Every'
+                    />
+                  </Grid>
+
+                  <Grid item xs={6}>
+                    <InputPercent
+                      title='When profit increases by'
+                      value={message.percentChange}
+                      onValueChange={handleMessageChange}
+                      isUpSelected={toggleSelection !== 'buy'}
+                      placeHolder={'0'}
+                    />
+                  </Grid>
+
+                  <Grid item xs={6}>
+                    <DatePicker
+                      title='Until'
+                      setSelectedDate={handleMessageChange}
+                    />
+                  </Grid>
+
+                  {allInputsFilled && (
+                    <Grid item xs={12}>
+                      <Typography
+                        sx={{
+                          display: 'inline',
+                          color: 'white',
+                          fontWeight: 'medium',
+                        }}
+                      >
+                        {'Estimated Profit: '}
+                      </Typography>
+                      <Typography
+                        sx={{
+                          display: 'inline',
+                          color: '#03C988',
+                          fontWeight: 'bold',
+                        }}
+                      >
+                        {profit + ' ' + currentOutput.name}
+                      </Typography>
+                    </Grid>
+                  )}
+
+                  <Grid
+                    item
+                    xs={12}
+                    sx={{
+                      display: 'flex',
+                      justifyContent: 'center',
+                      alignItems: 'center',
+                      pt: 4,
+                    }}
+                  >
+                    {!isWalletConnected ? (
+                      <button
+                        style={{
+                          backgroundColor: '#03C988',
+                          transition:
+                            'transform 0.3s ease, background-color 0.3s ease, box-shadow 0.3s ease',
+                        }}
+                        onClick={handleWalletConnection}
+                        className='text-white text-xl font-semibold rounded-lg shadow-lg hover:bg-green-600 hover:scale-[1.02] hover:shadow-md w-96 h-14 mt-[15px]'
+                      >
+                        Connect Wallet
+                      </button>
+                    ) : (
+                      <button
+                        style={{
+                          backgroundColor: '#03C988',
+                          transition:
+                            'transform 0.3s ease, background-color 0.3s ease, box-shadow 0.3s ease',
+                        }}
+                        onClick={() => {
+                          if (!validateInputs()) {
+                            return;
+                          }
+                          if (allowance < message.amount) {
+                            approveToken?.();
+                          }
+                          signTypedData();
+                        }}
+                        className='text-white text-xl font-semibold rounded-lg shadow-lg hover:bg-green-600 hover:scale-[1.02] hover:shadow-md w-96 h-14 mt-[15px]'
+                      >
+                        Start Automation
+                      </button>
+                    )}
+                  </Grid>
+                </React.Fragment>
+              </Grid>
+            </Paper>
+          </Box>
+
+          {allInputsFilled && (
+            <div className='absolute right-0 pr-5 space-y-1.25'>
+              <div
+                className={`${isTradeSumAccordionExpanded ? 'pb-10' : 'pb-5'}`}
+              >
+                <TradeSummaryDropdown
+                  tradeEntered={allInputsFilled}
+                  currentInput={currentInput.name}
+                  currentOutput={currentOutput.name}
+                  batches={message.tranches}
+                  percentChange={message.percentChange}
+                  movingAvg={message.priceAvg}
+                  timeBwTrades={message.timeBwTrade}
+                  expanded={isTradeSumAccordionExpanded}
+                  setExpanded={setIsTradeSumAccordionExpanded}
+                  tradeType={toggleSelection}
+                />
+              </div>
+
+              <div>
+                {currentInput.name === 'WETH' ? (
+                  // Get price on token you're going to buy
+                  <AvgPriceDropdown
+                    prices={pricesMap[currentOutput.name]}
+                    tokenAddy={currentOutput.address}
+                  />
+                ) : (
+                  // Get price on token you're going to sell
+                  <AvgPriceDropdown
+                    prices={pricesMap[currentInput.name]}
+                    tokenAddy={currentInput.address}
+                  />
+                )}
+              </div>
+            </div>
+          )}
+
+          {isLargeScreen && (
+            <div
+              style={{ position: 'absolute', bottom: '100px', left: '30px' }}
+            >
+              <CommunityPopUp />
+            </div>
+          )}
+        </div>
+      </LocalizationProvider>
+    </div>
   );
 }
