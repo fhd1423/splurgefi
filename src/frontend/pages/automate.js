@@ -3,7 +3,8 @@
 import React, { useState, useEffect } from 'react';
 import { Box, Grid, Paper, Typography, Alert } from '@mui/material';
 import Head from 'next/head';
-import { getAddress } from 'viem';
+import { formatEther, getAddress } from 'viem';
+
 import router from 'next/router';
 
 // MUI Date Picker Imports
@@ -327,9 +328,11 @@ export default function Automate() {
     args: [primaryWallet?.address],
     chainId: 42161,
     onSuccess(data) {
-      console.log('Balance:', data.toString());
-      setTokenBalance(data.toString());
-      return data;
+      let formattedBalance = 0;
+      try {
+        formattedBalance = formatEther(balance);
+      } catch (e) {}
+      setTokenBalance(String(formattedBalance));
     },
   });
 
