@@ -4,7 +4,7 @@ import React, { useState, useEffect } from 'react';
 import { Box, Grid, Paper, Typography, Alert } from '@mui/material';
 import Head from 'next/head';
 import { formatEther, getAddress } from 'viem';
-import { useMediaQuery } from '@mui/material';
+import { useTheme, useMediaQuery } from '@mui/material';
 import router from 'next/router';
 
 // MUI Date Picker Imports
@@ -42,9 +42,12 @@ export default function Automate() {
   const SPLURGE_ADDRESS = '0xe3345D0cca4c478cf16cDd0B7D7363ba223c87AF';
   const WETH_ADDRESS = '0x82af49447d8a07e3bd95bd0d56f35241523fbab1';
 
+  // FRONT END RESPONSIVENESS
+  const theme = useTheme();
+  const isLargeScreen = useMediaQuery(theme.breakpoints.up('md'));
+
   //STATE
   const [toggleSelection, setToggleSelection] = useState('buy');
-  // const [toggleTrade, setToggleTrade] = useState('pro');
   const [userInputError, setUserInputError] = useState('');
   const [allInputsFilled, setInputsFilled] = useState(false);
   const [correctTokensFilled, setCorrectTokensFilled] = useState(false);
@@ -715,9 +718,11 @@ export default function Automate() {
           </div>
         )}
 
-        <div style={{ position: 'absolute', bottom: 100, left: 30 }}>
-          <CommunityPopUp></CommunityPopUp>
-        </div>
+        {isLargeScreen && (
+          <div style={{ position: 'absolute', bottom: '100px', left: '30px' }}>
+            <CommunityPopUp />
+          </div>
+        )}
       </div>
     </LocalizationProvider>
   );
