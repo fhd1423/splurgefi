@@ -12,7 +12,7 @@ const DatePicker = ({ selectedDate, setSelectedDate, limitOrder, title }) => {
     palette: {
       primary: {
         main: '#03C988',
-        contrastText: '#1B1B1B',
+        contrastText: '#ffffff',
       },
     },
     components: {
@@ -20,7 +20,7 @@ const DatePicker = ({ selectedDate, setSelectedDate, limitOrder, title }) => {
         styleOverrides: {
           root: {
             input: {
-              color: '#1B1B1B',
+              color: '#ffffff',
               height: '35px',
               width: '170px',
               padding: '10px 14px 10px 0',
@@ -30,6 +30,7 @@ const DatePicker = ({ selectedDate, setSelectedDate, limitOrder, title }) => {
               color: '#ffffff',
             },
             '& .MuiInputBase-input': {
+              color: '#ffffff',
               paddingRight: '0px',
               paddingLeft: '10px',
             },
@@ -62,6 +63,9 @@ const DatePicker = ({ selectedDate, setSelectedDate, limitOrder, title }) => {
         // Days inside the calendar
         styleOverrides: {
           root: {
+            today: {
+              borderColor: '#ffffff',
+            },
             color: '#ffffff',
             '&:hover': {
               backgroundColor: 'rgba(255, 255, 255, 0.2)',
@@ -72,6 +76,9 @@ const DatePicker = ({ selectedDate, setSelectedDate, limitOrder, title }) => {
               '&:hover': {
                 backgroundColor: '#039874',
               },
+            },
+            '&.Mui-today': {
+              borderColor: '#ffffff',
             },
             '&.Mui-disabled': {
               color: 'rgba(255, 255, 255, 0.3)',

@@ -50,7 +50,7 @@ export default function InputBatches({
           sx={{
             color: 'white',
             fontWeight: 500,
-            marginLeft: 'auto', // Pushes 'batches' to the right
+            marginLeft: 'auto',
           }}
         >
           batches

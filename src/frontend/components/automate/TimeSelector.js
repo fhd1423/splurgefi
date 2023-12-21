@@ -16,7 +16,7 @@ export default function TimeSelector({
 
   return (
     <div>
-      <p className='text-white text-sm font-semibold mb-1'>{title}</p>
+      <p className='text-white text-sm font-semibold mb-0'>{title}</p>
       <div className='relative'>
         <button
           onClick={() => setOpen(!open)}
@@ -36,7 +36,7 @@ export default function TimeSelector({
             {options.map((option) => (
               <button
                 key={option.value}
-                className='text-white block px-4 py-2 text-sm w-full text-left rounded-md border-2 border-[#1B1B1B] hover:border-green-300'
+                className='text-white block px-4 py-2 text-sm w-full text-left rounded-md hover:bg-green-700 hover:bg-opacity-20'
                 onClick={() => {
                   onTradeActionChange('timeBwTrade', option.value);
                   setOpen(false);
