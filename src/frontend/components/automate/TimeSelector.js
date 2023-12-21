@@ -1,4 +1,57 @@
 import React, { useState } from 'react';
+import Box from '@mui/material/Box';
+import MenuItem from '@mui/material/MenuItem';
+import FormControl from '@mui/material/FormControl';
+import Select from '@mui/material/Select';
+import { styled } from '@mui/system';
+import IconButton from '@mui/material/IconButton';
+import KeyboardArrowDownIcon from '@mui/icons-material/KeyboardArrowDown';
+import Typography from '@mui/material/Typography';
+
+// Custom styles for the form control
+const CustomFormControl = styled(FormControl)({
+  backgroundColor: '#1B1B1B',
+  borderRadius: '10px',
+  width: '220px',
+  height: '55px',
+  display: 'flex',
+  flexDirection: 'row',
+  alignItems: 'center',
+  justifyContent: 'space-between',
+});
+
+const CustomMenuItem = styled(MenuItem)({
+  color: 'white',
+  width: '100%',
+  transition: 'background-color 0.3s ease, color 0.3s ease',
+  '&:hover': {
+    backgroundColor: 'rgba(255, 255, 255, 0.2)',
+    color: '#E0E0E0',
+  },
+  '&.Mui-selected': {
+    backgroundColor: 'rgba(255, 255, 255, 0.25)',
+    '&:hover': {
+      backgroundColor: 'rgba(255, 255, 255, 0.3)',
+    },
+  },
+});
+
+// Custom styles for the select component
+const CustomSelect = styled(Select)({
+  '& .MuiSelect-select': {
+    color: 'white',
+    lineHeight: '50px',
+    paddingLeft: '10px',
+    paddingRight: '32px',
+    fontSize: '1.2rem',
+  },
+  '& .MuiSelect-icon': {
+    display: 'none',
+  },
+  '& .MuiOutlinedInput-notchedOutline': {
+    border: 'none',
+  },
+});
 
 export default function TimeSelector({
   selectedTradeAction,
@@ -6,49 +59,72 @@ export default function TimeSelector({
   title,
 }) {
   const [open, setOpen] = useState(false);
-  const [time, setTime] = useState('Select time');
-  const options = [
-    { value: 900, label: '15 mins' },
-    { value: 3600, label: '1 hr' },
-    { value: 14400, label: '4 hrs' },
-    { value: 57600, label: '24 hrs' },
-  ];
+
+  // Toggles the select dropdown
+  const toggleDropdown = () => {
+    setOpen((prev) => !prev);
+  };
 
   return (
-    <div>
-      <p className='text-white text-sm font-semibold mb-0'>{title}</p>
-      <div className='relative'>
-        <button
-          onClick={() => setOpen(!open)}
-          className='mt-3 bg-[#1B1B1B] text-white py-5 px-4 rounded-xl leading-none flex justify-between items-center w-full'
+    <Box sx={{ minWidth: 120 }}>
+      <Typography
+        variant='subtitle1'
+        color='white'
+        fontWeight='600'
+        gutterBottom
+        style={{ marginBottom: '3px', fontSize: '.85rem', textAlign: 'left' }}
+      >
+        {title}
+      </Typography>
+      <CustomFormControl fullWidth>
+        <CustomSelect
+          open={open}
+          value={selectedTradeAction}
+          onClose={() => setOpen(false)}
+          onOpen={() => setOpen(true)}
+          displayEmpty
+          IconComponent={KeyboardArrowDownIcon}
+          onChange={(event) =>
+            onTradeActionChange('timeBwTrade', event.target.value)
+          }
+          MenuProps={{
+            PaperProps: {
+              style: {
+                width: '220px',
+                backgroundColor: '#1B1B1B',
+                color: 'white',
+                borderRadius: '10px',
+              },
+            },
+            anchorOrigin: {
+              vertical: 'bottom',
+              horizontal: 'left',
+            },
+            transformOrigin: {
+              vertical: 'top',
+              horizontal: 'left',
+            },
+          }}
         >
-          {time}
-          <svg
-            className='fill-current h-4 w-4'
-            xmlns='http://www.w3.org/2000/svg'
-            viewBox='0 0 20 20'
-          >
-            <path d='M5.516 7.548c0.436-0.446 1.043-0.481 1.576 0l3.908 3.747 3.908-3.747c0.533-0.481 1.141-0.446 1.576 0 0.436 0.445 0.408 1.197 0 1.615l-4.695 4.502c-0.533 0.481-1.408 0.481-1.942 0l-4.695-4.502c-0.408-0.418-0.436-1.17 0-1.615z' />
-          </svg>
-        </button>
-        {open && (
-          <div className='absolute z-10 mt-1 w-full rounded shadow bg-[#1B1B1B]'>
-            {options.map((option) => (
-              <button
-                key={option.value}
-                className='text-white block px-4 py-2 text-sm w-full text-left rounded-md hover:bg-green-700 hover:bg-opacity-20'
-                onClick={() => {
-                  onTradeActionChange('timeBwTrade', option.value);
-                  setOpen(false);
-                  setTime(option.label);
-                }}
-              >
-                {option.label}
-              </button>
-            ))}
-          </div>
-        )}
-      </div>
-    </div>
+          <CustomMenuItem value={900}>15 mins</CustomMenuItem>
+          <CustomMenuItem value={3600}>1 hr</CustomMenuItem>
+          <CustomMenuItem value={14400}>4 hrs</CustomMenuItem>
+          <CustomMenuItem value={57600}>24 hrs</CustomMenuItem>
+        </CustomSelect>
+        <IconButton
+          onClick={toggleDropdown}
+          sx={{
+            position: 'absolute',
+            top: '50%',
+            right: 10,
+            transform: 'translateY(-50%)',
+            color: '#FFFFFF',
+            backgroundColor: 'transparent',
+          }}
+        >
+          <KeyboardArrowDownIcon />
+        </IconButton>
+      </CustomFormControl>
+    </Box>
   );
 }

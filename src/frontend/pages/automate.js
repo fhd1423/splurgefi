@@ -86,6 +86,16 @@ export default function Automate() {
     symbol: 'WINR',
   });
 
+  // FRONT END
+  useEffect(() => {
+    // Set the background color for the entire page
+    document.body.style.backgroundColor = '#000';
+
+    return () => {
+      document.body.style.backgroundColor = '';
+    };
+  }, []);
+
   // PRICE DATA METHODS
   const getHistoricalPriceData = async (tokenAddress) => {
     const axios = require('axios');
@@ -329,7 +339,7 @@ export default function Automate() {
   };
   useEffect(() => {
     if (primaryWallet?.address && authToken) {
-      console.log("SEX", authToken)
+      console.log('SEX', authToken);
       // const jwtData = parseJwt(authToken);
 
       uploadUserData(primaryWallet?.address, jwtData);

@@ -36,7 +36,7 @@ export default function InputBatches({
         color='white'
         fontWeight={600}
         gutterBottom
-        style={{ marginBottom: '8px', fontSize: '0.85rem' }} // Adjusted margin and font size
+        style={{ marginBottom: '8px', fontSize: '0.85rem' }}
       >
         {title}
       </Typography>
