@@ -4,6 +4,7 @@ import React, { useState, useEffect } from 'react';
 import { Box, Grid, Paper, Typography, Alert } from '@mui/material';
 import Head from 'next/head';
 import { formatEther, getAddress } from 'viem';
+import { useMediaQuery } from '@mui/material';
 
 import router from 'next/router';
 
