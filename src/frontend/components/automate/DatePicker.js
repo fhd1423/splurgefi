@@ -20,7 +20,7 @@ const DatePicker = ({ selectedDate, setSelectedDate, limitOrder, title }) => {
         styleOverrides: {
           root: {
             input: {
-              color: '#ffffff',
+              color: '#1B1B1B',
               height: '35px',
               width: '170px',
               padding: '10px 14px 10px 0',
@@ -49,11 +49,70 @@ const DatePicker = ({ selectedDate, setSelectedDate, limitOrder, title }) => {
           },
         },
       },
+
+      MuiPickersPopper: {
+        styleOverrides: {
+          paper: {
+            backgroundColor: '#1B1B1B',
+            color: '#ffffff',
+          },
+        },
+      },
+      MuiPickersDay: {
+        // Days inside the calendar
+        styleOverrides: {
+          root: {
+            color: '#ffffff',
+            '&:hover': {
+              backgroundColor: 'rgba(255, 255, 255, 0.2)',
+            },
+            '&.Mui-selected': {
+              backgroundColor: '#03C988',
+              color: '#1B1B1B',
+              '&:hover': {
+                backgroundColor: '#039874',
+              },
+            },
+            '&.Mui-disabled': {
+              color: 'rgba(255, 255, 255, 0.3)',
+            },
+          },
+        },
+      },
+      MuiPickersPopper: {
+        styleOverrides: {
+          paper: {
+            backgroundColor: '#1B1B1B', // Background of the popup
+            color: '#ffffff',
+            '.MuiToolbar-root': {
+              color: '#ffffff',
+            },
+            '.MuiButtonBase-root': {
+              // Arrow buttons
+              color: '#ffffff',
+            },
+            '.MuiPickersYear-root': {
+              color: '#ffffff',
+            },
+            '.MuiPickersYear-yearSelected': {
+              // Selected year
+              color: '#03C988',
+            },
+            '.MuiPickersClockNumber-clockNumber': {
+              color: '#ffffff',
+            },
+            '.MuiTypography-root': {
+              // Month and year in the header
+              color: '#ffffff',
+            },
+          },
+        },
+      },
       MuiInputAdornment: {
         styleOverrides: {
           root: {
-            marginLeft: '0px', // Reduces the default margin on the left side of the adornment
-            marginRight: '0px', // Optionally, reduces the margin on the right side if needed
+            marginLeft: '0px',
+            marginRight: '0px',
           },
         },
       },
