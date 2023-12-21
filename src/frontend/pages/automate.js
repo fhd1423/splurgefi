@@ -5,7 +5,6 @@ import { Box, Grid, Paper, Typography, Alert } from '@mui/material';
 import Head from 'next/head';
 import { formatEther, getAddress } from 'viem';
 import { useMediaQuery } from '@mui/material';
-
 import router from 'next/router';
 
 // MUI Date Picker Imports
@@ -19,14 +18,12 @@ import ToggleOrderType from '../components/automate/ToggleBuySell';
 import ToggleSwap from '../components/automate/ToggleSwap';
 import InputPercent from '../components/automate/InputPercent';
 import InputBatches from '../components/automate/InputBatches';
-import TradeSelector from '../components/automate/TradeSelector';
 import DatePicker from '@/components/automate/DatePicker';
 import TimeSelector from '@/components/automate/TimeSelector';
 import NavBar from '../components/NavBar';
 import TradeSummaryDropdown from '@/components/automate/TradeSummaryDropdown';
 import AvgPriceDropdown from '@/components/automate/AvgPriceDropdown';
-import Popover from '@mui/material/Popover';
-
+import CommunityPopUp from '@/components/automate/CommunityPopUp';
 import {
   useSignTypedData,
   usePrepareContractWrite,
@@ -585,7 +582,7 @@ export default function Automate() {
                   />
                 </Grid>
 
-                <Grid item xs={6}>
+                <Grid item xs={6} style={{ marginTop: '5px' }}>
                   <TimeSelector
                     onTradeActionChange={handleMessageChange}
                     title='Every'
@@ -717,6 +714,10 @@ export default function Automate() {
             </div>
           </div>
         )}
+
+        <div style={{ position: 'absolute', bottom: 100, left: 30 }}>
+          <CommunityPopUp></CommunityPopUp>
+        </div>
       </div>
     </LocalizationProvider>
   );
