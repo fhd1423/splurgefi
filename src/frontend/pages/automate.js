@@ -64,11 +64,11 @@ export default function Automate() {
     outputTokenAddress: '0xd77b108d4f6cefaa0cae9506a934e825becca46e', // DEFAULT OUTPUT - WINR
     recipient: null,
     amount: null, // Input token scaled(18 decimal places)
-    tranches: null,
+    tranches: 1,
     percentChange: null,
     priceAvg: 5,
     deadline: null,
-    timeBwTrade: null,
+    timeBwTrade: 0,
     salt: generateRandomSalt(),
   });
 
