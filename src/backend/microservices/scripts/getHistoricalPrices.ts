@@ -29,6 +29,16 @@ const getFiveMinAvg = (priceData: number[]): number => {
 };
 
 async function main(tokenAddress: string, wethAddress: string) {
+  const { data: existingPairs } = await supabase
+    .from('Pairs')
+    .select('*')
+    .eq('path', `${wethAddress}-${tokenAddress}`);
+
+  if (existingPairs && existingPairs.length > 0) {
+    const existingPrices = existingPairs[0][`5min_avg`]['close_prices'];
+    const existingAvg = getFiveMinAvg(existingPrices);
+    console.log('existing', existingAvg);
+  }
   const coinPoolAddress = await getLargestPoolAddress(tokenAddress);
   const coinPrices = await getPrices(coinPoolAddress);
 
@@ -41,7 +51,7 @@ async function main(tokenAddress: string, wethAddress: string) {
   );
 
   const upsertData = {
-    path: `${tokenAddress}-${wethAddress}`,
+    path: `${wethAddress}-${tokenAddress}`,
     ['5min_avg']: { close_prices: ratioPrices },
     updated_at: new Date(),
     tokenName: 'SMOL',

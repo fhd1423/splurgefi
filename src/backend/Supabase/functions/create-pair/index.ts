@@ -64,6 +64,25 @@ async function main(
 Deno.serve(async (req) => {
   const { tokenAddress, tokenName } = await req.json();
 
+  const existingPairs = await supabase
+    .from('Pairs')
+    .eq('path', `0x82aF49447D8a07e3bd95BD0d56f35241523fBab1-${tokenAddress}`)
+    .select();
+
+  if (existingPairs.length > 0) {
+    const existingPrices = existingPairs[0][`5min_avg`]['close_prices'];
+    const existingAvg = getFiveMinAvg(existingPrices);
+
+    return new Response(
+      JSON.stringify({
+        message: `Pair already exists for ${tokenName}`,
+        avgPrice: existingAvg,
+      }),
+      {
+        headers: { 'Content-Type': 'application/json' },
+      },
+    );
+  }
   let data;
   try {
     const avgPrice = await main(

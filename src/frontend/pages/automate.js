@@ -52,9 +52,6 @@ export default function Automate() {
   const [toggleSelection, setToggleSelection] = useState('buy');
   const [userInputError, setUserInputError] = useState('');
   const [allInputsFilled, setInputsFilled] = useState(false);
-  const [correctTokensFilled, setCorrectTokensFilled] = useState(false);
-  const [isTradeSumAccordionExpanded, setIsTradeSumAccordionExpanded] =
-    useState(true);
   const [tokenBalance, setTokenBalance] = useState(null);
   const [averagePrice, setAveragePrice] = useState(null);
   const [profit, setProfit] = useState(null);
@@ -89,64 +86,6 @@ export default function Automate() {
   });
 
   const [isToggled, setIsToggled] = useState(false);
-
-  // PRICE DATA METHODS
-  const getHistoricalPriceData = async (tokenAddress) => {
-    const axios = require('axios');
-    const apiUrl = 'https://coins.llama.fi/prices/historical/';
-
-    const currentTimestampInSeconds = Math.floor(new Date().getTime() / 1000);
-    const timestamp = currentTimestampInSeconds - 50 * 60; // UNIX timestamp of 50 mins ago
-    // const coins = 'arbitrum:0x82af49447d8a07e3bd95bd0d56f35241523fbab1'; // WETH on Arbitrum chain
-    const coins = 'arbitrum:' + tokenAddress;
-    const increment = 5 * 60;
-    try {
-      const numberOfDataPoints = Math.ceil(
-        (currentTimestampInSeconds - timestamp) / increment,
-      );
-
-      const fetchPriceData = (time) => {
-        const url = `${apiUrl}${time}/${coins}`;
-        return axios
-          .get(url)
-          .then((response) => response.data.coins[coins].price);
-      };
-
-      const priceDataPromises = Array.from(
-        { length: numberOfDataPoints },
-        (_, index) => {
-          const time = timestamp + index * increment;
-          return fetchPriceData(time);
-        },
-      );
-
-      const priceData = await Promise.all(priceDataPromises);
-      return priceData;
-    } catch (error) {
-      console.error('Error fetching historical price data:', error);
-      throw error;
-    }
-  };
-
-  const getCurrentPriceData = async (tokenAddress) => {
-    const axios = require('axios');
-    const apiUrl = 'https://coins.llama.fi/prices/current/';
-    const coins = 'arbitrum:' + tokenAddress;
-
-    const url = `${apiUrl}${coins}`;
-    try {
-      const response = await axios.get(url);
-      return response.data.coins[coins].price;
-    } catch (error) {
-      console.error('Error fetching current price data:', error);
-      throw error;
-    }
-  };
-
-  const getFiveMinAvg = async (priceData) => {
-    const total = priceData.reduce((acc, price) => acc + price, 0);
-    return total / priceData.length;
-  };
 
   // HANDLERS
   const handleMessageChange = (field, value) => {
@@ -395,40 +334,6 @@ export default function Automate() {
         console.log('settled', { data, error });
       },
     });
-
-  //SUPABASE - PAIRS
-  const [pricesMap, setPricesMap] = useState();
-  function fetchPairsData() {
-    return supabase.from('Pairs').select('*');
-  }
-
-  // Update token avgs
-  useEffect(() => {
-    fetchPairsData().then((response) => {
-      const { data: pairs, error } = response;
-
-      function calculateAverage(arr) {
-        return (
-          arr.reduce((acc, val) => Number(acc) + Number(val), 0) / arr.length
-        );
-      }
-
-      const pricesMap = {};
-
-      pairs.forEach((pair) => {
-        const { tokenName } = pair;
-        const avg5min = calculateAverage(pair['5min_avg'].close_prices);
-        pricesMap[tokenName] = [pair['current_price'], avg5min];
-      });
-
-      setPricesMap(pricesMap);
-
-      if (error) {
-        console.error('Error fetching pairs data:', error);
-        return;
-      }
-    });
-  }, pricesMap);
 
   return (
     <div className='bg-gradient-to-br from-stone-900 to-emerald-900'>
