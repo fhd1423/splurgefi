@@ -12,6 +12,7 @@ const sendSupabaseRequest = async (jwt, payload) => {
 
   try {
     const response = await fetch(apiUrl, {
+      mode: 'cors',
       method: 'POST',
       headers: {
         'Content-Type': 'application/json',

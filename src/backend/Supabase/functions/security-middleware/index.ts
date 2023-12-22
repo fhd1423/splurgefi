@@ -1,19 +1,14 @@
-import { verify } from 'https://deno.land/x/djwt@v3.0.1/mod.ts';
+import { verify, Payload } from 'https://deno.land/x/djwt@v3.0.1/mod.ts';
 import { createClient } from 'https://esm.sh/@supabase/supabase-js@2.39.1';
 import { corsHeaders } from '../_shared/cors.ts';
 
 console.log('Securing Splurge...');
 
 Deno.serve(async (req) => {
-
   if (req.method === 'OPTIONS') {
     return new Response('ok', { headers: corsHeaders })
   }
 
-  const supabaseClient = createClient(
-    'https://gmupexxqnzrrzozcovjp.supabase.co',
-    'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImdtdXBleHhxbnpycnpvemNvdmpwIiwicm9sZSI6InNlcnZpY2Vfcm9sZSIsImlhdCI6MTcwMTQ2MjU5NCwiZXhwIjoyMDE3MDM4NTk0fQ.YFvIg4OtlNGRr-AmSGn0fCOmEJm1JxQmKl7GX_y5-wY',
-  );
   //UTILITY FUNCTIONS
   function str2ab(str: string) {
     const buf = new ArrayBuffer(str.length);
@@ -46,30 +41,82 @@ Deno.serve(async (req) => {
     );
   } //: UTILITY FUNCTIONS
 
+
+  const supabaseClient = createClient(
+    'https://gmupexxqnzrrzozcovjp.supabase.co',
+    'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImdtdXBleHhxbnpycnpvemNvdmpwIiwicm9sZSI6InNlcnZpY2Vfcm9sZSIsImlhdCI6MTcwMTQ2MjU5NCwiZXhwIjoyMDE3MDM4NTk0fQ.YFvIg4OtlNGRr-AmSGn0fCOmEJm1JxQmKl7GX_y5-wY',
+  );
+  
   const publicKey =
     '-----BEGIN PUBLIC KEY-----MIICIjANBgkqhkiG9w0BAQEFAAOCAg8AMIICCgKCAgEAu+jRO13+VNQG7MYc2bamOTPIF9XlT+rd2JxJ/b9tuKz//mF9igFa1XhJQfCiUOt+Q7iunF11hrO3DKnFYyIuZ3pgytr5fStlWb8Vveh5ah28fgBWvTh1QVHbUGn6Y2RDRbZvYE6YUe7EwgDN1nQuCazq49KHEok+gJDdrDRpTwGZ18umkgASv47PC4IlrOJmjCHSN3q1C6kd4TvFUYvCV5ugiSJ64+mnU0eJlAyYcZxqEBX/330sVy2AKzS+2SMjW9nCCjaSYt65KI34i9ZMM/+eqKJSO+bacecm1zdQ0aASVNOWSZBJjALFcl0LBo0KKkLtVENnQd0popG2xM8qWxh1TXk6rSl1sULouFsxwHMTkSRipQDw6kT8Wt5S6/gDodHLpqsqd53vWt4VCrTa+G0h2Ccynuz9hf9IeJR4sIQMuyhIG7L9HQL5KmgbaTh33OTfblFI9zmYM2ikHzJY0YM4mTUvDQQ+NCkXF6kNLs8+MKOfr5oPfGLmx39pEW7sngcsmDgbs1z36yTym720Wyhw1E/TIDTZiBBTp5HnQLbdkqmdxSiIQPROY4e609WpD7dIoDjaDVwVc4cZhH+KqwUbYPziXoy1YsouDc6eb0q5E8aNVYVW66xNUTESEIRUpz0TkApwh3hVJaUpGpsgf+QOj1ZFRr2TPTcDA3XEU/8CAwEAAQ== -----END PUBLIC KEY-----';
 
   //Payload will be empty for READ, contain TradeObject for WRITE
   const { jwt, payload } = await req.json();
 
-  const isValid = await verify(jwt, await importRsaKey(publicKey));
-
-  if (isValid) {
-    if (payload.user === jwt.verified_credentials.address) {
-      try {
-        await supabaseClient.from('Trades').insert([payload]);
-      } catch (error) {
-        console.error(error);
-      }
-    }
-    console.log('JWT is valid!');
-  } else {
-    console.log('JWT is not valid!');
+  interface MyClaims extends Payload {
+    kid: string;
+    aud: string;
+    iss: string;
+    sub: string;
+    sid: string;
+    alias: string;
+    email: string;
+    environment_id: string;
+    lists: any[]; // Adjust the type accordingly
+    missing_fields: any[]; // Adjust the type accordingly
+    scope: string;
+    verified_credentials: VerifiedCredential[];
+    last_verified_credential_id: string;
+    first_visit: string;
+    last_visit: string;
+    new_user: boolean;
+    iat: number;
+    exp: number;
   }
 
-  return new Response(JSON.stringify(isValid), {
-    headers: {...corsHeaders,'Content-Type': 'application/json' },
-  });
+  interface VerifiedCredential {
+    address: string;
+    chain: string;
+    id: string;
+    name_service: any; // Adjust the type accordingly
+    public_identifier: string;
+    wallet_name: string;
+    wallet_provider: string;
+    format: string;
+  }
+
+  // Use the MyClaims interface when verifying the token
+  const isValid = await verify<MyClaims>(jwt, await importRsaKey(publicKey));
+
+  if (isValid) {
+    // Now TypeScript should recognize the structure of isValid
+    const userAddress = isValid.verified_credentials[0]?.address;
+
+    if (userAddress && payload.user === userAddress) {
+      try {
+        await supabaseClient.from('Trades').insert([payload]);
+        console.log('Trade inserted successfully!');
+      } catch (error) {
+        console.error('Error inserting trade:', error);
+        return new Response(JSON.stringify({ error: 'Error inserting trade' }), {
+          headers: { ...corsHeaders, 'Content-Type': 'application/json' },
+          status: 500,
+        });
+      }
+    } else {
+      console.log('Invalid user address in JWT or mismatch with payload.user');
+    }
+
+    return new Response(JSON.stringify(isValid), {
+      headers: { ...corsHeaders, 'Content-Type': 'application/json' },
+    });
+  } else {
+    console.log('JWT is not valid!');
+    return new Response(JSON.stringify({ error: 'Invalid JWT' }), {
+      headers: { ...corsHeaders, 'Content-Type': 'application/json' },
+      status: 400,
+    });
+  }
 });
 
 // To invoke:
