@@ -1,9 +1,15 @@
 import { verify } from 'https://deno.land/x/djwt@v3.0.1/mod.ts';
 import { createClient } from 'https://esm.sh/@supabase/supabase-js@2.39.1';
+import { corsHeaders } from '../_shared/cors.ts';
 
 console.log('Securing Splurge...');
 
 Deno.serve(async (req) => {
+
+  if (req.method === 'OPTIONS') {
+    return new Response('ok', { headers: corsHeaders })
+  }
+
   const supabaseClient = createClient(
     'https://gmupexxqnzrrzozcovjp.supabase.co',
     'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImdtdXBleHhxbnpycnpvemNvdmpwIiwicm9sZSI6InNlcnZpY2Vfcm9sZSIsImlhdCI6MTcwMTQ2MjU5NCwiZXhwIjoyMDE3MDM4NTk0fQ.YFvIg4OtlNGRr-AmSGn0fCOmEJm1JxQmKl7GX_y5-wY',
@@ -62,7 +68,7 @@ Deno.serve(async (req) => {
   }
 
   return new Response(JSON.stringify(isValid), {
-    headers: { 'Content-Type': 'application/json' },
+    headers: {...corsHeaders,'Content-Type': 'application/json' },
   });
 });
 
