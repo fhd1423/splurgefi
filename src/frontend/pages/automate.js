@@ -90,16 +90,6 @@ export default function Automate() {
 
   const [isToggled, setIsToggled] = useState(false);
 
-  // FRONT END
-  useEffect(() => {
-    // Set the background color for the entire page
-    document.body.style.backgroundColor = '#000';
-
-    return () => {
-      document.body.style.backgroundColor = '';
-    };
-  }, []);
-
   // PRICE DATA METHODS
   const getHistoricalPriceData = async (tokenAddress) => {
     const axios = require('axios');
@@ -211,15 +201,7 @@ export default function Automate() {
   };
 
   const tradeEntered = () => {
-    const fields = [
-      'inputTokenAddress',
-      'outputTokenAddress',
-      'amount',
-      'tranches',
-      'percentChange',
-      'deadline',
-      'timeBwTrade',
-    ];
+    const fields = ['amount', 'percentChange', 'deadline'];
 
     const isAnyFieldEmpty = fields.some((field) => !message[field]);
 
@@ -244,77 +226,75 @@ export default function Automate() {
   };
 
   useEffect(() => {
-    const allFilled = tradeEntered();
-    setInputsFilled(allFilled);
+    if (tradeEntered()) {
+      const allFilled = tradeEntered();
+      setInputsFilled(allFilled);
 
-    const correctTokens = validateInputAndOutput();
-    setCorrectTokensFilled(correctTokens);
+      const correctTokens = validateInputAndOutput();
+      setCorrectTokensFilled(correctTokens);
 
-    if (validateInputs()) {
-      setUserInputError('');
-    }
+      if (validateInputs()) {
+        setUserInputError('');
+      }
 
-    if (!correctTokens) {
-      setUserInputError('Please make sure either input or output is WETH.');
-    } else {
-      console.log('INSIDE ELSE');
-      console.log('INPUT ADDY:', message.inputTokenAddress);
-      console.log('Output ADDY:', message.outputTokenAddress);
-
-      setUserInputError('');
-    }
-
-    console.log('All inputs filled:', allFilled);
-
-    if (correctTokens) {
-      if (currentInput.name === 'WETH') {
-        console.log('INSIDE CALC PROFIT FOR INPUT WETH');
-
-        // Fetch the 5-min average price
-        getHistoricalPriceData(currentOutput.address)
-          .then((priceData) => getFiveMinAvg(priceData))
-          .then((avgPrice) => {
-            setAveragePrice(avgPrice);
-            console.log('Average Price:', avgPrice); // WORKS
-
-            console.log('Output Address:', currentOutput.address);
-            // Now fetch the current price
-            return getCurrentPriceData(currentOutput.address).then(
-              (currentPriceData) => {
-                console.log('Current Price:', currentPriceData);
-
-                // Calculate and set profit based on average and current prices
-                const resultingProfit = calcBuyProfit(
-                  avgPrice,
-                  currentPriceData,
-                  message.percentChange,
-                  message.amount,
-                );
-                setProfit(resultingProfit);
-                console.log('Calculated Profit:', resultingProfit);
-                return resultingProfit;
-              },
-            );
-          })
-          .catch((error) => console.error('Error:', error));
+      if (!correctTokens) {
+        setUserInputError('Please make sure either input or output is WETH.');
       } else {
-        getHistoricalPriceData(currentInput.address)
-          .then((priceData) => getFiveMinAvg(priceData))
-          .then((avg) => setAveragePrice(avg))
-          .catch((error) =>
-            console.error('Error calculating average price:', error),
-          );
+        setUserInputError('');
+      }
 
-        getCurrentPriceData(currentInput.address)
-          .then((currentPriceData) =>
-            calcSellProfit(
-              averagePrice,
-              currentPriceData,
-              message.percentChange,
-              message.amount,
-            ),
-          )
-          .then((resultingProfit) => setProfit(resultingProfit));
+      console.log('All inputs filled:', allFilled);
+
+      if (correctTokens) {
+        if (currentInput.name === 'WETH') {
+          console.log('INSIDE CALC PROFIT FOR INPUT WETH');
+
+          // Fetch the 5-min average price
+          getHistoricalPriceData(currentOutput.address)
+            .then((priceData) => getFiveMinAvg(priceData))
+            .then((avgPrice) => {
+              setAveragePrice(avgPrice);
+              console.log('Average Price:', avgPrice); // WORKS
+
+              console.log('Output Address:', currentOutput.address);
+              // Now fetch the current price
+              return getCurrentPriceData(currentOutput.address).then(
+                (currentPriceData) => {
+                  console.log('Current Price:', currentPriceData);
+
+                  // Calculate and set profit based on average and current prices
+                  const resultingProfit = calcBuyProfit(
+                    avgPrice,
+                    currentPriceData,
+                    message.percentChange,
+                    message.amount,
+                  );
+                  setProfit(resultingProfit);
+                  console.log('Calculated Profit:', resultingProfit);
+                  return resultingProfit;
+                },
+              );
+            })
+            .catch((error) => console.error('Error:', error));
+        } else {
+          getHistoricalPriceData(currentInput.address)
+            .then((priceData) => getFiveMinAvg(priceData))
+            .then((avg) => setAveragePrice(avg))
+            .catch((error) =>
+              console.error('Error calculating average price:', error),
+            );
+
+          getCurrentPriceData(currentInput.address)
+            .then((currentPriceData) =>
+              calcSellProfit(
+                averagePrice,
+                currentPriceData,
+                message.percentChange,
+                message.amount,
+              ),
+            )
+            .then((resultingProfit) => setProfit(resultingProfit));
+        }
       }
     }
   }, [message]);
@@ -466,43 +446,32 @@ export default function Automate() {
   }
 
   // Update token avgs
-  useEffect(
-    () => {
-      fetchPairsData().then((response) => {
-        const { data: pairs, error } = response;
+  useEffect(() => {
+    fetchPairsData().then((response) => {
+      const { data: pairs, error } = response;
 
-        function calculateAverage(arr) {
-          return (
-            arr.reduce((acc, val) => Number(acc) + Number(val), 0) / arr.length
-          );
-        }
+      function calculateAverage(arr) {
+        return (
+          arr.reduce((acc, val) => Number(acc) + Number(val), 0) / arr.length
+        );
+      }
 
-        const pricesMap = {};
+      const pricesMap = {};
 
-        pairs.forEach((pair) => {
-          const { tokenName } = pair;
-          const avg5min = calculateAverage(pair['5min_avg'].close_prices);
-
-          // const avg15min = calculateAverage(pair['15min_avg'].close_prices);
-          // const avg60min = calculateAverage(pair['60min_avg'].close_prices);
-          // const avg240min = calculateAverage(pair['240min_avg'].close_prices);
-          // const avg1440min = calculateAverage(pair['1440min_avg'].close_prices);
-
-          // averageMap[tokenName] = [avg15min, avg60min, avg240min, avg1440min];
-          pricesMap[tokenName] = [pair['current_price'], avg5min];
-        });
-
-        setPricesMap(pricesMap);
-
-        if (error) {
-          console.error('Error fetching pairs data:', error);
-          return;
-        }
+      pairs.forEach((pair) => {
+        const { tokenName } = pair;
+        const avg5min = calculateAverage(pair['5min_avg'].close_prices);
+        pricesMap[tokenName] = [pair['current_price'], avg5min];
       });
-    },
 
-    pricesMap,
-  );
+      setPricesMap(pricesMap);
+
+      if (error) {
+        console.error('Error fetching pairs data:', error);
+        return;
+      }
+    });
+  }, pricesMap);
 
   return (
     <div className='bg-gradient-to-br from-stone-900 to-emerald-900'>
