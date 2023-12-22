@@ -88,6 +88,12 @@ export default function Automate() {
     symbol: 'WINR',
   });
 
+  const [isToggled, setIsToggled] = useState(false);
+
+  const toggleSwitch = () => {
+    setIsToggled(!isToggled);
+  };
+
   // FRONT END
   useEffect(() => {
     // Set the background color for the entire page
@@ -544,11 +550,28 @@ export default function Automate() {
                 borderRadius: '16px',
               }}
             >
+              <div className='w-full flex justify-end items-center'>
+                <span className='mr-2  font-semibold text-white'>
+                  Swap over time
+                </span>
+                <div
+                  className={`w-14 h-8 flex items-center bg-gray-200 rounded-full p-1 cursor-pointer ${
+                    isToggled ? 'bg-green-400' : 'bg-gray-700'
+                  }`}
+                  onClick={toggleSwitch}
+                >
+                  <div
+                    className={`bg-white w-6 h-6 rounded-full shadow-md transform ${
+                      isToggled ? 'translate-x-6' : 'translate-x-0'
+                    } transition-transform`}
+                  ></div>
+                </div>
+              </div>
               <Grid container spacing={2} justifyContent='center'>
                 <React.Fragment>
                   <Grid item xs={12}>
                     <InputToken
-                      title='I want to allocate'
+                      title='Allocate'
                       onValueChange={handleMessageChange}
                       onSelectChange={handleMessageChange}
                       message={message}
@@ -588,23 +611,27 @@ export default function Automate() {
                       setCurrentOutput={setCurrentOutput}
                     />
                   </Grid>
-                  <Grid item xs={6}>
-                    <InputBatches
-                      title='Split into'
-                      placeHolder={'5'}
-                      value={message.tranches}
-                      onValueChange={(e) =>
-                        handleMessageChange('tranches', e.target.value)
-                      }
-                    />
-                  </Grid>
+                  {isToggled && (
+                    <Grid item xs={6}>
+                      <InputBatches
+                        title='Split into'
+                        placeHolder={'5'}
+                        value={message.tranches}
+                        onValueChange={(e) =>
+                          handleMessageChange('tranches', e.target.value)
+                        }
+                      />
+                    </Grid>
+                  )}
 
-                  <Grid item xs={6} style={{ marginTop: '5px' }}>
-                    <TimeSelector
-                      onTradeActionChange={handleMessageChange}
-                      title='Every'
-                    />
-                  </Grid>
+                  {isToggled && (
+                    <Grid item xs={6} style={{ marginTop: '5px' }}>
+                      <TimeSelector
+                        onTradeActionChange={handleMessageChange}
+                        title='Every'
+                      />
+                    </Grid>
+                  )}
 
                   <Grid item xs={6}>
                     <InputPercent
