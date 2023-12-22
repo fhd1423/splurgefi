@@ -1,60 +1,59 @@
 import axios from 'axios';
+import { supabase } from '../utils/client';
 
-// JSON response format
-interface CoinPriceResponse {
-  coins: {
-    [key: string]: {
-      decimals: number;
-      symbol: string;
-      price: number;
-      timestamp: number;
-      confidence: number;
-    };
-  };
-}
+const apiUrl = 'https://api.geckoterminal.com/api/v2';
 
-// Format: /prices/historical/{timestamp}/{coins}
-const apiUrl: string = 'https://coins.llama.fi/prices/historical/';
+const getLargestPoolAddress = async (tokenAddress: string) => {
+  let response = await axios.get(
+    `${apiUrl}/networks/arbitrum/tokens/${tokenAddress}/pools`,
+  );
 
-const getHistoricalPriceData = async () => {
-  const currentTimestampInSeconds = Math.floor(new Date().getTime() / 1000);
-  const timestamp = currentTimestampInSeconds - 50 * 60; // UNIX timestamp of 50 mins ago
-  const coins = 'arbitrum:0x82af49447d8a07e3bd95bd0d56f35241523fbab1'; // WETH on Arbitrum chain
-  const increment = 5 * 60;
-
-  try {
-    const priceDataPromises = Array.from(
-      {
-        length: Math.ceil((currentTimestampInSeconds - timestamp) / increment),
-      },
-      (_, index) =>
-        axios
-          .get(`${apiUrl}${timestamp + index * increment}/${coins}`)
-          .then(
-            (response) =>
-              (response.data as CoinPriceResponse).coins[coins].price,
-          ),
-    );
-
-    const priceData = await Promise.all(priceDataPromises);
-    return priceData;
-  } catch (error) {
-    console.error('Error fetching historical price data:', error);
-    throw error;
-  }
+  return response.data.data[0].attributes.address;
 };
 
-const getFiveMinAvg = async (priceData: number[]): Promise<number> => {
-  const total = priceData.reduce((acc, price) => acc + price, 0);
+const getPrices = async (poolAddress: string) => {
+  const currentTime = Math.floor(new Date().getTime() / 1000);
+  let response = await axios.get(
+    `${apiUrl}/networks/arbitrum/pools/${poolAddress}/ohlcv/minute?aggregate=5&before_timestamp=${currentTime}&limit=10`,
+  );
+
+  const coinPricesUSD = response.data.data.attributes.ohlcv_list.map(
+    (ohlcv: any) => [ohlcv[4]],
+  );
+  return coinPricesUSD;
+};
+
+const getFiveMinAvg = (priceData: number[]): number => {
+  const total = priceData.reduce((acc, price) => acc + Number(price), 0);
   return total / priceData.length;
 };
 
-getHistoricalPriceData()
-  .then((priceData) => {
-    console.log('Price Data:', priceData);
-    return getFiveMinAvg(priceData);
-  })
-  .then((avg) => {
-    console.log('5 min average:', avg);
-  })
-  .catch((error) => console.error(error));
+async function main(tokenAddress: string, wethAddress: string) {
+  const coinPoolAddress = await getLargestPoolAddress(tokenAddress);
+  const coinPrices = await getPrices(coinPoolAddress);
+
+  const ethPoolAddress = await getLargestPoolAddress(wethAddress);
+  const ethPrices = await getPrices(ethPoolAddress);
+
+  const ratioPrices = coinPrices.map(
+    (price: number, index: number) =>
+      (0.01 * ethPrices[index]) / coinPrices[index],
+  );
+
+  const upsertData = {
+    path: `${tokenAddress}-${wethAddress}`,
+    ['5min_avg']: { close_prices: ratioPrices },
+    updated_at: new Date(),
+    tokenName: 'SMOL',
+  };
+
+  let { data, error } = await supabase.from('Pairs').upsert([upsertData]);
+
+  const avgRatio = await getFiveMinAvg(ratioPrices);
+  console.log(avgRatio);
+}
+
+main(
+  '0x9E64D3b9e8eC387a9a58CED80b71Ed815f8D82B5',
+  '0x82aF49447D8a07e3bd95BD0d56f35241523fBab1',
+);

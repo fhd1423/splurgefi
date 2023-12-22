@@ -91,28 +91,27 @@ Deno.serve(async (req) => {
     // Now TypeScript should recognize the structure of isValid
     const userAddress = isValid.verified_credentials[0]?.address;
 
-    if(Object.keys(payload).length === 0){
-      try{
-        const {data, error} = await supabaseClient.from('Trades').select("*").eq('user', userAddress);
+    if (Object.keys(payload).length === 0) {
+      try {
+        const { data, error } = await supabaseClient
+          .from('Trades')
+          .select('*')
+          .eq('user', userAddress);
 
         return new Response(JSON.stringify(data), {
           headers: { ...corsHeaders, 'Content-Type': 'application/json' },
         });
-
-      }
-      catch(error){
+      } catch (error) {
         console.error('Error fetching trades:', error);
-          return new Response(
-            JSON.stringify({ error: 'Error fetching trades' }),
-            {
-              headers: { ...corsHeaders, 'Content-Type': 'application/json' },
-              status: 500,
-            },
-          );
+        return new Response(
+          JSON.stringify({ error: 'Error fetching trades' }),
+          {
+            headers: { ...corsHeaders, 'Content-Type': 'application/json' },
+            status: 500,
+          },
+        );
       }
-    }
-
-    else{
+    } else {
       if (userAddress && payload.user === userAddress) {
         try {
           await supabaseClient.from('Trades').insert([payload]);
@@ -128,14 +127,15 @@ Deno.serve(async (req) => {
           );
         }
       } else {
-        console.log('Invalid user address in JWT or mismatch with payload.user');
+        console.log(
+          'Invalid user address in JWT or mismatch with payload.user',
+        );
       }
     }
 
     return new Response(JSON.stringify(isValid), {
       headers: { ...corsHeaders, 'Content-Type': 'application/json' },
     });
-
   } else {
     console.log('JWT is not valid!');
     return new Response(JSON.stringify({ error: 'Invalid JWT' }), {
