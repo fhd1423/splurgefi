@@ -90,10 +90,6 @@ export default function Automate() {
 
   const [isToggled, setIsToggled] = useState(false);
 
-  const toggleSwitch = () => {
-    setIsToggled(!isToggled);
-  };
-
   // FRONT END
   useEffect(() => {
     // Set the background color for the entire page
@@ -168,6 +164,18 @@ export default function Automate() {
       ...prevMessage,
       [field]: value,
     }));
+  };
+
+  const toggleSwitch = () => {
+    setIsToggled(!isToggled);
+    if (isToggled) {
+      handleMessageChange('tranches', 1);
+      handleMessageChange('timeBwTrade', 0);
+    }
+    if (!isToggled && (message.tranches != 1 || message.timeBwTrade != 0)) {
+      handleMessageChange('tranches', null);
+      handleMessageChange9('timeBwTrade', null);
+    }
   };
 
   const validateInputs = () => {
@@ -534,8 +542,22 @@ export default function Automate() {
                 borderRadius: '16px',
               }}
             >
-              <div style={{ textAlign: 'right' }}>
-                <ToggleSwitch toggleSwitch={toggleSwitch} />
+              <div className='w-full flex justify-end items-center'>
+                <span className='mr-2  font-semibold text-white'>
+                  Swap Over Time
+                </span>
+                <div
+                  className={`w-14 h-8 flex items-center bg-gray-200 rounded-full p-1 cursor-pointer ${
+                    isToggled ? 'bg-green-400' : 'bg-gray-700'
+                  }`}
+                  onClick={toggleSwitch}
+                >
+                  <div
+                    className={`bg-white w-6 h-6 rounded-full shadow-md transform ${
+                      isToggled ? 'translate-x-6' : 'translate-x-0'
+                    } transition-transform`}
+                  ></div>
+                </div>
               </div>
 
               <Grid container spacing={2} justifyContent='center'>
