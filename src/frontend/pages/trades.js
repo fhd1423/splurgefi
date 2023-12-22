@@ -7,6 +7,7 @@ import {
 } from '@dynamic-labs/sdk-react-core';
 import { EthereumWalletConnectors } from '@dynamic-labs/ethereum';
 import { supabase } from '../components/supabase/client';
+import sendSupabaseRequest from '../components/supabase/supabaseClient';
 import NavBar from '../components/NavBar';
 import Table from '@mui/material/Table';
 import TableBody from '@mui/material/TableBody';
@@ -80,7 +81,7 @@ const style = {
   p: 4,
 };
 export default function Trades() {
-  const { setShowAuthFlow, primaryWallet } = useDynamicContext();
+  const { setShowAuthFlow, primaryWallet, authToken } = useDynamicContext();
   const [userTrades, setUserTrades] = useState(new Map());
   const [selected, setSelected] = useState([]);
   const [open, setOpen] = React.useState(false);
@@ -140,6 +141,7 @@ export default function Trades() {
         .eq('id', tradeId);
 
       if (error) throw error;
+
       console.log('Trade updated successfully:', data);
     } catch (error) {
       console.error('Error updating trade:', error);
@@ -149,15 +151,13 @@ export default function Trades() {
   useEffect(() => {
     const fetchTrades = async () => {
       if (primaryWallet?.address) {
-        const { data, error } = await supabase
-          .from('Trades')
-          .select('*')
-          .eq('user', primaryWallet.address);
+        // const { data, error } = await supabase
+        //   .from('Trades')
+        //   .select('*')
+        //   .eq('user', primaryWallet.address);
 
-        if (error) {
-          console.error('Error fetching trades:', error);
-          return;
-        }
+        const data = await sendSupabaseRequest(authToken, {})
+        console.log(data);
 
         const tradesPromises = data.map(async (trade) => ({
           id: trade.id,

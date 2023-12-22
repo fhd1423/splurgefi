@@ -6,7 +6,7 @@ console.log('Securing Splurge...');
 
 Deno.serve(async (req) => {
   if (req.method === 'OPTIONS') {
-    return new Response('ok', { headers: corsHeaders })
+    return new Response('ok', { headers: corsHeaders });
   }
 
   //UTILITY FUNCTIONS
@@ -41,12 +41,11 @@ Deno.serve(async (req) => {
     );
   } //: UTILITY FUNCTIONS
 
-
   const supabaseClient = createClient(
     'https://gmupexxqnzrrzozcovjp.supabase.co',
     'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImdtdXBleHhxbnpycnpvemNvdmpwIiwicm9sZSI6InNlcnZpY2Vfcm9sZSIsImlhdCI6MTcwMTQ2MjU5NCwiZXhwIjoyMDE3MDM4NTk0fQ.YFvIg4OtlNGRr-AmSGn0fCOmEJm1JxQmKl7GX_y5-wY',
   );
-  
+
   const publicKey =
     '-----BEGIN PUBLIC KEY-----MIICIjANBgkqhkiG9w0BAQEFAAOCAg8AMIICCgKCAgEAu+jRO13+VNQG7MYc2bamOTPIF9XlT+rd2JxJ/b9tuKz//mF9igFa1XhJQfCiUOt+Q7iunF11hrO3DKnFYyIuZ3pgytr5fStlWb8Vveh5ah28fgBWvTh1QVHbUGn6Y2RDRbZvYE6YUe7EwgDN1nQuCazq49KHEok+gJDdrDRpTwGZ18umkgASv47PC4IlrOJmjCHSN3q1C6kd4TvFUYvCV5ugiSJ64+mnU0eJlAyYcZxqEBX/330sVy2AKzS+2SMjW9nCCjaSYt65KI34i9ZMM/+eqKJSO+bacecm1zdQ0aASVNOWSZBJjALFcl0LBo0KKkLtVENnQd0popG2xM8qWxh1TXk6rSl1sULouFsxwHMTkSRipQDw6kT8Wt5S6/gDodHLpqsqd53vWt4VCrTa+G0h2Ccynuz9hf9IeJR4sIQMuyhIG7L9HQL5KmgbaTh33OTfblFI9zmYM2ikHzJY0YM4mTUvDQQ+NCkXF6kNLs8+MKOfr5oPfGLmx39pEW7sngcsmDgbs1z36yTym720Wyhw1E/TIDTZiBBTp5HnQLbdkqmdxSiIQPROY4e609WpD7dIoDjaDVwVc4cZhH+KqwUbYPziXoy1YsouDc6eb0q5E8aNVYVW66xNUTESEIRUpz0TkApwh3hVJaUpGpsgf+QOj1ZFRr2TPTcDA3XEU/8CAwEAAQ== -----END PUBLIC KEY-----';
 
@@ -92,24 +91,51 @@ Deno.serve(async (req) => {
     // Now TypeScript should recognize the structure of isValid
     const userAddress = isValid.verified_credentials[0]?.address;
 
-    if (userAddress && payload.user === userAddress) {
-      try {
-        await supabaseClient.from('Trades').insert([payload]);
-        console.log('Trade inserted successfully!');
-      } catch (error) {
-        console.error('Error inserting trade:', error);
-        return new Response(JSON.stringify({ error: 'Error inserting trade' }), {
+    if(Object.keys(payload).length === 0){
+      try{
+        const {data, error} = await supabaseClient.from('Trades').select("*").eq('user', userAddress);
+
+        return new Response(JSON.stringify(data), {
           headers: { ...corsHeaders, 'Content-Type': 'application/json' },
-          status: 500,
         });
+
       }
-    } else {
-      console.log('Invalid user address in JWT or mismatch with payload.user');
+      catch(error){
+        console.error('Error fetching trades:', error);
+          return new Response(
+            JSON.stringify({ error: 'Error fetching trades' }),
+            {
+              headers: { ...corsHeaders, 'Content-Type': 'application/json' },
+              status: 500,
+            },
+          );
+      }
+    }
+
+    else{
+      if (userAddress && payload.user === userAddress) {
+        try {
+          await supabaseClient.from('Trades').insert([payload]);
+          console.log('Trade inserted successfully!');
+        } catch (error) {
+          console.error('Error inserting trade:', error);
+          return new Response(
+            JSON.stringify({ error: 'Error inserting trade' }),
+            {
+              headers: { ...corsHeaders, 'Content-Type': 'application/json' },
+              status: 500,
+            },
+          );
+        }
+      } else {
+        console.log('Invalid user address in JWT or mismatch with payload.user');
+      }
     }
 
     return new Response(JSON.stringify(isValid), {
       headers: { ...corsHeaders, 'Content-Type': 'application/json' },
     });
+
   } else {
     console.log('JWT is not valid!');
     return new Response(JSON.stringify({ error: 'Invalid JWT' }), {
