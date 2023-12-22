@@ -68,7 +68,7 @@ export default function Automate() {
     percentChange: null,
     priceAvg: 5,
     deadline: null,
-    timeBwTrade: 0,
+    timeBwTrade: 100,
     salt: generateRandomSalt(),
   });
 
@@ -160,9 +160,9 @@ export default function Automate() {
     setIsToggled(!isToggled);
     if (isToggled) {
       handleMessageChange('tranches', 1);
-      handleMessageChange('timeBwTrade', 0);
+      handleMessageChange('timeBwTrade', 100);
     }
-    if (!isToggled && (message.tranches != 1 || message.timeBwTrade != 0)) {
+    if (!isToggled && (message.tranches != 1 || message.timeBwTrade != 100)) {
       handleMessageChange('tranches', null);
       handleMessageChange9('timeBwTrade', null);
     }
@@ -195,71 +195,63 @@ export default function Automate() {
 
     const isAnyFieldEmpty = fields.some((field) => !message[field]);
 
-    if (isAnyFieldEmpty) {
-      setUserInputError('Please make sure all inputs are filled.');
-      return false;
-    }
+    if (isAnyFieldEmpty) return false;
     return true;
   };
 
   useEffect(() => {
-    if (validate('tradeEntered')) {
-      const allFilled = validate('tradeEntered');
-      setInputsFilled(allFilled);
-      validate('includeWeth');
-      validate('everything');
-      console.log('All inputs filled:', allFilled);
+    const correctTokens = validate('everything');
+    validate('includeWeth');
 
-      if (correctTokens) {
-        if (currentInput.name === 'WETH') {
-          console.log('INSIDE CALC PROFIT FOR INPUT WETH');
+    if (correctTokens) {
+      if (currentInput.name === 'WETH') {
+        console.log('INSIDE CALC PROFIT FOR INPUT WETH');
 
-          // Fetch the 5-min average price
-          getHistoricalPriceData(currentOutput.address)
-            .then((priceData) => getFiveMinAvg(priceData))
-            .then((avgPrice) => {
-              setAveragePrice(avgPrice);
-              console.log('Average Price:', avgPrice); // WORKS
+        // Fetch the 5-min average price
+        getHistoricalPriceData(currentOutput.address)
+          .then((priceData) => getFiveMinAvg(priceData))
+          .then((avgPrice) => {
+            setAveragePrice(avgPrice);
+            console.log('Average Price:', avgPrice); // WORKS
 
-              console.log('Output Address:', currentOutput.address);
-              // Now fetch the current price
-              return getCurrentPriceData(currentOutput.address).then(
-                (currentPriceData) => {
-                  console.log('Current Price:', currentPriceData);
+            console.log('Output Address:', currentOutput.address);
+            // Now fetch the current price
+            return getCurrentPriceData(currentOutput.address).then(
+              (currentPriceData) => {
+                console.log('Current Price:', currentPriceData);
 
-                  // Calculate and set profit based on average and current prices
-                  const resultingProfit = calcBuyProfit(
-                    avgPrice,
-                    currentPriceData,
-                    message.percentChange,
-                    message.amount,
-                  );
-                  setProfit(resultingProfit);
-                  console.log('Calculated Profit:', resultingProfit);
-                  return resultingProfit;
-                },
-              );
-            })
-            .catch((error) => console.error('Error:', error));
-        } else {
-          getHistoricalPriceData(currentInput.address)
-            .then((priceData) => getFiveMinAvg(priceData))
-            .then((avg) => setAveragePrice(avg))
-            .catch((error) =>
-              console.error('Error calculating average price:', error),
+                // Calculate and set profit based on average and current prices
+                const resultingProfit = calcBuyProfit(
+                  avgPrice,
+                  currentPriceData,
+                  message.percentChange,
+                  message.amount,
+                );
+                setProfit(resultingProfit);
+                console.log('Calculated Profit:', resultingProfit);
+                return resultingProfit;
+              },
             );
+          })
+          .catch((error) => console.error('Error:', error));
+      } else {
+        getHistoricalPriceData(currentInput.address)
+          .then((priceData) => getFiveMinAvg(priceData))
+          .then((avg) => setAveragePrice(avg))
+          .catch((error) =>
+            console.error('Error calculating average price:', error),
+          );
 
-          getCurrentPriceData(currentInput.address)
-            .then((currentPriceData) =>
-              calcSellProfit(
-                averagePrice,
-                currentPriceData,
-                message.percentChange,
-                message.amount,
-              ),
-            )
-            .then((resultingProfit) => setProfit(resultingProfit));
-        }
+        getCurrentPriceData(currentInput.address)
+          .then((currentPriceData) =>
+            calcSellProfit(
+              averagePrice,
+              currentPriceData,
+              message.percentChange,
+              message.amount,
+            ),
+          )
+          .then((resultingProfit) => setProfit(resultingProfit));
       }
     }
   }, [message]);
@@ -631,6 +623,9 @@ export default function Automate() {
                         }}
                         onClick={() => {
                           if (!validate('everything')) {
+                            setUserInputError(
+                              'Please make sure all inputs are filled.',
+                            );
                             return;
                           }
                           if (allowance < message.amount) {
