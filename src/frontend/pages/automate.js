@@ -173,7 +173,9 @@ export default function Automate() {
 
     if (validationType == 'includeWeth') {
       fields = ['inputTokenAddress', 'outputTokenAddress'];
-      return fields.some((field) => message[field] === WETH_ADDRESS);
+      const hasWeth = fields.some((field) => message[field] === WETH_ADDRESS);
+      if (!hasWeth)
+        setUserInputError('Please make sure either input or output is WETH.');
     } else if (validationType == 'tradeEntered') {
       fields = ['amount', 'percentChange', 'deadline'];
     } else if (validationType == 'everything') {
@@ -204,20 +206,8 @@ export default function Automate() {
     if (validate('tradeEntered')) {
       const allFilled = validate('tradeEntered');
       setInputsFilled(allFilled);
-
-      const correctTokens = validate('includeWeth');
-      setCorrectTokensFilled(correctTokens);
-
-      if (validate('everything')) {
-        setUserInputError('');
-      }
-
-      if (!correctTokens) {
-        setUserInputError('Please make sure either input or output is WETH.');
-      } else {
-        setUserInputError('');
-      }
-
+      validate('includeWeth');
+      validate('everything');
       console.log('All inputs filled:', allFilled);
 
       if (correctTokens) {
