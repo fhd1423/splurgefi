@@ -644,43 +644,6 @@ export default function Automate() {
             </Paper>
           </Box>
 
-          {allInputsFilled && (
-            <div className='absolute right-0 pr-5 space-y-1.25'>
-              <div
-                className={`${isTradeSumAccordionExpanded ? 'pb-10' : 'pb-5'}`}
-              >
-                <TradeSummaryDropdown
-                  tradeEntered={allInputsFilled}
-                  currentInput={currentInput.name}
-                  currentOutput={currentOutput.name}
-                  batches={message.tranches}
-                  percentChange={message.percentChange}
-                  movingAvg={message.priceAvg}
-                  timeBwTrades={message.timeBwTrade}
-                  expanded={isTradeSumAccordionExpanded}
-                  setExpanded={setIsTradeSumAccordionExpanded}
-                  tradeType={toggleSelection}
-                />
-              </div>
-
-              <div>
-                {currentInput.name === 'WETH' ? (
-                  // Get price on token you're going to buy
-                  <AvgPriceDropdown
-                    prices={pricesMap[currentOutput.name]}
-                    tokenAddy={currentOutput.address}
-                  />
-                ) : (
-                  // Get price on token you're going to sell
-                  <AvgPriceDropdown
-                    prices={pricesMap[currentInput.name]}
-                    tokenAddy={currentInput.address}
-                  />
-                )}
-              </div>
-            </div>
-          )}
-
           {isLargeScreen && (
             <div
               style={{ position: 'absolute', bottom: '100px', left: '30px' }}
