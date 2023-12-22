@@ -14,7 +14,6 @@ import { AdapterDayjs } from '@mui/x-date-pickers/AdapterDayjs';
 // Custom Component Imports
 import InputToken from '../components/automate/InputToken';
 import OutputToken from '../components/automate/OutputToken';
-import ToggleOrderType from '../components/automate/ToggleBuySell';
 import ToggleSwap from '../components/automate/ToggleSwap';
 import InputPercent from '../components/automate/InputPercent';
 import InputBatches from '../components/automate/InputBatches';
@@ -23,6 +22,7 @@ import TimeSelector from '@/components/automate/TimeSelector';
 import NavBar from '../components/NavBar';
 import TradeSummaryDropdown from '@/components/automate/TradeSummaryDropdown';
 import AvgPriceDropdown from '@/components/automate/AvgPriceDropdown';
+import ToggleSwitch from '@/components/automate/Switch';
 import CommunityPopUp from '@/components/automate/CommunityPopUp';
 import {
   useSignTypedData,
@@ -440,22 +440,6 @@ export default function Automate() {
           lastExecuted: 0,
         });
 
-        console.log('FUCK', result);
-
-        // await supabase.from('Trades').insert([
-        //   {
-        //     user: primaryWallet.address,
-        //     pair: `${getAddress(message.inputTokenAddress)}-${getAddress(
-        //       message.outputTokenAddress,
-        //     )}`, // have to checksum to match in db for now
-        //     order: message,
-        //     signature: data,
-        //     complete: false,
-        //     ready: false,
-        //     remainingBatches: message.tranches,
-        //     lastExecuted: 0,
-        //   },
-        // ]);
         router.push('/trades');
       },
 
@@ -550,23 +534,10 @@ export default function Automate() {
                 borderRadius: '16px',
               }}
             >
-              <div className='w-full flex justify-end items-center'>
-                <span className='mr-2  font-semibold text-white'>
-                  Swap over time
-                </span>
-                <div
-                  className={`w-14 h-8 flex items-center bg-gray-200 rounded-full p-1 cursor-pointer ${
-                    isToggled ? 'bg-green-400' : 'bg-gray-700'
-                  }`}
-                  onClick={toggleSwitch}
-                >
-                  <div
-                    className={`bg-white w-6 h-6 rounded-full shadow-md transform ${
-                      isToggled ? 'translate-x-6' : 'translate-x-0'
-                    } transition-transform`}
-                  ></div>
-                </div>
+              <div style={{ textAlign: 'right' }}>
+                <ToggleSwitch toggleSwitch={toggleSwitch} />
               </div>
+
               <Grid container spacing={2} justifyContent='center'>
                 <React.Fragment>
                   <Grid item xs={12}>
