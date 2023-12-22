@@ -168,25 +168,27 @@ export default function Automate() {
     }
   };
 
-  const validateInputs = () => {
-    const fields = [
-      'inputTokenAddress',
-      'outputTokenAddress',
-      'recipient',
-      'amount',
-      'tranches',
-      'percentChange',
-      'priceAvg',
-      'deadline',
-      'timeBwTrade',
-      'salt',
-    ];
+  const validate = (validationType) => {
+    let fields = [];
 
-    const isValidSwap = fields.some((field) => message[field] == WETH_ADDRESS);
-
-    if (!isValidSwap) {
-      setUserInputError(`Either input or output must be WETH`);
-      return false;
+    if (validationType == 'includeWeth') {
+      fields = ['inputTokenAddress', 'outputTokenAddress'];
+      return fields.some((field) => message[field] === WETH_ADDRESS);
+    } else if (validationType == 'tradeEntered') {
+      fields = ['amount', 'percentChange', 'deadline'];
+    } else if (validationType == 'everything') {
+      fields = [
+        'inputTokenAddress',
+        'outputTokenAddress',
+        'recipient',
+        'amount',
+        'tranches',
+        'percentChange',
+        'priceAvg',
+        'deadline',
+        'timeBwTrade',
+        'salt',
+      ];
     }
 
     const isAnyFieldEmpty = fields.some((field) => !message[field]);
@@ -195,45 +197,18 @@ export default function Automate() {
       setUserInputError('Please make sure all inputs are filled.');
       return false;
     }
-
-    setUserInputError('');
-    return true;
-  };
-
-  const tradeEntered = () => {
-    const fields = ['amount', 'percentChange', 'deadline'];
-
-    const isAnyFieldEmpty = fields.some((field) => !message[field]);
-
-    if (isAnyFieldEmpty) {
-      return false;
-    }
-
-    return true;
-  };
-
-  const validateInputAndOutput = () => {
-    const fields = ['inputTokenAddress', 'outputTokenAddress'];
-
-    const isWETHIncluded = fields.some(
-      (field) => message[field] === WETH_ADDRESS,
-    );
-    if (!isWETHIncluded) {
-      return false;
-    }
-
     return true;
   };
 
   useEffect(() => {
-    if (tradeEntered()) {
-      const allFilled = tradeEntered();
+    if (validate('tradeEntered')) {
+      const allFilled = validate('tradeEntered');
       setInputsFilled(allFilled);
 
-      const correctTokens = validateInputAndOutput();
+      const correctTokens = validate('includeWeth');
       setCorrectTokensFilled(correctTokens);
 
-      if (validateInputs()) {
+      if (validate('everything')) {
         setUserInputError('');
       }
 
@@ -665,7 +640,7 @@ export default function Automate() {
                             'transform 0.3s ease, background-color 0.3s ease, box-shadow 0.3s ease',
                         }}
                         onClick={() => {
-                          if (!validateInputs()) {
+                          if (!validate('everything')) {
                             return;
                           }
                           if (allowance < message.amount) {
