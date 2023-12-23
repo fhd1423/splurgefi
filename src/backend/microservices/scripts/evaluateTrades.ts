@@ -146,4 +146,4 @@ const updateTrades = async () => {
 };
 
 console.log('Continuous evaluation loop started');
-setInterval(updateTrades, 10000);
+setInterval(updateTrades, 5000);
