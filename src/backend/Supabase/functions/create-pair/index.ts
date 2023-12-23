@@ -7,6 +7,7 @@ const supabase = createClient(
 );
 
 const apiUrl = 'https://api.geckoterminal.com/api/v2';
+const WETH_ADDRESS = '0x82aF49447D8a07e3bd95BD0d56f35241523fBab1';
 
 const getLargestPoolAddress = async (tokenAddress: string) => {
   const response = await axios.get(
@@ -64,12 +65,12 @@ async function main(
 Deno.serve(async (req) => {
   const { tokenAddress, tokenName } = await req.json();
 
-  const existingPairs = await supabase
+  const { data: existingPairs } = await supabase
     .from('Pairs')
-    .eq('path', `0x82aF49447D8a07e3bd95BD0d56f35241523fBab1-${tokenAddress}`)
-    .select();
+    .select()
+    .eq('path', `${WETH_ADDRESS}-${tokenAddress}`);
 
-  if (existingPairs.length > 0) {
+  if (existingPairs && existingPairs.length > 0) {
     const existingPrices = existingPairs[0][`5min_avg`]['close_prices'];
     const existingAvg = getFiveMinAvg(existingPrices);
 
@@ -85,11 +86,7 @@ Deno.serve(async (req) => {
   }
   let data;
   try {
-    const avgPrice = await main(
-      tokenAddress,
-      tokenName,
-      '0x82aF49447D8a07e3bd95BD0d56f35241523fBab1',
-    );
+    const avgPrice = await main(tokenAddress, tokenName, WETH_ADDRESS);
     data = {
       message: `Inserted new Pair for ${tokenName}`,
       avgPrice,
