@@ -27,23 +27,25 @@ const updatePriceData = async () => {
     [key: string]: number; // Assuming the value is a number. Adjust the type as necessary.
   }
   let pairPrices: PairPrices = {};
+  let response;
 
   try {
-    const response = await axios.get(
+    response = await axios.get(
       `${apiUrl}/simple/networks/arbitrum/token_price/${pairString}`,
     );
-    console.log(response);
-    let prices = response.data.data.attributes.token_prices;
-    const ethPrice = prices[`${WETH_ADDRESS.toLowerCase()}`];
-
-    for (let pair of pairList) {
-      pairPrices[`${WETH_ADDRESS}-${pair}`] =
-        (0.01 * Number(ethPrice)) /
-        Number(prices[`${String(pair).toLowerCase()}`]);
-    }
   } catch (e) {
     console.log('Error with geckoterminal');
+    return;
   }
+  let prices = response.data.data.attributes.token_prices;
+  const ethPrice = prices[`${WETH_ADDRESS.toLowerCase()}`];
+
+  for (let pair of pairList) {
+    pairPrices[`${WETH_ADDRESS}-${pair}`] =
+      (0.01 * Number(ethPrice)) /
+      Number(prices[`${String(pair).toLowerCase()}`]);
+  }
+
   if (isInInterval) {
     for (let pair of pairs) {
       const current_price = pairPrices[pair.path];
