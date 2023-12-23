@@ -138,59 +138,52 @@ export default function Automate() {
     return true;
   };
 
+  const fetchAveragePrice = async (tokenAddress, tokenName) => {
+    try {
+      const response = await axios.post(
+        'http://127.0.0.1:54321/functions/v1/',
+        {
+          tokenAddress,
+          tokenName,
+        },
+        {
+          headers: {
+            'Content-Type': 'application/json',
+          },
+        },
+      );
+
+      if (response.data && response.data.avgPrice) {
+        return response.data.avgPrice;
+      } else {
+        throw new Error('Average price data not found');
+      }
+    } catch (error) {
+      console.error('Error fetching average price:', error);
+      return null;
+    }
+  };
+
+  // Fetchs avg price from edge func
   useEffect(() => {
     const correctTokens = validate('everything');
     validate('includeWeth');
 
     if (correctTokens) {
+      console.log('INSIDE CORRECT TOKENS');
       if (currentInput.name === 'WETH') {
-        console.log('INSIDE CALC PROFIT FOR INPUT WETH');
-
-        // Fetch the 5-min average price
-        getHistoricalPriceData(currentOutput.address)
-          .then((priceData) => getFiveMinAvg(priceData))
-          .then((avgPrice) => {
-            setAveragePrice(avgPrice);
-            console.log('Average Price:', avgPrice); // WORKS
-
-            console.log('Output Address:', currentOutput.address);
-            // Now fetch the current price
-            return getCurrentPriceData(currentOutput.address).then(
-              (currentPriceData) => {
-                console.log('Current Price:', currentPriceData);
-
-                // Calculate and set profit based on average and current prices
-                const resultingProfit = calcBuyProfit(
-                  avgPrice,
-                  currentPriceData,
-                  message.percentChange,
-                  message.amount,
-                );
-                setProfit(resultingProfit);
-                console.log('Calculated Profit:', resultingProfit);
-                return resultingProfit;
-              },
-            );
-          })
-          .catch((error) => console.error('Error:', error));
+        console.log('INSIDE EQUAL TO WETH');
+        const price = fetchAveragePrice(
+          currentOutput.address,
+          currentOutput.name,
+        );
+        console.log('Current Output Avg. Price', price);
       } else {
-        getHistoricalPriceData(currentInput.address)
-          .then((priceData) => getFiveMinAvg(priceData))
-          .then((avg) => setAveragePrice(avg))
-          .catch((error) =>
-            console.error('Error calculating average price:', error),
-          );
-
-        getCurrentPriceData(currentInput.address)
-          .then((currentPriceData) =>
-            calcSellProfit(
-              averagePrice,
-              currentPriceData,
-              message.percentChange,
-              message.amount,
-            ),
-          )
-          .then((resultingProfit) => setProfit(resultingProfit));
+        const price = fetchAveragePrice(
+          currentInput.address,
+          currentInput.name,
+        );
+        console.log('Current Input Avg. Price', price);
       }
     }
   }, [message]);
@@ -231,7 +224,6 @@ export default function Automate() {
   };
   useEffect(() => {
     if (primaryWallet?.address && authToken) {
-      console.log('SEX', authToken);
       const jwtData = parseJwt(authToken);
 
       uploadUserData(primaryWallet?.address, jwtData);
@@ -254,6 +246,7 @@ export default function Automate() {
       return data;
     },
   });
+
   const { data: balance } = useContractRead({
     address: message.inputTokenAddress,
     abi: ERC20abi,
