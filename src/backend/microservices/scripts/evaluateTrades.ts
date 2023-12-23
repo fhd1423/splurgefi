@@ -55,7 +55,7 @@ const getSortedTrades = async (path: string) => {
     .eq('complete', 'false')
     .eq('pair', path)
     .is('failedSimulation', null)
-    .is('tradeStopped', null);
+    .is('tradeStopped', false);
 
   if (error) console.log(error);
   return Trades;

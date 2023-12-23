@@ -1,5 +1,6 @@
 import axios from 'axios';
 import { supabase } from '../utils/client';
+import { getAddress } from 'viem';
 
 const apiUrl = 'https://api.geckoterminal.com/api/v2';
 
@@ -51,7 +52,7 @@ async function main(tokenAddress: string, wethAddress: string) {
   );
 
   const upsertData = {
-    path: `${wethAddress}-${tokenAddress}`,
+    path: `${wethAddress}-${getAddress(tokenAddress)}`,
     ['5min_avg']: { close_prices: ratioPrices },
     updated_at: new Date(),
     tokenName: 'OMNI',
@@ -64,6 +65,6 @@ async function main(tokenAddress: string, wethAddress: string) {
 }
 
 main(
-  '0xBFb01b32e6b2d6D724821753d3230B4F5D14054b',
+  '0x9e20461bc2c4c980f62f1b279d71734207a6a356',
   '0x82aF49447D8a07e3bd95BD0d56f35241523fBab1',
 );
