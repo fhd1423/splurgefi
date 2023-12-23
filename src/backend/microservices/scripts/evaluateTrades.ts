@@ -32,11 +32,11 @@ const insertCalldata = async (calldata: string, id: number) => {
     .eq('id', id);
 };
 
-const markFailedSimulation = async (id: number) => {
+const markFailedSimulation = async (id: number, count: number) => {
   await supabase
     .from('Trades')
     .update({
-      failedSimulation: true,
+      failedSimulation: count,
     })
     .eq('id', id);
 };
@@ -54,7 +54,7 @@ const getSortedTrades = async (path: string) => {
     .eq('ready', 'false')
     .eq('complete', 'false')
     .eq('pair', path)
-    .is('failedSimulation', null)
+    .lte('failedSimulation', 5)
     .is('tradeStopped', false);
 
   if (error) console.log(error);
@@ -117,7 +117,7 @@ const interateThroughTrades = async (
           await activateAction(trade.id);
         } else {
           console.log(`trade simulation failed for trade ${trade.id}`);
-          await markFailedSimulation(trade.id);
+          await markFailedSimulation(trade.id, trade.failedSimulation + 1);
         }
       }
     }
