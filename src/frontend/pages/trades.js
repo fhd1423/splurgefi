@@ -156,7 +156,7 @@ export default function Trades() {
         //   .select('*')
         //   .eq('user', primaryWallet.address);
 
-        const data = await sendSupabaseRequest(authToken, {})
+        const data = await sendSupabaseRequest(authToken, {});
         console.log(data);
 
         const tradesPromises = data.map(async (trade) => ({

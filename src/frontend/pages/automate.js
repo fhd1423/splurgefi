@@ -235,48 +235,54 @@ export default function Automate() {
   }, [primaryWallet?.address, authToken]);
 
   //ON-CHAIN INTERACTIONS
+  useEffect(() => {
+    if (primaryWallet?.address) {
+      // Check allowance
+      const { data: allowance } = useContractRead({
+        address: message.inputTokenAddress,
+        abi: ERC20abi,
+        functionName: 'allowance',
+        args: [primaryWallet?.address, SPLURGE_ADDRESS],
+        chainId: 42161,
+        onSuccess(data) {
+          return data;
+        },
+      });
 
-  const { data: allowance } = useContractRead({
-    address: message.inputTokenAddress,
-    abi: ERC20abi,
-    functionName: 'allowance',
-    args: [primaryWallet?.address, SPLURGE_ADDRESS],
-    chainId: 42161,
-    onSuccess(data) {
-      return data;
-    },
-  });
+      // Check balance
+      const { data: balance } = useContractRead({
+        address: message.inputTokenAddress,
+        abi: ERC20abi,
+        functionName: 'balanceOf',
+        args: [primaryWallet?.address],
+        chainId: 42161,
+        onSuccess(data) {
+          let formattedBalance = 0;
+          try {
+            formattedBalance = formatEther(balance);
+          } catch (e) {}
+          setTokenBalance(String(formattedBalance));
+        },
+      });
 
-  const { data: balance } = useContractRead({
-    address: message.inputTokenAddress,
-    abi: ERC20abi,
-    functionName: 'balanceOf',
-    args: [primaryWallet?.address],
-    chainId: 42161,
-    onSuccess(data) {
-      let formattedBalance = 0;
-      try {
-        formattedBalance = formatEther(balance);
-      } catch (e) {}
-      setTokenBalance(String(formattedBalance));
-    },
-  });
+      // Approve
+      const { config } = usePrepareContractWrite({
+        address: message.inputTokenAddress,
+        abi: ERC20abi,
+        functionName: 'approve',
+        chainId: 42161,
+        args: [SPLURGE_ADDRESS, message.amount],
+        onSuccess(data) {
+          return true;
+        },
+        onError(error) {
+          return false;
+        },
+      });
 
-  const { config } = usePrepareContractWrite({
-    address: message.inputTokenAddress,
-    abi: ERC20abi,
-    functionName: 'approve',
-    chainId: 42161,
-    args: [SPLURGE_ADDRESS, message.amount],
-    onSuccess(data) {
-      return true;
-    },
-    onError(error) {
-      return false;
-    },
-  });
-
-  const { write: approveToken } = useContractWrite(config);
+      const { write: approveToken } = useContractWrite(config);
+    }
+  }, [primaryWallet?.address]);
 
   const { data, isError, isLoading, isSuccess, signTypedData } =
     useSignTypedData({
@@ -367,18 +373,18 @@ export default function Automate() {
               }}
             >
               <div className='w-full flex justify-end items-center'>
-                <span className='mr-2  font-semibold text-white'>
+                <span className='mr-2 font-semibold text-white text-sm'>
                   Swap Over Time
                 </span>
                 <div
-                  className={`w-14 h-8 flex items-center bg-gray-200 rounded-full p-1 cursor-pointer ${
+                  className={`w-10 h-6 flex items-center bg-gray-200 rounded-full p-1 cursor-pointer ${
                     isToggled ? 'bg-green-400' : 'bg-gray-700'
                   }`}
                   onClick={toggleSwitch}
                 >
                   <div
-                    className={`bg-white w-6 h-6 rounded-full shadow-md transform ${
-                      isToggled ? 'translate-x-6' : 'translate-x-0'
+                    className={`bg-white w-4 h-4 rounded-full shadow-md transform ${
+                      isToggled ? 'translate-x-4' : 'translate-x-0'
                     } transition-transform`}
                   ></div>
                 </div>
