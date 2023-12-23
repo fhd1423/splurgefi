@@ -6,6 +6,7 @@ import Head from 'next/head';
 import { formatEther, getAddress } from 'viem';
 import { useTheme, useMediaQuery } from '@mui/material';
 import router from 'next/router';
+import axios from 'axios';
 
 // MUI Date Picker Imports
 import { LocalizationProvider } from '@mui/x-date-pickers/LocalizationProvider';
@@ -130,10 +131,16 @@ export default function Automate() {
         'timeBwTrade',
         'salt',
       ];
+    } else if (validationType == 'tokens') {
+      fields = ['inputTokenAddress', 'outputTokenAddress'];
     }
 
     const isAnyFieldEmpty = fields.some((field) => !message[field]);
 
+    const emptyFields = fields.filter((field) => !message[field]);
+    if (emptyFields.length > 0) {
+      console.log('Empty fields:', emptyFields);
+    }
     if (isAnyFieldEmpty) return false;
     return true;
   };
@@ -166,9 +173,11 @@ export default function Automate() {
 
   // Fetchs avg price from edge func
   useEffect(() => {
-    const correctTokens = validate('everything');
+    const correctTokens = validate('tokens');
     validate('includeWeth');
 
+    console.log('BEFORE IF CORRECT TOKENS');
+    console.log('CORRECT TOKENS', correctTokens);
     if (correctTokens) {
       console.log('INSIDE CORRECT TOKENS');
       if (currentInput.name === 'WETH') {
