@@ -32,6 +32,7 @@ const updatePriceData = async () => {
     const response = await axios.get(
       `${apiUrl}/simple/networks/arbitrum/token_price/${pairString}`,
     );
+    console.log(response);
     let prices = response.data.data.attributes.token_prices;
     const ethPrice = prices[`${WETH_ADDRESS.toLowerCase()}`];
 
@@ -41,7 +42,7 @@ const updatePriceData = async () => {
         Number(prices[`${String(pair).toLowerCase()}`]);
     }
   } catch (e) {
-    console.log(e);
+    console.log('Error with geckoterminal');
   }
   if (isInInterval) {
     for (let pair of pairs) {
