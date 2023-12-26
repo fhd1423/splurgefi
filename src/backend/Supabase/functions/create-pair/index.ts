@@ -14,16 +14,19 @@ const WETH_ADDRESS = '0x82aF49447D8a07e3bd95BD0d56f35241523fBab1';
 
 // Function to get the largest pool address
 const getLargestPoolAddress = async (tokenAddress: string) => {
-  const response = await fetch(`${apiUrl}/networks/arbitrum/tokens/${tokenAddress}/pools`);
+  const response = await fetch(
+    `${apiUrl}/networks/arbitrum/tokens/${tokenAddress}/pools`,
+  );
   const data = await response.json();
   return data.data[0].attributes.address;
 };
 
-
 // Function to get prices
 const getPrices = async (poolAddress: string) => {
   const currentTime = Math.floor(new Date().getTime() / 1000);
-  const response = await fetch(`${apiUrl}/networks/arbitrum/pools/${poolAddress}/ohlcv/minute?aggregate=5&before_timestamp=${currentTime}&limit=10`);
+  const response = await fetch(
+    `${apiUrl}/networks/arbitrum/pools/${poolAddress}/ohlcv/minute?aggregate=5&before_timestamp=${currentTime}&limit=10`,
+  );
   const data = await response.json();
   return data.data.attributes.ohlcv_list.map((ohlcv: any) => [ohlcv[4]]);
 };
@@ -33,7 +36,6 @@ const getFiveMinAvg = (priceData: number[]): number => {
   const total = priceData.reduce((acc, price) => acc + Number(price), 0);
   return total / priceData.length;
 };
-
 
 // Main function to process data
 async function main(
@@ -52,7 +54,7 @@ async function main(
   );
 
   const upsertData = {
-    path: `${tokenAddress}-${wethAddress}`,
+    path: `${wethAddress}-${tokenAddress}`,
     ['5min_avg']: { close_prices: ratioPrices },
     updated_at: new Date(),
     tokenName,
@@ -114,6 +116,5 @@ Deno.serve(async (req) => {
 
 // To invoke:
 // curl -L -X POST 'https://gmupexxqnzrrzozcovjp.supabase.co/functions/v1/create-pair' -H 'Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImdtdXBleHhxbnpycnpvemNvdmpwIiwicm9sZSI6ImFub24iLCJpYXQiOjE3MDE0NjI1OTQsImV4cCI6MjAxNzAzODU5NH0.rBzk_etmt7NYB2Pzvn5TwAKvZhFjMRS-JPcP_2JtMeI' --data '{"name":"Functions"}'
-
 
 // endpoint: https://gmupexxqnzrrzozcovjp.supabase.co/functions/v1/create-pair

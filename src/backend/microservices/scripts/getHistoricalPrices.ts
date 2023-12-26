@@ -55,7 +55,7 @@ async function main(tokenAddress: string, wethAddress: string) {
     path: `${wethAddress}-${getAddress(tokenAddress)}`,
     ['5min_avg']: { close_prices: ratioPrices },
     updated_at: new Date(),
-    tokenName: 'OMNI',
+    tokenName: 'USDC',
   };
 
   let { data, error } = await supabase.from('Pairs').upsert([upsertData]);
@@ -65,6 +65,6 @@ async function main(tokenAddress: string, wethAddress: string) {
 }
 
 main(
-  '0x9e20461bc2c4c980f62f1b279d71734207a6a356',
+  '0xaf88d065e77c8cC2239327C5EDb3A432268e5831',
   '0x82aF49447D8a07e3bd95BD0d56f35241523fBab1',
 );
