@@ -1,39 +1,44 @@
 import axios from 'npm:axios';
 import { createClient } from 'https://esm.sh/@supabase/supabase-js@2.39.1';
+import { corsHeaders } from '../_shared/cors.ts';
 
+// Supabase client initialization
 const supabase = createClient(
   'https://gmupexxqnzrrzozcovjp.supabase.co',
   'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImdtdXBleHhxbnpycnpvemNvdmpwIiwicm9sZSI6InNlcnZpY2Vfcm9sZSIsImlhdCI6MTcwMTQ2MjU5NCwiZXhwIjoyMDE3MDM4NTk0fQ.YFvIg4OtlNGRr-AmSGn0fCOmEJm1JxQmKl7GX_y5-wY',
 );
 
+// External API URL and WETH_ADDRESS constants
 const apiUrl = 'https://api.geckoterminal.com/api/v2';
 const WETH_ADDRESS = '0x82aF49447D8a07e3bd95BD0d56f35241523fBab1';
 
+// Function to get the largest pool address
 const getLargestPoolAddress = async (tokenAddress: string) => {
   const response = await axios.get(
     `${apiUrl}/networks/arbitrum/tokens/${tokenAddress}/pools`,
   );
-
   return response.data.data[0].attributes.address;
 };
 
+// Function to get prices
 const getPrices = async (poolAddress: string) => {
   const currentTime = Math.floor(new Date().getTime() / 1000);
   const response = await axios.get(
     `${apiUrl}/networks/arbitrum/pools/${poolAddress}/ohlcv/minute?aggregate=5&before_timestamp=${currentTime}&limit=10`,
   );
-
   const coinPricesUSD = response.data.data.attributes.ohlcv_list.map(
     (ohlcv: any) => [ohlcv[4]],
   );
   return coinPricesUSD;
 };
 
+// Function to calculate the average price
 const getFiveMinAvg = (priceData: number[]): number => {
   const total = priceData.reduce((acc, price) => acc + Number(price), 0);
   return total / priceData.length;
 };
 
+// Main function to process data
 async function main(
   tokenAddress: string,
   tokenName: string,
@@ -62,43 +67,57 @@ async function main(
   return avgRatio;
 }
 
+// Deno server to handle requests
 Deno.serve(async (req) => {
-  const { tokenAddress, tokenName } = await req.json();
+  
+  // Handle preflight requests for CORS
+  if (req.method === 'OPTIONS') {
+    return new Response(null, { headers: corsHeaders });
+  }
 
-  const { data: existingPairs } = await supabase
-    .from('Pairs')
-    .select()
-    .eq('path', `${WETH_ADDRESS}-${tokenAddress}`);
+  let responseData, status;
+  try {
+    const { tokenAddress, tokenName } = await req.json();
 
-  if (existingPairs && existingPairs.length > 0) {
-    const existingPrices = existingPairs[0][`5min_avg`]['close_prices'];
-    const existingAvg = getFiveMinAvg(existingPrices);
+    const { data: existingPairs } = await supabase
+      .from('Pairs')
+      .select()
+      .eq('path', `${WETH_ADDRESS}-${tokenAddress}`);
 
-    return new Response(
-      JSON.stringify({
+    if (existingPairs && existingPairs.length > 0) {
+      const existingPrices = existingPairs[0][`5min_avg`]['close_prices'];
+      const existingAvg = getFiveMinAvg(existingPrices);
+
+      responseData = {
         message: `Pair already exists for ${tokenName}`,
         avgPrice: existingAvg,
-      }),
-      {
-        headers: { 'Content-Type': 'application/json' },
-      },
-    );
-  }
-  let data;
-  try {
-    const avgPrice = await main(tokenAddress, tokenName, WETH_ADDRESS);
-    data = {
-      message: `Inserted new Pair for ${tokenName}`,
-      avgPrice,
-    };
+      };
+      status = 200;
+    } else {
+      const avgPrice = await main(tokenAddress, tokenName, WETH_ADDRESS);
+      responseData = {
+        message: `Inserted new Pair for ${tokenName}`,
+        avgPrice,
+      };
+      status = 200;
+    }
   } catch (e) {
-    data = {
-      message: `Error inserting new pair for ${tokenName}!`,
+
+    let errorMessage = 'Unknown error occurred';
+
+    if (e instanceof Error) {
+      errorMessage = e.message;
+    }
+    responseData = {
+      message: `Error processing request: ${errorMessage}`,
     };
+
+    status = 500; // Internal Server Error
   }
 
-  return new Response(JSON.stringify(data), {
-    headers: { 'Content-Type': 'application/json' },
+  return new Response(JSON.stringify(responseData), {
+    headers: { ...corsHeaders, 'Content-Type': 'application/json' },
+    status: status,
   });
 });
 
