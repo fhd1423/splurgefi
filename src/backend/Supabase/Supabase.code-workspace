@@ -13,6 +13,9 @@
     "files.exclude": {
       "supabase/functions/": true
     },
-    "deno.enable": true
+    "deno.enable": true, 
+    "deno.unstable": true, 
+    "deno.importMap": "./import_map.json",
+    "deno.lint": true
   }
 }

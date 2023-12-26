@@ -1,4 +1,5 @@
-import axios from 'npm:axios';
+// import axios from 'npm:axios';
+// import ky from 'https://cdn.skypack.dev/ky?dts';
 import { createClient } from 'https://esm.sh/@supabase/supabase-js@2.39.1';
 import { corsHeaders } from '../_shared/cors.ts';
 
@@ -8,28 +9,23 @@ const supabase = createClient(
   'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImdtdXBleHhxbnpycnpvemNvdmpwIiwicm9sZSI6InNlcnZpY2Vfcm9sZSIsImlhdCI6MTcwMTQ2MjU5NCwiZXhwIjoyMDE3MDM4NTk0fQ.YFvIg4OtlNGRr-AmSGn0fCOmEJm1JxQmKl7GX_y5-wY',
 );
 
-// External API URL and WETH_ADDRESS constants
 const apiUrl = 'https://api.geckoterminal.com/api/v2';
 const WETH_ADDRESS = '0x82aF49447D8a07e3bd95BD0d56f35241523fBab1';
 
 // Function to get the largest pool address
 const getLargestPoolAddress = async (tokenAddress: string) => {
-  const response = await axios.get(
-    `${apiUrl}/networks/arbitrum/tokens/${tokenAddress}/pools`,
-  );
-  return response.data.data[0].attributes.address;
+  const response = await fetch(`${apiUrl}/networks/arbitrum/tokens/${tokenAddress}/pools`);
+  const data = await response.json();
+  return data.data[0].attributes.address;
 };
+
 
 // Function to get prices
 const getPrices = async (poolAddress: string) => {
   const currentTime = Math.floor(new Date().getTime() / 1000);
-  const response = await axios.get(
-    `${apiUrl}/networks/arbitrum/pools/${poolAddress}/ohlcv/minute?aggregate=5&before_timestamp=${currentTime}&limit=10`,
-  );
-  const coinPricesUSD = response.data.data.attributes.ohlcv_list.map(
-    (ohlcv: any) => [ohlcv[4]],
-  );
-  return coinPricesUSD;
+  const response = await fetch(`${apiUrl}/networks/arbitrum/pools/${poolAddress}/ohlcv/minute?aggregate=5&before_timestamp=${currentTime}&limit=10`);
+  const data = await response.json();
+  return data.data.attributes.ohlcv_list.map((ohlcv: any) => [ohlcv[4]]);
 };
 
 // Function to calculate the average price
@@ -37,6 +33,7 @@ const getFiveMinAvg = (priceData: number[]): number => {
   const total = priceData.reduce((acc, price) => acc + Number(price), 0);
   return total / priceData.length;
 };
+
 
 // Main function to process data
 async function main(
@@ -69,8 +66,6 @@ async function main(
 
 // Deno server to handle requests
 Deno.serve(async (req) => {
-  
-  // Handle preflight requests for CORS
   if (req.method === 'OPTIONS') {
     return new Response(null, { headers: corsHeaders });
   }
@@ -78,14 +73,13 @@ Deno.serve(async (req) => {
   let responseData, status;
   try {
     const { tokenAddress, tokenName } = await req.json();
-
     const { data: existingPairs } = await supabase
       .from('Pairs')
       .select()
       .eq('path', `${WETH_ADDRESS}-${tokenAddress}`);
 
     if (existingPairs && existingPairs.length > 0) {
-      const existingPrices = existingPairs[0][`5min_avg`]['close_prices'];
+      const existingPrices = existingPairs[0]['5min_avg']['close_prices'];
       const existingAvg = getFiveMinAvg(existingPrices);
 
       responseData = {
@@ -102,16 +96,13 @@ Deno.serve(async (req) => {
       status = 200;
     }
   } catch (e) {
-
     let errorMessage = 'Unknown error occurred';
-
     if (e instanceof Error) {
       errorMessage = e.message;
     }
     responseData = {
       message: `Error processing request: ${errorMessage}`,
     };
-
     status = 500; // Internal Server Error
   }
 
@@ -122,7 +113,7 @@ Deno.serve(async (req) => {
 });
 
 // To invoke:
-// curl -i --location --request POST 'http://127.0.0.1:54321/functions/v1/' \
-//  --header 'Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZS1kZW1vIiwicm9sZSI6ImFub24iLCJleHAiOjE5ODM4MTI5OTZ9.CRXP1A7WOeoJeXxjNni43kdQwgnWNReilDMblYTn_I0' \
-//   --header 'Content-Type: application/json' \
-//   --data '{"name":"Functions"}'
+// curl -L -X POST 'https://gmupexxqnzrrzozcovjp.supabase.co/functions/v1/create-pair' -H 'Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImdtdXBleHhxbnpycnpvemNvdmpwIiwicm9sZSI6ImFub24iLCJpYXQiOjE3MDE0NjI1OTQsImV4cCI6MjAxNzAzODU5NH0.rBzk_etmt7NYB2Pzvn5TwAKvZhFjMRS-JPcP_2JtMeI' --data '{"name":"Functions"}'
+
+
+// endpoint: https://gmupexxqnzrrzozcovjp.supabase.co/functions/v1/create-pair
