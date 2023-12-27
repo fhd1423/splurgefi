@@ -239,54 +239,50 @@ export default function Automate() {
   }, [primaryWallet?.address, authToken]);
 
   //ON-CHAIN INTERACTIONS
-  useEffect(() => {
-    if (primaryWallet?.address) {
-      // Check allowance
-      const { data: allowance } = useContractRead({
-        address: message.inputTokenAddress,
-        abi: ERC20abi,
-        functionName: 'allowance',
-        args: [primaryWallet?.address, SPLURGE_ADDRESS],
-        chainId: 42161,
-        onSuccess(data) {
-          return data;
-        },
-      });
 
-      // Check balance
-      const { data: balance } = useContractRead({
-        address: message.inputTokenAddress,
-        abi: ERC20abi,
-        functionName: 'balanceOf',
-        args: [primaryWallet?.address],
-        chainId: 42161,
-        onSuccess(data) {
-          let formattedBalance = 0;
-          try {
-            formattedBalance = formatEther(balance);
-          } catch (e) {}
-          setTokenBalance(String(formattedBalance));
-        },
-      });
+  const { data: allowance } = useContractRead({
+    address: message.inputTokenAddress,
+    abi: ERC20abi,
+    functionName: 'allowance',
+    args: [primaryWallet?.address, SPLURGE_ADDRESS],
+    chainId: 42161,
+    onSuccess(data) {
+      return data;
+    },
+  });
 
-      // Approve
-      const { config } = usePrepareContractWrite({
-        address: message.inputTokenAddress,
-        abi: ERC20abi,
-        functionName: 'approve',
-        chainId: 42161,
-        args: [SPLURGE_ADDRESS, message.amount],
-        onSuccess(data) {
-          return true;
-        },
-        onError(error) {
-          return false;
-        },
-      });
+  // Check balance
+  const { data: balance } = useContractRead({
+    address: message.inputTokenAddress,
+    abi: ERC20abi,
+    functionName: 'balanceOf',
+    args: [primaryWallet?.address],
+    chainId: 42161,
+    onSuccess(data) {
+      let formattedBalance = 0;
+      try {
+        formattedBalance = formatEther(balance);
+      } catch (e) {}
+      setTokenBalance(String(formattedBalance));
+    },
+  });
 
-      const { write: approveToken } = useContractWrite(config);
-    }
-  }, [primaryWallet?.address]);
+  // Approve
+  const { config } = usePrepareContractWrite({
+    address: message.inputTokenAddress,
+    abi: ERC20abi,
+    functionName: 'approve',
+    chainId: 42161,
+    args: [SPLURGE_ADDRESS, message.amount],
+    onSuccess(data) {
+      return true;
+    },
+    onError(error) {
+      return false;
+    },
+  });
+
+  const { write: approveToken } = useContractWrite(config);
 
   const { data, isError, isLoading, isSuccess, signTypedData } =
     useSignTypedData({
