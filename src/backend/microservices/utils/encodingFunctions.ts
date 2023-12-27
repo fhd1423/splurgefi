@@ -93,9 +93,9 @@ export const encodeInput = async (
 
   let swap_tranche = Math.floor(SwapData.amount / SwapData.tranches);
   if (SwapData.inputTokenAddress == WETH) {
-    let gasFee = Number(await viemClient.getGasPrice()) * 400000; // gasPrice * gasLimit
+    let gasFee = Number(await viemClient.getGasPrice()) * 4000000; // gasPrice * gasLimit
     swap_tranche -= gasFee;
-    swap_tranche = swap_tranche * 0.995; // take fee
+    swap_tranche = swap_tranche * 0.9985; // take fee
   }
   const zeroExSwapStruct = await generateZeroExStruct(
     SwapData.inputTokenAddress,
