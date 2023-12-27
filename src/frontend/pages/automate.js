@@ -42,7 +42,7 @@ import { ERC20abi } from '@/helpers/ERC20';
 import ProfitDropdown from '@/components/automate/ProfitDropdown';
 
 export default function Automate() {
-  const SPLURGE_ADDRESS = '0xe3345D0cca4c478cf16cDd0B7D7363ba223c87AF';
+  const SPLURGE_ADDRESS = '0x47Bfd5fDF1925eF64606c73533Fb4d8C163fDB16';
   const WETH_ADDRESS = '0x82af49447d8a07e3bd95bd0d56f35241523fbab1';
 
   // FRONT END RESPONSIVENESS

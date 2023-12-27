@@ -3,7 +3,7 @@ pragma solidity ^0.8.21;
 
 import { IERC20 } from "@openzeppelin/contracts/token/ERC20/IERC20.sol";
 import { ECDSA } from "@openzeppelin/contracts/utils/cryptography/ECDSA.sol";
-import { IZeroExSwap, IWETH, SplurgeOrderStruct, ZeroExSwapStruct, badSignature, tradesCompleted, mustIncludeWETH, tradeExpired, timeNotSatisfied } from "./Interfaces.sol";
+import { IZeroExSwap, IWETH, SplurgeOrderStruct, ZeroExSwapStruct, badSignature, tooManyTranches, tradesCompleted, mustIncludeWETH, tradeExpired, timeNotSatisfied } from "./Interfaces.sol";
 
 contract Splurge {
     IZeroExSwap public swapRouter;
@@ -14,7 +14,7 @@ contract Splurge {
     address public executor;
     event TradeEvent(bytes signature);
 
-    uint256 public tradeGasLimit = 400000;
+    uint256 public tradeGasLimit = 4000000;
 
     modifier onlyExecutorOrDeployer() {
         //solhint-disable-next-line
@@ -53,6 +53,8 @@ contract Splurge {
 
         if (order.timeBwTrade > block.timestamp - lastCompletedTrade[signature])
             revert timeNotSatisfied(order, block.timestamp);
+
+        if (order.tranches > 50) revert tooManyTranches(order);
 
         executeTrade(order, swapCallData, signature);
         tranchesCompleted[signature] += 1;
@@ -99,7 +101,7 @@ contract Splurge {
     function takeFees(uint256 amount) public view returns (uint256) {
         uint256 gasPaid = tradeGasLimit * tx.gasprice;
         uint256 afterGas = amount - gasPaid;
-        uint256 afterFee = (afterGas * 995) / 1000;
+        uint256 afterFee = (afterGas * 9985) / 10000;
         return afterFee;
     }
 

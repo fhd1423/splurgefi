@@ -10,6 +10,7 @@ error tradeExpired(SplurgeOrderStruct, uint256);
 error notEnoughBalanceToWithdraw(uint256, uint256);
 error feeTransferFailed(uint256, uint256);
 error timeNotSatisfied(SplurgeOrderStruct, uint256);
+error tooManyTranches(SplurgeOrderStruct);
 
 struct SplurgeOrderStruct {
     address inputTokenAddy;
