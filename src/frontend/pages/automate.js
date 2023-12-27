@@ -16,6 +16,7 @@ import { AdapterDayjs } from '@mui/x-date-pickers/AdapterDayjs';
 import InputToken from '../components/automate/InputToken';
 import OutputToken from '../components/automate/OutputToken';
 import ToggleSwap from '../components/automate/ToggleSwap';
+import sendCreatePairRequest from '@/components/supabase/sendCreatePairRequest';
 import InputPercent from '../components/automate/InputPercent';
 import InputBatches from '../components/automate/InputBatches';
 import DatePicker from '@/components/automate/DatePicker';
@@ -140,85 +141,41 @@ export default function Automate() {
     return true;
   };
 
-  const fetchAveragePrice = async (tokenAddress, tokenName) => {
-    try {
-      const response = await axios.post(
-        'http://127.0.0.1:54321/functions/v1/',
-        {
-          tokenAddress,
-          tokenName,
-        },
-        {
-          headers: {
-            'Content-Type': 'application/json',
-          },
-        },
-      );
-
-      if (response.data && response.data.avgPrice) {
-        return response.data.avgPrice;
-      } else {
-        throw new Error('Average price data not found');
-      }
-    } catch (error) {
-      console.error('Error fetching average price:', error);
-      return null;
-    }
-  };
-
   // Fetchs avg price from edge func
   useEffect(() => {
     const correctTokens = validate('tokens');
     validate('includeWeth');
 
-    console.log('BEFORE IF CORRECT TOKENS');
-    console.log('CORRECT TOKENS', correctTokens);
-    if (correctTokens) {
-      console.log('INSIDE CORRECT TOKENS');
-      if (currentInput.name === 'WETH') {
-        console.log('INSIDE EQUAL TO WETH');
-        const price = fetchAveragePrice(
-          currentOutput.address,
-          currentOutput.name,
-        );
-        console.log('Current Output Avg. Price', price);
-      } else {
-        const price = fetchAveragePrice(
-          currentInput.address,
-          currentInput.name,
-        );
-        console.log('Current Input Avg. Price', price);
+    const fetchPrice = async () => {
+      if (correctTokens) {
+        try {
+          let data;
+          if (currentInput.name === 'WETH') {
+            data = await sendCreatePairRequest(
+              currentOutput.address,
+              currentOutput.name,
+            );
+          } else {
+            data = await sendCreatePairRequest(
+              currentInput.address,
+              currentInput.name,
+            );
+          }
+
+          if (data && data.avgPrice) {
+            console.log('Fetched avgPrice:', data.avgPrice);
+            setAveragePrice(data.avgPrice);
+          } else {
+            console.error('Average price data not found');
+          }
+        } catch (error) {
+          console.error('Error fetching average price:', error);
+        }
       }
-    }
+    };
+
+    fetchPrice();
   }, [message]);
-
-  // Need previous avg. price of token to buy and current price of that token (sellPrice)
-  function calcBuyProfit(avgPrice, sellPrice, percentChange, amountWETH) {
-    const amountWETHInEther = amountWETH / 1e18;
-
-    // Calc buy price
-    const buyPrice = avgPrice * (1 - percentChange / 100);
-
-    // Calc profit
-    const amountOfBuyToken = amountWETHInEther / buyPrice;
-
-    // Profit in terms of buy token
-    const profit = amountOfBuyToken * (sellPrice - buyPrice);
-
-    return profit.toFixed(2);
-  }
-
-  function calcSellProfit(avgPrice, buyPrice, percentChange, amountOfToken) {
-    const amountOfTokenInEther = amountOfToken / 1e18;
-    // Calculate sell price as a percentage above the average price
-    const sellPrice = avgPrice * (1 + percentChange / 100);
-
-    // Calculate profit
-    // Based on the difference between the sell price and the buy price
-    const profit = amountOfTokenInEther * (sellPrice - buyPrice);
-
-    return profit.toFixed(2);
-  }
 
   //AUTH - DYNAMIC
   const { setShowAuthFlow, authToken, primaryWallet } = useDynamicContext();
