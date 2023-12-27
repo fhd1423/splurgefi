@@ -67,6 +67,7 @@ async function main(
   tokenAddress: string,
   tokenName: string,
   wethAddress: string,
+  insertPair: boolean,
 ) {
   const coinPoolAddress = await getLargestPoolAddress(tokenAddress);
   const coinPrices = await getPrices(coinPoolAddress);
@@ -78,14 +79,16 @@ async function main(
     (_: number, index: number) => (0.01 * ethPrices[index]) / coinPrices[index],
   );
 
-  const upsertData = {
-    path: `${wethAddress}-${tokenAddress}`,
-    ['5min_avg']: { close_prices: ratioPrices },
-    updated_at: new Date(),
-    tokenName,
-  };
+  if (insertPair) {
+    const upsertData = {
+      path: `${wethAddress}-${tokenAddress}`,
+      ['5min_avg']: { close_prices: ratioPrices },
+      updated_at: new Date(),
+      tokenName,
+    };
 
-  let { data, error } = await supabase.from('Pairs').upsert([upsertData]);
+    let { data, error } = await supabase.from('Pairs').upsert([upsertData]);
+  }
 
   const avgRatio = await getFiveMinAvg(ratioPrices);
   return avgRatio;
@@ -99,7 +102,7 @@ Deno.serve(async (req) => {
 
   let responseData, status;
   try {
-    const { tokenAddress, tokenName } = await req.json();
+    const { tokenAddress, tokenName, insertPair } = await req.json();
     const currentPrice = await getCurrentPrice(tokenAddress);
     const { data: existingPairs } = await supabase
       .from('Pairs')
@@ -117,7 +120,12 @@ Deno.serve(async (req) => {
       };
       status = 200;
     } else {
-      const avgPrice = await main(tokenAddress, tokenName, WETH_ADDRESS);
+      const avgPrice = await main(
+        tokenAddress,
+        tokenName,
+        WETH_ADDRESS,
+        insertPair,
+      );
       responseData = {
         message: `Inserted new Pair for ${tokenName}`,
         avgPrice,

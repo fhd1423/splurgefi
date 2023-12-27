@@ -6,7 +6,7 @@ import Head from 'next/head';
 import { formatEther, getAddress } from 'viem';
 import { useTheme, useMediaQuery } from '@mui/material';
 import router from 'next/router';
-import axios from 'axios';
+import { Toaster, toast } from 'sonner';
 
 // MUI Date Picker Imports
 import { LocalizationProvider } from '@mui/x-date-pickers/LocalizationProvider';
@@ -48,13 +48,10 @@ export default function Automate() {
 
   //STATE
   const [toggleSelection, setToggleSelection] = useState('buy');
-  const [userInputError, setUserInputError] = useState('');
   const [allInputsFilled, setInputsFilled] = useState(false);
   const [tokenBalance, setTokenBalance] = useState(null);
-  // const [averagePrice, setAveragePrice] = useState(null);
   const [priceData, setPriceData] = useState([]);
   const [tokensSelected, setTokensSelected] = useState(false);
-  // const [profit, setProfit] = useState(null);
 
   const [message, setMessage] = useState({
     inputTokenAddress: WETH_ADDRESS, // DEFAULT INPUT - WETH
@@ -113,8 +110,9 @@ export default function Automate() {
     if (validationType == 'includeWeth') {
       fields = ['inputTokenAddress', 'outputTokenAddress'];
       const hasWeth = fields.some((field) => message[field] === WETH_ADDRESS);
-      if (!hasWeth)
-        setUserInputError('Please make sure either input or output is WETH.');
+      if (!hasWeth) {
+        toast.error('Please make sure either input or output is WETH.');
+      }
     } else if (validationType == 'tradeEntered') {
       fields = ['amount', 'percentChange', 'deadline'];
     } else if (validationType == 'everything') {
@@ -142,8 +140,6 @@ export default function Automate() {
     }
     if (isAnyFieldEmpty) {
       return false;
-    } else {
-      setUserInputError('');
     }
     return true;
   };
@@ -288,7 +284,7 @@ export default function Automate() {
         );
 
         sendCreatePairRequest(
-          getAddress(urrentOutput.address),
+          getAddress(currentOutput.address),
           currentOutput.name,
           true,
         );
@@ -339,12 +335,6 @@ export default function Automate() {
               justifyContent: 'center',
             }}
           >
-            <div className='mb-10'>
-              {userInputError && (
-                <Alert severity='error'>{userInputError}</Alert>
-              )}
-            </div>
-
             <Paper
               elevation={16}
               sx={{
@@ -510,7 +500,7 @@ export default function Automate() {
                         }}
                         onClick={() => {
                           if (!validate('everything')) {
-                            setUserInputError(
+                            toast.error(
                               'Please make sure all inputs are filled.',
                             );
                             return;
@@ -560,6 +550,7 @@ export default function Automate() {
             </div>
           )}
         </div>
+        <Toaster richColors />
       </LocalizationProvider>
     </div>
   );
