@@ -168,9 +168,6 @@ export default function Automate() {
           }
 
           if (data && data.avgPrice && data.currentPrice) {
-            console.log('Fetched avgPrice:', data.avgPrice);
-            console.log('Fetched currentPrice:', data.avgPrice);
-            // setAveragePrice(data.avgPrice);
             setPriceData([data.currentPrice, data.avgPrice]);
             setTokensSelected(true); // Set this to true so price data can be displayed
           } else {
