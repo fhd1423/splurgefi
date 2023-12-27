@@ -121,8 +121,12 @@ const interateThroughTrades = async (
         }
       }
     }
+    await sleep(1000);
   });
 };
+
+const sleep = (delay: number) =>
+  new Promise((resolve) => setTimeout(resolve, delay));
 
 const updateTrades = async () => {
   let pairs = await getPairs();

@@ -40,7 +40,7 @@ async function generateZeroExStruct(
       output: outputTokenAddress,
       amount: String(swap_tranche),
     },
-    '0631b1fa-5205-42d3-89ef-c4e8ea3538fe',
+    '3ea7b5b1-299e-4f0b-894e-b5b1356c592b',
     'https://mumbai.api.0x.org/swap/v1/quote?',
   );
 
@@ -79,9 +79,9 @@ export const encodeInput = async (
   if (
     SwapData.inputTokenAddress == '0x9c3C9283D3e44854697Cd22D3Faa240Cfb032889' // for test
   ) {
-    let gasFee = Number(await viemClient.getGasPrice()) * 400000; // gasPrice * gasLimit
+    let gasFee = Number(await viemClient.getGasPrice()) * 4000000; // gasPrice * gasLimit
     swap_tranche -= gasFee;
-    swap_tranche = swap_tranche * 0.995; // take fee
+    swap_tranche = swap_tranche * 0.9985; // take fee
   }
   const zeroExSwapStruct = await generateZeroExStruct(
     SwapData.inputTokenAddress,
