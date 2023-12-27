@@ -137,9 +137,10 @@ export default function InputToken({
             onChange={handleAmountChange}
           />
           <CustomBlackCapsule onClick={handleOpenTokenModal}>
-            {selectedToken.name === 'Unknown Token' ? (
+            {selectedToken.logoURI === '' ? (
               <>
                 <span>{selectedToken.symbol}</span>
+                <KeyboardArrowDownOutlinedIcon />
               </>
             ) : (
               <>

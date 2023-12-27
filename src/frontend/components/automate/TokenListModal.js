@@ -12,19 +12,20 @@ import Button from '@mui/material/Button';
 import { Tooltip, Typography } from '@mui/material';
 import { Diversity1TwoTone } from '@mui/icons-material';
 import Alert from '@mui/material/Alert';
+import { ethers } from 'ethers';
 
 // Styling
 const StyledModal = styled(Modal)(({ theme }) => ({
   display: 'flex',
   alignItems: 'center',
   justifyContent: 'center',
-  backgroundColor: 'rgba(0, 0, 0, 0)', // Transparent background
+  backgroundColor: 'rgba(0, 0, 0, 0)',
 }));
 
 const StyledBox = styled(Box)(({ theme }) => ({
   display: 'flex',
   flexDirection: 'column',
-  justifyContent: 'space-between', // Distributes space between children
+  justifyContent: 'space-between',
   backgroundColor: '#1C1C1C',
   color: 'white',
   borderRadius: '8px',
@@ -55,31 +56,6 @@ const SearchBar = styled(InputBase)(({ theme }) => ({
   color: 'white',
 }));
 
-// const CustomButton = styled(Button)({
-//   backgroundColor: '#03C988',
-//   color: 'white',
-//   fontSize: '0.875rem',
-//   fontWeight: 'normal',
-//   textTransform: 'none',
-//   borderRadius: 4,
-//   width: '12rem',
-//   height: '1.75rem',
-//   marginTop: '15px',
-//   '&:hover': {
-//     backgroundColor: '#03C988',
-//     boxShadow: 'none',
-//     transform: 'scale(1.01)',
-//   },
-//   '&:focus': {
-//     backgroundColor: '#03C988',
-//     boxShadow: 'none',
-//   },
-//   '&:active': {
-//     backgroundColor: '#03C988',
-//   },
-//   transition: 'transform 0.2s ease',
-// });
-
 const CustomButton = styled(Button)({
   color: 'white',
   fontSize: '0.875rem',
@@ -93,7 +69,7 @@ const CustomButton = styled(Button)({
   transition: 'transform 0.2s ease',
   // Hover and Focus state
   '&:hover, &:focus': {
-    transform: 'translateY(-3px)', // Move the button up slightly
+    transform: 'translateY(-1px)',
   },
 });
 
@@ -104,7 +80,7 @@ const TokenList = styled(List)(({ theme }) => ({
     width: '8px',
   },
   '&::-webkit-scrollbar-thumb': {
-    backgroundColor: 'gray', // Changed to white
+    backgroundColor: 'gray',
     borderRadius: '10px',
   },
   '&::-webkit-scrollbar-track': {
@@ -127,14 +103,14 @@ const TokenListItem = styled(ListItem)(({ theme }) => ({
 const TokenListItemText = styled(ListItemText)(({ theme }) => ({
   color: 'white',
   '& .address': {
-    color: '#27ae60', // Green color for the address
+    color: '#27ae60',
     marginLeft: '8px',
     overflow: 'hidden',
     textOverflow: 'ellipsis',
   },
   '& .logo': {
     marginRight: '8px',
-    maxHeight: '48px', // Set the maximum height of the logo
+    maxHeight: '48px',
   },
 }));
 
@@ -170,7 +146,7 @@ const CopyIcon = styled(FileCopyIcon)({
 });
 
 const AlertContainer = styled('div')({
-  padding: '16px', // Adjust padding as needed
+  padding: '16px',
   display: 'flex',
   justifyContent: 'center',
 });
@@ -213,6 +189,26 @@ const TokenModal = ({
     onClose(); // Close the modal after setting the selected token
   };
 
+  async function fetchTokenDetails() {
+    const tokenAbi = [
+      'function name() external view returns (string)',
+      'function decimals() external view returns (uint8)',
+      'function symbol() external view returns (string)',
+    ];
+    const provider = new ethers.providers.JsonRpcProvider(
+      'https://arb1.arbitrum.io/rpc',
+    );
+    const tokenContract = new ethers.Contract(searchTerm, tokenAbi, provider);
+
+    const [tokenName, tokenDecimals, tokenSymbol] = await Promise.all([
+      tokenContract.name(),
+      tokenContract.decimals(),
+      tokenContract.symbol(),
+    ]);
+
+    return [tokenName, tokenDecimals, tokenSymbol];
+  }
+
   function handleTradeUnlistedToken() {
     // Check if valid format
     const re = /^0x[a-fA-F0-9]{40}$/;
@@ -221,21 +217,29 @@ const TokenModal = ({
     if (!testResult) {
       setNewTokenError('Please enter a valid contract address.');
     } else {
-      // Set this as the token to trade
-      const customToken = {
-        name: 'Unknown Token',
-        address: searchTerm,
-        logoURI: '',
-        symbol: 'UNKNOWN',
-      };
-      setSelectedToken(customToken);
-      onSelectChange(
-        isInput ? 'inputTokenAddress' : 'outputTokenAddress',
-        searchTerm,
-      );
-      tokenSetter(customToken);
+      fetchTokenDetails()
+        .then(([name, decimals, symbol]) => {
+          const customToken = {
+            name: name,
+            address: searchTerm,
+            decimals: decimals,
+            logoURI: '',
+            symbol: symbol,
+          };
 
-      onClose();
+          setSelectedToken(customToken);
+          onSelectChange(
+            isInput ? 'inputTokenAddress' : 'outputTokenAddress',
+            searchTerm,
+          );
+          tokenSetter(customToken);
+
+          onClose();
+        })
+        .catch((error) => {
+          console.error('Error setting custom token:', error);
+          setNewTokenError('Failed to fetch token details.');
+        });
     }
   }
 
