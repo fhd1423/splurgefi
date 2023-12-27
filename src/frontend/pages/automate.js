@@ -21,9 +21,6 @@ import InputBatches from '../components/automate/InputBatches';
 import DatePicker from '@/components/automate/DatePicker';
 import TimeSelector from '@/components/automate/TimeSelector';
 import NavBar from '../components/NavBar';
-import TradeSummaryDropdown from '@/components/automate/TradeSummaryDropdown';
-import AvgPriceDropdown from '@/components/automate/AvgPriceDropdown';
-import ToggleSwitch from '@/components/automate/Switch';
 import CommunityPopUp from '@/components/automate/CommunityPopUp';
 import {
   useSignTypedData,

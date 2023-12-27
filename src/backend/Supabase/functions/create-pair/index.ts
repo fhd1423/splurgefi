@@ -31,6 +31,31 @@ const getPrices = async (poolAddress: string) => {
   return data.data.attributes.ohlcv_list.map((ohlcv: any) => [ohlcv[4]]);
 };
 
+const getCurrentPrice = async (tokenAddress: string) => {
+  const apiUrl: string = 'https://api.geckoterminal.com/api/v2';
+  const WETH_ADDRESS = '0x82aF49447D8a07e3bd95BD0d56f35241523fBab1';
+
+  let pairString = `${WETH_ADDRESS},${tokenAddress}`;
+
+  let response;
+
+  try {
+    response = await fetch(
+      `${apiUrl}/simple/networks/arbitrum/token_price/${pairString}`,
+    );
+    response = await response.json();
+  } catch (e) {
+    console.log('Error with geckoterminal');
+    return;
+  }
+  let prices = response.data.data.attributes.token_prices;
+  const ethPrice = prices[`${WETH_ADDRESS.toLowerCase()}`];
+  const tokenPrice = prices[`${tokenAddress.toLowerCase()}`];
+
+  const currentRatio = (0.01 * ethPrice) / tokenPrice;
+  return currentRatio;
+};
+
 // Function to calculate the average price
 const getFiveMinAvg = (priceData: number[]): number => {
   const total = priceData.reduce((acc, price) => acc + Number(price), 0);
@@ -75,6 +100,7 @@ Deno.serve(async (req) => {
   let responseData, status;
   try {
     const { tokenAddress, tokenName } = await req.json();
+    const currentPrice = await getCurrentPrice(tokenAddress);
     const { data: existingPairs } = await supabase
       .from('Pairs')
       .select()
@@ -87,6 +113,7 @@ Deno.serve(async (req) => {
       responseData = {
         message: `Pair already exists for ${tokenName}`,
         avgPrice: existingAvg,
+        currentPrice,
       };
       status = 200;
     } else {
@@ -94,6 +121,7 @@ Deno.serve(async (req) => {
       responseData = {
         message: `Inserted new Pair for ${tokenName}`,
         avgPrice,
+        currentPrice,
       };
       status = 200;
     }
