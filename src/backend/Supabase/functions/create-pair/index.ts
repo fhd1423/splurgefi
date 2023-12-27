@@ -48,7 +48,7 @@ const getCurrentPrice = async (tokenAddress: string) => {
     console.log('Error with geckoterminal');
     return;
   }
-  let prices = response.data.data.attributes.token_prices;
+  let prices = response.data.attributes.token_prices;
   const ethPrice = prices[`${WETH_ADDRESS.toLowerCase()}`];
   const tokenPrice = prices[`${tokenAddress.toLowerCase()}`];
 
