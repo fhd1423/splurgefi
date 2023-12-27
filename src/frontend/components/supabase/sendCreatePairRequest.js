@@ -1,4 +1,4 @@
-const sendCreatePairRequest = async (tokenAddress, tokenName) => {
+const sendCreatePairRequest = async (tokenAddress, tokenName, insertPair) => {
   const apiUrl =
     'https://gmupexxqnzrrzozcovjp.supabase.co/functions/v1/create-pair';
 
@@ -13,7 +13,7 @@ const sendCreatePairRequest = async (tokenAddress, tokenName) => {
         'Content-Type': 'application/json',
         Authorization: `Bearer ${anonKey}`,
       },
-      body: JSON.stringify({ tokenAddress, tokenName }),
+      body: JSON.stringify({ tokenAddress, tokenName, insertPair }),
     });
 
     if (!response.ok) {

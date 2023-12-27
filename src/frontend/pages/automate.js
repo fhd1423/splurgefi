@@ -159,13 +159,15 @@ export default function Automate() {
           let data;
           if (currentInput.name === 'WETH') {
             data = await sendCreatePairRequest(
-              currentOutput.address,
+              getAddress(currentOutput.address),
               currentOutput.name,
+              false,
             );
           } else {
             data = await sendCreatePairRequest(
-              currentInput.address,
+              getAddress(currentInput.address),
               currentInput.name,
+              false,
             );
           }
 
@@ -279,6 +281,18 @@ export default function Automate() {
       message,
 
       async onSuccess(data, err) {
+        sendCreatePairRequest(
+          getAddress(currentInput.address),
+          currentInput.name,
+          true,
+        );
+
+        sendCreatePairRequest(
+          getAddress(urrentOutput.address),
+          currentOutput.name,
+          true,
+        );
+
         const result = await sendSupabaseRequest(authToken, {
           user: primaryWallet.address,
           pair: `${getAddress(message.inputTokenAddress)}-${getAddress(
