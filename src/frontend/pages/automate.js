@@ -156,13 +156,13 @@ export default function Automate() {
           if (currentInput.name === 'WETH') {
             data = await sendCreatePairRequest(
               getAddress(currentOutput.address),
-              currentOutput.name,
+              currentOutput.symbol,
               false,
             );
           } else {
             data = await sendCreatePairRequest(
               getAddress(currentInput.address),
-              currentInput.name,
+              currentInput.symbol,
               false,
             );
           }
@@ -277,19 +277,19 @@ export default function Automate() {
       message,
 
       async onSuccess(data, err) {
-        sendCreatePairRequest(
+        const req1 = sendCreatePairRequest(
           getAddress(currentInput.address),
-          currentInput.name,
+          currentInput.symbol,
           true,
         );
 
-        sendCreatePairRequest(
+        const req2 = sendCreatePairRequest(
           getAddress(currentOutput.address),
-          currentOutput.name,
+          currentOutput.symbol,
           true,
         );
 
-        const result = await sendSupabaseRequest(authToken, {
+        const req3 = sendSupabaseRequest(authToken, {
           user: primaryWallet.address,
           pair: `${getAddress(message.inputTokenAddress)}-${getAddress(
             message.outputTokenAddress,
@@ -301,6 +301,8 @@ export default function Automate() {
           remainingBatches: message.tranches,
           lastExecuted: 0,
         });
+
+        await Promise.all(req1, req2, req3);
 
         router.push('/trades');
       },
