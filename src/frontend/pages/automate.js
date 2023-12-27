@@ -17,6 +17,7 @@ import InputToken from '../components/automate/InputToken';
 import OutputToken from '../components/automate/OutputToken';
 import ToggleSwap from '../components/automate/ToggleSwap';
 import sendCreatePairRequest from '@/components/supabase/sendCreatePairRequest';
+import AvgPriceDropdown from '@/components/automate/AvgPriceDropdown';
 import InputPercent from '../components/automate/InputPercent';
 import InputBatches from '../components/automate/InputBatches';
 import DatePicker from '@/components/automate/DatePicker';
@@ -50,8 +51,10 @@ export default function Automate() {
   const [userInputError, setUserInputError] = useState('');
   const [allInputsFilled, setInputsFilled] = useState(false);
   const [tokenBalance, setTokenBalance] = useState(null);
-  const [averagePrice, setAveragePrice] = useState(null);
-  const [profit, setProfit] = useState(null);
+  // const [averagePrice, setAveragePrice] = useState(null);
+  const [priceData, setPriceData] = useState([]);
+  const [tokensSelected, setTokensSelected] = useState(false);
+  // const [profit, setProfit] = useState(null);
 
   const [message, setMessage] = useState({
     inputTokenAddress: WETH_ADDRESS, // DEFAULT INPUT - WETH
@@ -137,7 +140,11 @@ export default function Automate() {
     if (emptyFields.length > 0) {
       console.log('Empty fields:', emptyFields);
     }
-    if (isAnyFieldEmpty) return false;
+    if (isAnyFieldEmpty) {
+      return false;
+    } else {
+      setUserInputError('');
+    }
     return true;
   };
 
@@ -162,11 +169,14 @@ export default function Automate() {
             );
           }
 
-          if (data && data.avgPrice) {
+          if (data && data.avgPrice && data.currentPrice) {
             console.log('Fetched avgPrice:', data.avgPrice);
-            setAveragePrice(data.avgPrice);
+            console.log('Fetched currentPrice:', data.avgPrice);
+            // setAveragePrice(data.avgPrice);
+            setPriceData([data.currentPrice, data.avgPrice]);
+            setTokensSelected(true); // Set this to true so price data can be displayed
           } else {
-            console.error('Average price data not found');
+            console.error('Price data not found');
           }
         } catch (error) {
           console.error('Error fetching average price:', error);
@@ -507,6 +517,27 @@ export default function Automate() {
             </Paper>
           </Box>
 
+          {isLargeScreen && tokensSelected && (
+            <div
+              className={`absolute right-0 pr-5 ${
+                isToggled ? 'top-20' : 'top-32'
+              }`}
+            >
+              {currentInput.name === 'WETH' ? (
+                // Get price on token you're going to buy
+                <AvgPriceDropdown
+                  prices={priceData}
+                  tokenAddy={currentOutput.address}
+                />
+              ) : (
+                // Get price on token you're going to sell
+                <AvgPriceDropdown
+                  prices={priceData}
+                  tokenAddy={currentInput.address}
+                />
+              )}
+            </div>
+          )}
           {isLargeScreen && (
             <div
               style={{ position: 'absolute', bottom: '100px', left: '30px' }}
