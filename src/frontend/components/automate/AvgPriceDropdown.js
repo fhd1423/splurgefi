@@ -139,7 +139,7 @@ export default function AvgPriceDropdown({ prices, tokenAddy }) {
                   }}
                 >
                   {Array.isArray(prices) && prices.length > 0
-                    ? '$' + (prices[1] - prices[0]).toFixed(2)
+                    ? '$' + (prices[0] - prices[1]).toFixed(2)
                     : 'N/A'}
                 </Typography>
               </div>
