@@ -220,7 +220,9 @@ export default function Automate() {
       try {
         formattedBalance = formatEther(balance);
       } catch (e) {}
-      setTokenBalance(String(formattedBalance));
+
+      const roundedBalance = Number(formattedBalance).toFixed(5);
+      setTokenBalance(roundedBalance);
     },
   });
 
