@@ -247,7 +247,7 @@ export default function Trades() {
           </div>
 
           {userTrades.size > 0 ? (
-            <div className='h-screen bg-black flex flex-col justify-start items-start pt-8 pl-5 pr-5'>
+            <div className='h-screen flex flex-col justify-start items-start pt-8 pl-5 pr-5'>
               <TableContainer
                 component={Paper}
                 sx={{
