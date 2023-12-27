@@ -119,9 +119,9 @@ const interateThroughTrades = async (
           console.log(`trade simulation failed for trade ${trade.id}`);
           await markFailedSimulation(trade.id, trade.failedSimulation + 1);
         }
+        await sleep(1000);
       }
     }
-    await sleep(1000);
   });
 };
 
