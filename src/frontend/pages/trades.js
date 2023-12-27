@@ -221,9 +221,9 @@ export default function Trades() {
   );
 
   return (
-    <div className='h-screen bg-black flex flex-col'>
+    <div className='h-screen bg-gradient-to-br from-stone-900 to-emerald-900 flex flex-col'>
       <NavBar inTradesPage={true} />
-      <div className='h-screen bg-black flex flex-col justify-start items-start pt-12 pl-10'>
+      <div className='h-screen flex flex-col justify-start items-start pt-12 pl-10'>
         <DynamicContextProvider
           settings={{
             environmentId: 'a8961ac2-2a97-4735-a2b2-253f2485557e',

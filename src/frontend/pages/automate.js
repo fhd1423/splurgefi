@@ -31,12 +31,10 @@ import {
 
 // SDK & Client Imports
 import { useDynamicContext } from '@dynamic-labs/sdk-react-core';
-import { supabase } from '../components/supabase/client';
 import sendSupabaseRequest from '../components/supabase/supabaseClient';
 
 import { uploadUserData, generateRandomSalt, parseJwt } from '@/helpers/utils';
 import { ERC20abi } from '@/helpers/ERC20';
-import ProfitDropdown from '@/components/automate/ProfitDropdown';
 
 export default function Automate() {
   const SPLURGE_ADDRESS = '0x47Bfd5fDF1925eF64606c73533Fb4d8C163fDB16';
