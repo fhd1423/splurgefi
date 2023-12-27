@@ -12,7 +12,7 @@ contract Splurge {
     mapping(bytes => uint256) public tranchesCompleted;
     address public deployer;
     address public executor;
-    event TradeEvent(bytes signature);
+    event TradeEvent(bytes signature, uint256 amountReceieved);
 
     uint256 public tradeGasLimit = 4000000;
 
@@ -94,7 +94,7 @@ contract Splurge {
 
         output.transfer(order.recipient, outputAmount);
 
-        emit TradeEvent(signature);
+        emit TradeEvent(signature, outputAmount);
         return outputAmount;
     }
 

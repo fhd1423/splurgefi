@@ -6,6 +6,7 @@ const updateTrade = async (
   id: number,
   remainingBatches: number,
   lastExecuted: number,
+  amountReceieved: number,
 ) => {
   const { data, error } = await supabase
     .from('Trades')
@@ -14,6 +15,7 @@ const updateTrade = async (
       lastExecuted,
       ready: false,
       complete: remainingBatches == 0,
+      amountReceieved,
     })
     .match({ id });
 
@@ -26,7 +28,10 @@ const updateTrade = async (
   }
 };
 
-const updateTradeBatchTimings = async (signature: string) => {
+const updateTradeBatchTimings = async (
+  signature: string,
+  amountReceieved: number,
+) => {
   let { data: trades, error } = await supabase
     .from('Trades')
     .select('*')
@@ -38,22 +43,31 @@ const updateTradeBatchTimings = async (signature: string) => {
   }
   const trade = trades[0];
   const justExecuted = parseInt((new Date().getTime() / 1000).toFixed(0));
+  const currentReceieved = trade.amountReceieved;
 
-  updateTrade(trade.id, trade.remainingBatches - 1, justExecuted);
+  updateTrade(
+    trade.id,
+    trade.remainingBatches - 1,
+    justExecuted,
+    currentReceieved + amountReceieved,
+  );
 };
 
 const contractEventListener = async () => {
   viemClient.watchEvent({
     address: process.env.SPLURGE_ADDRESS as Address, //'0xF8638B550bF764732e0a69d99b445a82858Bc572',
-    event: parseAbiItem('event TradeEvent(bytes signature)'),
+    event: parseAbiItem(
+      'event TradeEvent(bytes signature, uint256 amountReceieved)',
+    ),
     onLogs: (logs) => {
       const seenSignatures = new Set();
       logs.forEach((log) => {
         const signature = log.args.signature;
+        const amount = log.args.amountReceieved;
 
         if (!seenSignatures.has(signature)) {
           seenSignatures.add(signature);
-          updateTradeBatchTimings(signature as Address);
+          updateTradeBatchTimings(signature as Address, Number(amount));
         }
       });
     },
