@@ -298,7 +298,7 @@ export default function Automate() {
           lastExecuted: 0,
         });
 
-        await Promise.all(req1, req2, req3);
+        await Promise.all([req1, req2, req3]);
 
         router.push('/trades');
       },
