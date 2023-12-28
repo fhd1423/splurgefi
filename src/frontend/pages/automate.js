@@ -464,7 +464,7 @@ export default function Automate() {
                     />
                   </Grid>
 
-                  {allInputsFilled && (
+                  {/*allInputsFilled && (
                     <Grid item xs={12}>
                       <Typography
                         sx={{
@@ -485,7 +485,7 @@ export default function Automate() {
                         {profit + ' ' + currentOutput.name}
                       </Typography>
                     </Grid>
-                  )}
+                      )*/}
 
                   <Grid
                     item
@@ -539,7 +539,7 @@ export default function Automate() {
             </Paper>
           </Box>
 
-          {tokensSelected && isLargeScreen && (
+          {/*tokensSelected && isLargeScreen && (
             <div
               className={`absolute right-0 pr-5 ${
                 isToggled ? 'top-20' : 'top-32'
@@ -563,7 +563,7 @@ export default function Automate() {
                 />
               )}
             </div>
-          )}
+              )*/}
           {isLargeScreen && (
             <div
               style={{ position: 'absolute', bottom: '100px', left: '30px' }}
