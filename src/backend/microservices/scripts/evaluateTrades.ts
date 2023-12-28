@@ -112,6 +112,7 @@ const interateThroughTrades = async (
           trade.order as SwapDataStruct,
           trade.signature,
         );
+        if (!callData) return;
         if (await simulateTrade(callData)) {
           await insertCalldata(callData, trade.id);
           await activateAction(trade.id);

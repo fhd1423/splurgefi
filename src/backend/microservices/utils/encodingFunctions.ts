@@ -40,7 +40,7 @@ async function fetchQuote(
 ) {
   const url = `${apiUrl}buyToken=${pair.output}&sellToken=${pair.input}&sellAmount=${pair.amount}`;
   const headers = { '0x-api-key': apiKey };
-  const response = await axios.get(url, { headers });
+  let response = await axios.get(url, { headers });
 
   return response.data;
 }
@@ -98,11 +98,16 @@ export const encodeInput = async (
     swap_tranche -= gasFee;
     swap_tranche = swap_tranche * 0.9985; // take fee
   }
-  const zeroExSwapStruct = await generateZeroExStruct(
-    SwapData.inputTokenAddress,
-    SwapData.outputTokenAddress,
-    swap_tranche,
-  );
+  let zeroExSwapStruct;
+  try {
+    zeroExSwapStruct = await generateZeroExStruct(
+      SwapData.inputTokenAddress,
+      SwapData.outputTokenAddress,
+      swap_tranche,
+    );
+  } catch (e) {
+    return null;
+  }
 
   const data = encodeFunctionData({
     abi: splurgeAbi,
