@@ -33,7 +33,12 @@ const CustomAccordionDetails = styled(AccordionDetails)(({ theme }) => ({
   borderBottomRightRadius: 5,
 }));
 
-export default function AvgPriceDropdown({ prices, tokenAddy }) {
+export default function AvgPriceDropdown({
+  prices,
+  tokenAddy,
+  currentInput,
+  currentOutput,
+}) {
   const [expanded, setExpanded] = useState(true);
   const handleToggleAccordion = () => {
     setExpanded(!expanded);
@@ -67,7 +72,7 @@ export default function AvgPriceDropdown({ prices, tokenAddy }) {
         </CustomAccordionSummary>
         <CustomAccordionDetails>
           <Grid container spacing={2}>
-            <Grid item xs={6}>
+            {/* <Grid item xs={6}>
               <div>
                 <Typography
                   sx={{
@@ -92,8 +97,8 @@ export default function AvgPriceDropdown({ prices, tokenAddy }) {
                     : 'N/A'}
                 </Typography>
               </div>
-            </Grid>
-            <Grid item xs={6}>
+            </Grid> */}
+            {/* <Grid item xs={6}>
               <div>
                 <Typography
                   sx={{
@@ -117,20 +122,10 @@ export default function AvgPriceDropdown({ prices, tokenAddy }) {
                     : 'N/A'}
                 </Typography>
               </div>
-            </Grid>
+            </Grid> */}
 
             <Grid item xs={12}>
               <div>
-                <Typography
-                  sx={{
-                    color: 'gray',
-                    fontSize: '0.75',
-                    fontWeight: 'medium',
-                    mb: 0,
-                  }}
-                >
-                  Price Difference
-                </Typography>
                 <Typography
                   sx={{
                     color: 'white',
@@ -139,7 +134,11 @@ export default function AvgPriceDropdown({ prices, tokenAddy }) {
                   }}
                 >
                   {Array.isArray(prices) && prices.length > 0
-                    ? '$' + (prices[0] - prices[1]).toFixed(2)
+                    ? currentOutput / currentInput +
+                      ' ' +
+                      'currently up' +
+                      ((1 - priceData[0] / priceData[1]) * 100).toFixed(4) +
+                      '%'
                     : 'N/A'}
                 </Typography>
               </div>

@@ -146,10 +146,9 @@ export default function Automate() {
 
   // Fetchs avg price from edge func
   useEffect(() => {
-    const correctTokens = validate('tokens');
-    validate('includeWeth');
-
+    const correctTokens = validate('includeWeth');
     const fetchPrice = async () => {
+      console.log('FETCH PRICE CALLED');
       if (correctTokens) {
         try {
           let data;
@@ -406,13 +405,13 @@ export default function Automate() {
                       setCurrentOutput={setCurrentOutput}
                     />
                   </Grid>
-                  <div className='w-full text-center p-4 text-white font-semibold text-lg'>
+                  {/* <div className='w-full text-center p-4 text-white font-semibold text-lg'>
                     {currentOutput.name}/{currentInput.name} currently up
                     <span className='rounded-lg  p-2 text-emerald-500 bg-black '>
                       {' '}
                       {((1 - priceData[0] / priceData[1]) * 100).toFixed(4)}%
                     </span>
-                  </div>
+                  </div> */}
                   {isToggled && (
                     <Grid item xs={6}>
                       <InputBatches
@@ -527,7 +526,7 @@ export default function Automate() {
             </Paper>
           </Box>
 
-          {/*isLargeScreen && tokensSelected && (
+          {tokensSelected && isLargeScreen && (
             <div
               className={`absolute right-0 pr-5 ${
                 isToggled ? 'top-20' : 'top-32'
@@ -538,16 +537,20 @@ export default function Automate() {
                 <AvgPriceDropdown
                   prices={priceData}
                   tokenAddy={currentOutput.address}
+                  currentInput={currentInput.name}
+                  currentOutput={currentOutput.name}
                 />
               ) : (
                 // Get price on token you're going to sell
                 <AvgPriceDropdown
                   prices={priceData}
                   tokenAddy={currentInput.address}
+                  currentInput={currentInput.name}
+                  currentOutput={currentOutput.name}
                 />
               )}
             </div>
-              )*/}
+          )}
           {isLargeScreen && (
             <div
               style={{ position: 'absolute', bottom: '100px', left: '30px' }}
