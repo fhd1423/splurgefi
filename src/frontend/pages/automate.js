@@ -407,16 +407,7 @@ export default function Automate() {
                   </Grid>
                   {message.inputTokenAddress == WETH_ADDRESS && (
                     <div className='w-full text-center p-4 text-white font-semibold text-lg'>
-                      {currentOutput.name}/{currentInput.name} currently up
-                      <span className='rounded-lg  p-2 text-emerald-500 bg-black '>
-                        {' '}
-                        {((1 - priceData[0] / priceData[1]) * 100).toFixed(4)}%
-                      </span>
-                    </div>
-                  )}
-                  {message.outputTokenAddress == WETH_ADDRESS && (
-                    <div className='w-full text-center p-4 text-white font-semibold text-lg'>
-                      {currentOutput.name}/{currentInput.name} currently up
+                      {currentOutput.name} output currently up
                       <span className='rounded-lg  p-2 text-emerald-500 bg-black '>
                         {' '}
                         {(
@@ -424,6 +415,15 @@ export default function Automate() {
                           ((1 - priceData[0] / priceData[1]) * 100)
                         ).toFixed(4)}
                         %
+                      </span>
+                    </div>
+                  )}
+                  {message.outputTokenAddress == WETH_ADDRESS && (
+                    <div className='w-full text-center p-4 text-white font-semibold text-lg'>
+                      {currentOutput.name} output currently up
+                      <span className='rounded-lg  p-2 text-emerald-500 bg-black '>
+                        {' '}
+                        {((1 - priceData[0] / priceData[1]) * 100).toFixed(4)}%
                       </span>
                     </div>
                   )}
