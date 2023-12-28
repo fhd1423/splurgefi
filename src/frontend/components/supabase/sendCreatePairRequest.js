@@ -7,7 +7,7 @@ const sendCreatePairRequest = async (tokenAddress, tokenName, insertPair) => {
 
   try {
     const response = await fetch(apiUrl, {
-      mode: 'no-cors',
+      mode: 'cors',
       method: 'POST',
       headers: {
         'Content-Type': 'application/json',
