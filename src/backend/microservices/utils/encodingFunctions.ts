@@ -4,7 +4,7 @@ import ExAbi from '../utils/zeroexabi';
 import splurgeAbi from '../utils/splurgeAbi';
 import { viemClient } from './viemclient';
 
-const WETH = '0x82aF49447D8a07e3bd95BD0d56f35241523fBab1'; // production weth: arbitrum currently
+const WETH = '0x82af49447d8a07e3bd95bd0d56f35241523fbab1'; // production weth: arbitrum currently
 
 export type TransformERC20 = [
   string, // First address
@@ -50,6 +50,7 @@ async function generateZeroExStruct(
   outputTokenAddress: Address,
   swap_tranche: number,
 ) {
+  console.log('quoting swap for', swap_tranche);
   const res = await fetchQuote(
     {
       input: inputTokenAddress,
