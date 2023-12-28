@@ -407,23 +407,21 @@ export default function Automate() {
                   </Grid>
                   {message.inputTokenAddress == WETH_ADDRESS && (
                     <div className='w-full text-center p-4 text-white font-semibold text-lg'>
-                      {currentOutput.name} output currently up
-                      <span className='rounded-lg  p-2 text-emerald-500 bg-black '>
-                        {' '}
+                      Current {currentOutput.symbol} Output:
+                      <span className='rounded-lg p-1 text-emerald-500 bg-black ml-1'>
                         {(
                           -1 *
                           ((1 - priceData[0] / priceData[1]) * 100)
-                        ).toFixed(4)}
+                        ).toFixed(2)}
                         %
                       </span>
                     </div>
                   )}
                   {message.outputTokenAddress == WETH_ADDRESS && (
                     <div className='w-full text-center p-4 text-white font-semibold text-lg'>
-                      {currentOutput.name} output currently up
-                      <span className='rounded-lg  p-2 text-emerald-500 bg-black '>
-                        {' '}
-                        {((1 - priceData[0] / priceData[1]) * 100).toFixed(4)}%
+                      Current {currentOutput.symbol} Output:
+                      <span className='rounded-lg p-1 text-emerald-500 bg-black ml-1'>
+                        {((1 - priceData[0] / priceData[1]) * 100).toFixed(2)}%
                       </span>
                     </div>
                   )}
@@ -451,7 +449,7 @@ export default function Automate() {
 
                   <Grid item xs={6}>
                     <InputPercent
-                      title='When profit increases by'
+                      title='When output increases by'
                       value={message.percentChange}
                       onValueChange={handleMessageChange}
                       isUpSelected={toggleSelection !== 'buy'}
