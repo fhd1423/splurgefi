@@ -439,7 +439,7 @@ export default function Automate() {
                   )}
 
                   {isToggled && (
-                    <Grid item xs={6} style={{ marginTop: '5px' }}>
+                    <Grid item xs={6}>
                       <TimeSelector
                         onTradeActionChange={handleMessageChange}
                         title='Every'
