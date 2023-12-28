@@ -137,7 +137,7 @@ export default function AvgPriceDropdown({
                     ? currentOutput / currentInput +
                       ' ' +
                       'currently up' +
-                      ((1 - priceData[0] / priceData[1]) * 100).toFixed(4) +
+                      ((1 - prices[0] / prices[1]) * 100).toFixed(4) +
                       '%'
                     : 'N/A'}
                 </Typography>
