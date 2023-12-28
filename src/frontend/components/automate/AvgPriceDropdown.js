@@ -72,65 +72,12 @@ export default function AvgPriceDropdown({
         </CustomAccordionSummary>
         <CustomAccordionDetails>
           <Grid container spacing={2}>
-            {/* <Grid item xs={6}>
-              <div>
-                <Typography
-                  sx={{
-                    color: 'gray',
-                    fontSize: '0.75',
-                    fontWeight: 'medium',
-                    mb: 0,
-                  }}
-                >
-                  Current Price
-                </Typography>
-
-                <Typography
-                  sx={{
-                    color: 'white',
-                    fontSize: '1.25rem',
-                    fontWeight: 'bold',
-                  }}
-                >
-                  {Array.isArray(prices) && prices.length > 1
-                    ? '$' + prices[0].toFixed(2)
-                    : 'N/A'}
-                </Typography>
-              </div>
-            </Grid> */}
-            {/* <Grid item xs={6}>
-              <div>
-                <Typography
-                  sx={{
-                    color: 'gray',
-                    fontSize: '0.75',
-                    fontWeight: 'medium',
-                    mb: 0,
-                  }}
-                >
-                  5 min avg.
-                </Typography>
-                <Typography
-                  sx={{
-                    color: 'white',
-                    fontSize: '1.25rem',
-                    fontWeight: 'bold',
-                  }}
-                >
-                  {Array.isArray(prices) && prices.length > 0
-                    ? '$' + prices[1].toFixed(2)
-                    : 'N/A'}
-                </Typography>
-              </div>
-            </Grid> */}
-
             <Grid item xs={12}>
               <div>
                 <Typography
                   sx={{
                     color: 'white',
-                    fontSize: '1.25rem',
-                    fontWeight: 'bold',
+                    fontSize: '1rem',
                   }}
                 >
                   {Array.isArray(prices) && prices.length > 0
