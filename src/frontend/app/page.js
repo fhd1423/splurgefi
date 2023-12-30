@@ -2,10 +2,7 @@
 import LandingPage from '../components/home/LandingPage';
 import FeaturesSection from '../components/home/FeaturesSection';
 import WaitlistSection from '../components/home/WaitlistSection';
-import {
-  DynamicContextProvider,
-  DynamicWidget,
-} from '@dynamic-labs/sdk-react-core';
+import { DynamicContextProvider } from '@dynamic-labs/sdk-react-core';
 import Graph from '../components/home/Graph';
 import { EthereumWalletConnectors } from '@dynamic-labs/ethereum';
 
@@ -67,7 +64,7 @@ export default function Home() {
                 target='_blank'
                 rel='noopener noreferrer'
               >
-                Docs
+                GitBook
               </a>
             </div>
           </div>
