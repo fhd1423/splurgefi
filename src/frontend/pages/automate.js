@@ -168,7 +168,6 @@ export default function Automate() {
 
           if (data && data.avgPrice && data.currentPrice) {
             setPriceData([data.currentPrice, data.avgPrice]);
-            setTokensSelected(true); // Set this to true so price data can be displayed
             setPriceDataLoading(false);
           } else {
             console.error('Price data not found');
