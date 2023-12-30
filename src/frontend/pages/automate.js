@@ -48,6 +48,7 @@ export default function Automate() {
   const [toggleSelection, setToggleSelection] = useState('buy');
   const [tokenBalance, setTokenBalance] = useState(null);
   const [priceData, setPriceData] = useState([]);
+  const [priceDataLoading, setPriceDataLoading] = useState(false);
 
   const [message, setMessage] = useState({
     inputTokenAddress: WETH_ADDRESS, // DEFAULT INPUT - WETH
@@ -148,6 +149,7 @@ export default function Automate() {
     const fetchPrice = async () => {
       console.log('FETCH PRICE CALLED');
       if (correctTokens) {
+        setPriceDataLoading(true);
         try {
           let data;
           if (currentInput.name === 'WETH') {
@@ -167,6 +169,7 @@ export default function Automate() {
           if (data && data.avgPrice && data.currentPrice) {
             setPriceData([data.currentPrice, data.avgPrice]);
             setTokensSelected(true); // Set this to true so price data can be displayed
+            setPriceDataLoading(false);
           } else {
             console.error('Price data not found');
           }
@@ -408,12 +411,19 @@ export default function Automate() {
                     {outputIsWETH
                       ? `Current ${currentInput.symbol} Price:`
                       : `Current ${currentOutput.symbol} Price:`}
-                    <span className='rounded-lg p-1 text-emerald-500 bg-black ml-1'>
-                      {(-1 * ((1 - priceData[0] / priceData[1]) * 100)).toFixed(
-                        2,
-                      )}
-                      %
-                    </span>
+                    {!priceDataLoading ? (
+                      <span className='rounded-lg p-1 text-emerald-500 bg-black ml-1'>
+                        {(
+                          -1 *
+                          ((1 - priceData[0] / priceData[1]) * 100)
+                        ).toFixed(2)}
+                        %
+                      </span>
+                    ) : (
+                      <span className='rounded-lg p-1 text-emerald-500 bg-black ml-1'>
+                        <m className='animate-pulse'>.... </m>
+                      </span>
+                    )}
                   </div>
 
                   {isToggled && (
