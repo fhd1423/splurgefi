@@ -127,7 +127,7 @@ export default function Trades() {
     if (event.target.checked) {
       const newSelected = tradeRows.map((n) => n.id);
       setSelected(newSelected);
-      await Promise.all(newSelected.map((id) => updateTradeStatus(id))); // Use Promise.all to await all updateTradeStatus calls
+      await Promise.all(newSelected.map((id) => updateTradeStatus(id)));
       return;
     }
     setSelected([]);
@@ -151,11 +151,6 @@ export default function Trades() {
   useEffect(() => {
     const fetchTrades = async () => {
       if (primaryWallet?.address) {
-        // const { data, error } = await supabase
-        //   .from('Trades')
-        //   .select('*')
-        //   .eq('user', primaryWallet.address);
-
         const data = await sendSupabaseRequest(authToken, {});
         console.log(data);
 
@@ -171,6 +166,7 @@ export default function Trades() {
             trade.remainingBatches,
             trade.tradeStopped,
             trade.failedSimulation,
+            trade.amountRecieved,
           ],
         }));
 
@@ -202,6 +198,7 @@ export default function Trades() {
         remainingBatches,
         tradeStopped,
         failedSimulation,
+        amountRecieved,
       ],
     ]) => ({
       id,
@@ -217,6 +214,7 @@ export default function Trades() {
         : `Pending (${batches - remainingBatches}/${batches})`,
       tradeStopped,
       failedSimulation,
+      amountRecieved,
     }),
   );
 
@@ -347,6 +345,15 @@ export default function Trades() {
                       >
                         Status
                       </TableCell>
+                      <TableCell
+                        sx={{
+                          color: 'white',
+                          borderBottom: 'none',
+                          fontWeight: 'bold',
+                        }}
+                      >
+                        Amount Recieved
+                      </TableCell>
                     </TableRow>
                   </TableHead>
                   <TableBody>
@@ -403,6 +410,7 @@ export default function Trades() {
                             ? 'Failed Simulation'
                             : row.status}
                         </TableCell>
+                        <TableCell>{row.amountRecieved / 1e18}</TableCell>
                       </TableRow>
                     ))}
                   </TableBody>
