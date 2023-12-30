@@ -66,6 +66,9 @@ export default function Automate() {
     salt: generateRandomSalt(),
   });
 
+  const inputIsWETH = message.inputTokenAddress == WETH_ADDRESS;
+  const outputIsWETH = message.outputTokenAddress == WETH_ADDRESS;
+
   const [currentInput, setCurrentInput] = useState({
     name: 'WETH',
     address: WETH_ADDRESS,
@@ -405,9 +408,9 @@ export default function Automate() {
                       setCurrentOutput={setCurrentOutput}
                     />
                   </Grid>
-                  {message.inputTokenAddress == WETH_ADDRESS && (
+                  {inputIsWETH && (
                     <div className='w-full text-center p-4 text-white font-semibold text-lg'>
-                      Current {currentOutput.symbol} Output:
+                      Current {currentOutput.symbol} Price:
                       <span className='rounded-lg p-1 text-emerald-500 bg-black ml-1'>
                         {(
                           -1 *
@@ -417,9 +420,9 @@ export default function Automate() {
                       </span>
                     </div>
                   )}
-                  {message.outputTokenAddress == WETH_ADDRESS && (
+                  {outputIsWETH && (
                     <div className='w-full text-center p-4 text-white font-semibold text-lg'>
-                      Current {currentOutput.symbol} Output:
+                      Current {currentOutput.symbol} Price:
                       <span className='rounded-lg p-1 text-emerald-500 bg-black ml-1'>
                         {((1 - priceData[0] / priceData[1]) * 100).toFixed(2)}%
                       </span>
@@ -449,7 +452,11 @@ export default function Automate() {
 
                   <Grid item xs={6}>
                     <InputPercent
-                      title='When output increases by'
+                      title={
+                        outputIsWETH
+                          ? `When ${currentInput.symbol} pumps`
+                          : `When ${currentOutput.symbol} dumps`
+                      }
                       value={message.percentChange}
                       onValueChange={handleMessageChange}
                       isUpSelected={toggleSelection !== 'buy'}
