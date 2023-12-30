@@ -1,31 +1,31 @@
-import React, { useState, useEffect } from 'react';
-import Head from 'next/head';
+import { EthereumWalletConnectors } from '@dynamic-labs/ethereum';
 import {
   DynamicContextProvider,
   DynamicWidget,
   useDynamicContext,
 } from '@dynamic-labs/sdk-react-core';
-import { EthereumWalletConnectors } from '@dynamic-labs/ethereum';
-import { supabase } from '../components/supabase/client';
-import sendSupabaseRequest from '../components/supabase/supabaseClient';
-import NavBar from '../components/NavBar';
+import CloseIcon from '@mui/icons-material/Close';
+import DeleteIcon from '@mui/icons-material/Delete';
+import { Paper } from '@mui/material';
+import Box from '@mui/material/Box';
+import Button from '@mui/material/Button';
+import Checkbox from '@mui/material/Checkbox';
+import IconButton from '@mui/material/IconButton';
+import Modal from '@mui/material/Modal';
 import Table from '@mui/material/Table';
 import TableBody from '@mui/material/TableBody';
 import TableCell from '@mui/material/TableCell';
 import TableContainer from '@mui/material/TableContainer';
 import TableHead from '@mui/material/TableHead';
 import TableRow from '@mui/material/TableRow';
-import Checkbox from '@mui/material/Checkbox';
-import { Paper } from '@mui/material';
-import Tooltip from '@mui/material/Tooltip';
 import Toolbar from '@mui/material/Toolbar';
+import Tooltip from '@mui/material/Tooltip';
 import Typography from '@mui/material/Typography';
-import IconButton from '@mui/material/IconButton';
-import DeleteIcon from '@mui/icons-material/Delete';
-import Box from '@mui/material/Box';
-import Button from '@mui/material/Button';
-import Modal from '@mui/material/Modal';
-import CloseIcon from '@mui/icons-material/Close';
+import Head from 'next/head';
+import React, { useEffect, useState } from 'react';
+import NavBar from '../components/NavBar';
+import { supabase } from '../components/supabase/client';
+import sendSupabaseRequest from '../components/supabase/supabaseClient';
 
 const EnhancedTableToolbar = ({ numSelected, onDeleteSelected }) => (
   <Toolbar

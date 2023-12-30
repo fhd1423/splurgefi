@@ -1,4 +1,4 @@
-import { Paper, Grid, Box, Link } from '@mui/material';
+import { Box, Grid, Link, Paper } from '@mui/material';
 
 export default function CommunityPopUp() {
   return (

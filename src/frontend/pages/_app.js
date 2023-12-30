@@ -1,8 +1,7 @@
-import * as React from 'react';
-import '../app/globals.css';
+import { EthereumWalletConnectors } from '@dynamic-labs/ethereum';
 import { DynamicContextProvider } from '@dynamic-labs/sdk-react-core';
 import { DynamicWagmiConnector } from '@dynamic-labs/wagmi-connector';
-import { EthereumWalletConnectors } from '@dynamic-labs/ethereum';
+import '../app/globals.css';
 
 function MyApp({ Component, pageProps }) {
   return (

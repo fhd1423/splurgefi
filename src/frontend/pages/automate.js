@@ -1,41 +1,40 @@
 'use client';
 
-import React, { useState, useEffect } from 'react';
-import { Box, Grid, Paper } from '@mui/material';
+import { Box, Grid, Paper, useMediaQuery, useTheme } from '@mui/material';
 import Head from 'next/head';
-import { formatEther, getAddress } from 'viem';
-import { useTheme, useMediaQuery } from '@mui/material';
 import router from 'next/router';
+import React, { useEffect, useState } from 'react';
 import { Toaster, toast } from 'sonner';
+import { formatEther, getAddress } from 'viem';
 
 // MUI Date Picker Imports
-import { LocalizationProvider } from '@mui/x-date-pickers/LocalizationProvider';
 import { AdapterDayjs } from '@mui/x-date-pickers/AdapterDayjs';
+import { LocalizationProvider } from '@mui/x-date-pickers/LocalizationProvider';
 
 // Custom Component Imports
+import CommunityPopUp from '@/components/automate/CommunityPopUp';
+import DatePicker from '@/components/automate/DatePicker';
+import TimeSelector from '@/components/automate/TimeSelector';
+import sendCreatePairRequest from '@/components/supabase/sendCreatePairRequest';
+import {
+  useContractRead,
+  useContractWrite,
+  usePrepareContractWrite,
+  useSignTypedData,
+} from 'wagmi';
+import NavBar from '../components/NavBar';
+import InputBatches from '../components/automate/InputBatches';
+import InputPercent from '../components/automate/InputPercent';
 import InputToken from '../components/automate/InputToken';
 import OutputToken from '../components/automate/OutputToken';
 import ToggleSwap from '../components/automate/ToggleSwap';
-import sendCreatePairRequest from '@/components/supabase/sendCreatePairRequest';
-import InputPercent from '../components/automate/InputPercent';
-import InputBatches from '../components/automate/InputBatches';
-import DatePicker from '@/components/automate/DatePicker';
-import TimeSelector from '@/components/automate/TimeSelector';
-import NavBar from '../components/NavBar';
-import CommunityPopUp from '@/components/automate/CommunityPopUp';
-import {
-  useSignTypedData,
-  usePrepareContractWrite,
-  useContractWrite,
-  useContractRead,
-} from 'wagmi';
 
 // SDK & Client Imports
 import { useDynamicContext } from '@dynamic-labs/sdk-react-core';
 import sendSupabaseRequest from '../components/supabase/supabaseClient';
 
-import { uploadUserData, generateRandomSalt, parseJwt } from '@/helpers/utils';
 import { ERC20abi } from '@/helpers/ERC20';
+import { generateRandomSalt, parseJwt, uploadUserData } from '@/helpers/utils';
 
 export default function Automate() {
   const SPLURGE_ADDRESS = '0x2c5C7dbE16685e1371F4caeAF586c6CaBFFc4252';

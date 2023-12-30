@@ -1,11 +1,11 @@
 'use client';
+import { useDynamicContext } from '@dynamic-labs/sdk-react-core';
 import Head from 'next/head';
-import { useEffect, useState } from 'react';
-import { useDynamicContext, DynamicWidget } from '@dynamic-labs/sdk-react-core';
-import GradientText from './GradientText';
 import Link from 'next/link';
 import { useRouter } from 'next/navigation';
+import { useEffect, useState } from 'react';
 import NavBar from '../NavBar';
+import GradientText from './GradientText';
 
 const LandingPage = () => {
   const router = useRouter();

@@ -1,18 +1,10 @@
-import { styled } from '@mui/system';
-import React, { useState, useEffect } from 'react';
-import OutlinedInput from '@mui/material/OutlinedInput';
 import KeyboardArrowDownOutlinedIcon from '@mui/icons-material/KeyboardArrowDownOutlined';
-import TokenModal from './TokenListModal';
+import { styled } from '@mui/system';
+import { useEffect, useState } from 'react';
 import { parseEther } from 'viem';
+import TokenModal from './TokenListModal';
 
-import {
-  Typography,
-  Select,
-  MenuItem,
-  InputBase,
-  FormControl,
-} from '@mui/material';
-import { output } from '@/next.config';
+import { FormControl, InputBase, MenuItem, Typography } from '@mui/material';
 
 //STYLING
 const CustomInputContainer = styled('div')({

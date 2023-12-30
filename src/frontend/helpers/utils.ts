@@ -1,6 +1,6 @@
+import { bytesToHex } from 'viem';
 import { supabase } from '../components/supabase/client';
 require('crypto');
-import { bytesToHex } from 'viem';
 
 // Utility function to generate random salt
 export function generateRandomSalt() {

@@ -1,15 +1,14 @@
-import React from 'react';
-import { styled } from '@mui/material/styles';
 import ExpandMoreIcon from '@mui/icons-material/ExpandMore';
+import SummarizeOutlinedIcon from '@mui/icons-material/SummarizeOutlined';
 import {
   Accordion,
-  AccordionSummary,
   AccordionDetails,
-  Typography,
+  AccordionSummary,
   Box,
+  Typography,
 } from '@mui/material';
-import SummarizeOutlinedIcon from '@mui/icons-material/SummarizeOutlined';
 import Grid from '@mui/material/Grid';
+import { styled } from '@mui/material/styles';
 
 // Custom styled components
 const CustomAccordion = styled(Accordion)(({ theme, expanded }) => ({

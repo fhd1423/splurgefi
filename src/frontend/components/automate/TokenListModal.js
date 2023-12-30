@@ -1,17 +1,17 @@
-import React, { useState, useEffect } from 'react';
-import Modal from '@mui/material/Modal';
-import { styled } from '@mui/system';
+import CloseIcon from '@mui/icons-material/Close';
+import FileCopyIcon from '@mui/icons-material/FileCopy'; // Import the FileCopy icon
+import { Tooltip } from '@mui/material';
+import Alert from '@mui/material/Alert';
+import Box from '@mui/material/Box';
+import Button from '@mui/material/Button';
 import InputBase from '@mui/material/InputBase';
 import List from '@mui/material/List';
 import ListItem from '@mui/material/ListItem';
 import ListItemText from '@mui/material/ListItemText';
-import FileCopyIcon from '@mui/icons-material/FileCopy'; // Import the FileCopy icon
-import Box from '@mui/material/Box';
-import CloseIcon from '@mui/icons-material/Close';
-import Button from '@mui/material/Button';
-import { Tooltip } from '@mui/material';
-import Alert from '@mui/material/Alert';
+import Modal from '@mui/material/Modal';
+import { styled } from '@mui/system';
 import { ethers } from 'ethers';
+import { useEffect, useState } from 'react';
 
 // Styling
 const StyledModal = styled(Modal)(({ theme }) => ({

@@ -1,9 +1,9 @@
-import { styled } from '@mui/system';
-import React, { useState, useEffect } from 'react';
-import { Typography, InputBase, FormControl } from '@mui/material';
 import KeyboardArrowDownOutlinedIcon from '@mui/icons-material/KeyboardArrowDownOutlined';
-import TokenModal from './TokenListModal';
+import { FormControl, InputBase, Typography } from '@mui/material';
+import { styled } from '@mui/system';
+import { useEffect, useState } from 'react';
 import { parseEther } from 'viem';
+import TokenModal from './TokenListModal';
 
 const CustomInputContainer = styled('div')(({ address }) => ({
   display: 'flex',

@@ -1,9 +1,9 @@
-import * as React from 'react';
-import PropTypes from 'prop-types';
-import { Paper } from '@mui/material';
 import ImportExportRoundedIcon from '@mui/icons-material/ImportExportRounded';
-import Stack from '@mui/material/Stack';
+import { Paper } from '@mui/material';
 import IconButton from '@mui/material/IconButton';
+import Stack from '@mui/material/Stack';
+import PropTypes from 'prop-types';
+import * as React from 'react';
 
 export default function ToggleSwap({
   selection,
