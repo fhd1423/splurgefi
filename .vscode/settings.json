@@ -3,6 +3,6 @@
   "solidity.defaultCompiler": "localFile",
   "editor.formatOnSave": true,
   "editor.codeActionsOnSave": {
-    "source.organizeImports": true
+    "source.organizeImports": "explicit"
   }
 }

@@ -410,7 +410,11 @@ export default function Trades() {
                             ? 'Failed Simulation'
                             : row.status}
                         </TableCell>
-                        <TableCell>{row.amountRecieved / 1e18}</TableCell>
+                        <TableCell>
+                          {row.amountRecieved
+                            ? row.amountRecieved / 1e18
+                            : 'N/A'}
+                        </TableCell>
                       </TableRow>
                     ))}
                   </TableBody>
