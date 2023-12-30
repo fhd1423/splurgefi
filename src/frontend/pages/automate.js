@@ -17,7 +17,6 @@ import InputToken from '../components/automate/InputToken';
 import OutputToken from '../components/automate/OutputToken';
 import ToggleSwap from '../components/automate/ToggleSwap';
 import sendCreatePairRequest from '@/components/supabase/sendCreatePairRequest';
-import AvgPriceDropdown from '@/components/automate/AvgPriceDropdown';
 import InputPercent from '../components/automate/InputPercent';
 import InputBatches from '../components/automate/InputBatches';
 import DatePicker from '@/components/automate/DatePicker';
@@ -48,10 +47,8 @@ export default function Automate() {
 
   //STATE
   const [toggleSelection, setToggleSelection] = useState('buy');
-  const [allInputsFilled, setInputsFilled] = useState(false);
   const [tokenBalance, setTokenBalance] = useState(null);
   const [priceData, setPriceData] = useState([]);
-  const [tokensSelected, setTokensSelected] = useState(false);
 
   const [message, setMessage] = useState({
     inputTokenAddress: WETH_ADDRESS, // DEFAULT INPUT - WETH
@@ -408,26 +405,19 @@ export default function Automate() {
                       setCurrentOutput={setCurrentOutput}
                     />
                   </Grid>
-                  {inputIsWETH && (
-                    <div className='w-full text-center p-4 text-white font-semibold text-lg'>
-                      Current {currentOutput.symbol} Price:
-                      <span className='rounded-lg p-1 text-emerald-500 bg-black ml-1'>
-                        {(
-                          -1 *
-                          ((1 - priceData[0] / priceData[1]) * 100)
-                        ).toFixed(2)}
-                        %
-                      </span>
-                    </div>
-                  )}
-                  {outputIsWETH && (
-                    <div className='w-full text-center p-4 text-white font-semibold text-lg'>
-                      Current {currentOutput.symbol} Price:
-                      <span className='rounded-lg p-1 text-emerald-500 bg-black ml-1'>
-                        {((1 - priceData[0] / priceData[1]) * 100).toFixed(2)}%
-                      </span>
-                    </div>
-                  )}
+
+                  <div className='w-full text-center p-4 text-white font-semibold text-lg'>
+                    {outputIsWETH
+                      ? `Current ${currentInput.symbol} Price:`
+                      : `Current ${currentOutput.symbol} Price:`}
+                    <span className='rounded-lg p-1 text-emerald-500 bg-black ml-1'>
+                      {(-1 * ((1 - priceData[0] / priceData[1]) * 100)).toFixed(
+                        2,
+                      )}
+                      %
+                    </span>
+                  </div>
+
                   {isToggled && (
                     <Grid item xs={6}>
                       <InputBatches
@@ -470,29 +460,6 @@ export default function Automate() {
                       setSelectedDate={handleMessageChange}
                     />
                   </Grid>
-
-                  {/*allInputsFilled && (
-                    <Grid item xs={12}>
-                      <Typography
-                        sx={{
-                          display: 'inline',
-                          color: 'white',
-                          fontWeight: 'medium',
-                        }}
-                      >
-                        {'Estimated Profit: '}
-                      </Typography>
-                      <Typography
-                        sx={{
-                          display: 'inline',
-                          color: '#03C988',
-                          fontWeight: 'bold',
-                        }}
-                      >
-                        {profit + ' ' + currentOutput.name}
-                      </Typography>
-                    </Grid>
-                      )*/}
 
                   <Grid
                     item
@@ -546,31 +513,6 @@ export default function Automate() {
             </Paper>
           </Box>
 
-          {/*tokensSelected && isLargeScreen && (
-            <div
-              className={`absolute right-0 pr-5 ${
-                isToggled ? 'top-20' : 'top-32'
-              }`}
-            >
-              {currentInput.name === 'WETH' ? (
-                // Get price on token you're going to buy
-                <AvgPriceDropdown
-                  prices={priceData}
-                  tokenAddy={currentOutput.address}
-                  currentInput={currentInput.name}
-                  currentOutput={currentOutput.name}
-                />
-              ) : (
-                // Get price on token you're going to sell
-                <AvgPriceDropdown
-                  prices={priceData}
-                  tokenAddy={currentInput.address}
-                  currentInput={currentInput.name}
-                  currentOutput={currentOutput.name}
-                />
-              )}
-            </div>
-              )*/}
           {isLargeScreen && (
             <div
               style={{ position: 'absolute', bottom: '100px', left: '30px' }}
