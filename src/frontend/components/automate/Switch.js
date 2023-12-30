@@ -1,7 +1,7 @@
-import Switch from '@mui/material/Switch';
-import FormControlLabel from '@mui/material/FormControlLabel';
-import { styled } from '@mui/system';
 import { Typography } from '@mui/material';
+import FormControlLabel from '@mui/material/FormControlLabel';
+import Switch from '@mui/material/Switch';
+import { styled } from '@mui/system';
 
 const MaterialUISwitch = styled(Switch)(({ theme }) => ({
   '& .MuiSwitch-switchBase': {

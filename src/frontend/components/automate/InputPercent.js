@@ -1,7 +1,6 @@
-import React from 'react';
-import { styled } from '@mui/system';
-import InputBase from '@mui/material/InputBase';
 import { Typography } from '@mui/material';
+import InputBase from '@mui/material/InputBase';
+import { styled } from '@mui/system';
 
 // Entire input container (includes icon and textfield)
 const CustomInputContainer = styled('div')(({ limitOrder }) => ({

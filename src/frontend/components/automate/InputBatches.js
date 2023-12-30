@@ -1,7 +1,6 @@
-import React from 'react';
-import { styled } from '@mui/system';
 import InputBase from '@mui/material/InputBase';
 import Typography from '@mui/material/Typography';
+import { styled } from '@mui/system';
 
 const CustomInputContainer = styled('div')({
   display: 'flex',

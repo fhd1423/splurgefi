@@ -1,6 +1,4 @@
 import Link from 'next/link';
-import { Button } from '@mui/material';
-import Typography from '@mui/material/Typography';
 const NavBar = ({ inTradesPage }) => {
   return (
     <nav className='flex justify-between items-center px-8 pt-5'>

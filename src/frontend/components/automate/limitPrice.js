@@ -1,4 +1,3 @@
-import React, { useState } from 'react';
 import TextField from '@mui/material/TextField';
 
 export default function LimitPriceInput({ onValueChange, label, value }) {

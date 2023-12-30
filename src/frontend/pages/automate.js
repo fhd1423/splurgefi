@@ -1,42 +1,40 @@
 'use client';
 
-import React, { useState, useEffect } from 'react';
-import { Box, Grid, Paper, Typography, Alert } from '@mui/material';
+import { Box, Grid, Paper, useMediaQuery, useTheme } from '@mui/material';
 import Head from 'next/head';
-import { formatEther, getAddress } from 'viem';
-import { useTheme, useMediaQuery } from '@mui/material';
 import router from 'next/router';
+import React, { useEffect, useState } from 'react';
 import { Toaster, toast } from 'sonner';
+import { formatEther, getAddress } from 'viem';
 
 // MUI Date Picker Imports
-import { LocalizationProvider } from '@mui/x-date-pickers/LocalizationProvider';
 import { AdapterDayjs } from '@mui/x-date-pickers/AdapterDayjs';
+import { LocalizationProvider } from '@mui/x-date-pickers/LocalizationProvider';
 
 // Custom Component Imports
+import CommunityPopUp from '@/components/automate/CommunityPopUp';
+import DatePicker from '@/components/automate/DatePicker';
+import TimeSelector from '@/components/automate/TimeSelector';
+import sendCreatePairRequest from '@/components/supabase/sendCreatePairRequest';
+import {
+  useContractRead,
+  useContractWrite,
+  usePrepareContractWrite,
+  useSignTypedData,
+} from 'wagmi';
+import NavBar from '../components/NavBar';
+import InputBatches from '../components/automate/InputBatches';
+import InputPercent from '../components/automate/InputPercent';
 import InputToken from '../components/automate/InputToken';
 import OutputToken from '../components/automate/OutputToken';
 import ToggleSwap from '../components/automate/ToggleSwap';
-import sendCreatePairRequest from '@/components/supabase/sendCreatePairRequest';
-import AvgPriceDropdown from '@/components/automate/AvgPriceDropdown';
-import InputPercent from '../components/automate/InputPercent';
-import InputBatches from '../components/automate/InputBatches';
-import DatePicker from '@/components/automate/DatePicker';
-import TimeSelector from '@/components/automate/TimeSelector';
-import NavBar from '../components/NavBar';
-import CommunityPopUp from '@/components/automate/CommunityPopUp';
-import {
-  useSignTypedData,
-  usePrepareContractWrite,
-  useContractWrite,
-  useContractRead,
-} from 'wagmi';
 
 // SDK & Client Imports
 import { useDynamicContext } from '@dynamic-labs/sdk-react-core';
 import sendSupabaseRequest from '../components/supabase/supabaseClient';
 
-import { uploadUserData, generateRandomSalt, parseJwt } from '@/helpers/utils';
 import { ERC20abi } from '@/helpers/ERC20';
+import { generateRandomSalt, parseJwt, uploadUserData } from '@/helpers/utils';
 
 export default function Automate() {
   const SPLURGE_ADDRESS = '0x2c5C7dbE16685e1371F4caeAF586c6CaBFFc4252';
@@ -48,10 +46,9 @@ export default function Automate() {
 
   //STATE
   const [toggleSelection, setToggleSelection] = useState('buy');
-  const [allInputsFilled, setInputsFilled] = useState(false);
   const [tokenBalance, setTokenBalance] = useState(null);
   const [priceData, setPriceData] = useState([]);
-  const [tokensSelected, setTokensSelected] = useState(false);
+  const [priceDataLoading, setPriceDataLoading] = useState(false);
 
   const [message, setMessage] = useState({
     inputTokenAddress: WETH_ADDRESS, // DEFAULT INPUT - WETH
@@ -65,6 +62,8 @@ export default function Automate() {
     timeBwTrade: 100,
     salt: generateRandomSalt(),
   });
+
+  const outputIsWETH = message.outputTokenAddress == WETH_ADDRESS;
 
   const [currentInput, setCurrentInput] = useState({
     name: 'WETH',
@@ -150,6 +149,7 @@ export default function Automate() {
     const fetchPrice = async () => {
       console.log('FETCH PRICE CALLED');
       if (correctTokens) {
+        setPriceDataLoading(true);
         try {
           let data;
           if (currentInput.name === 'WETH') {
@@ -168,7 +168,7 @@ export default function Automate() {
 
           if (data && data.avgPrice && data.currentPrice) {
             setPriceData([data.currentPrice, data.avgPrice]);
-            setTokensSelected(true); // Set this to true so price data can be displayed
+            setPriceDataLoading(false);
           } else {
             console.error('Price data not found');
           }
@@ -298,7 +298,7 @@ export default function Automate() {
           lastExecuted: 0,
         });
 
-        await Promise.all(req1, req2, req3);
+        await Promise.all([req1, req2, req3]);
 
         router.push('/trades');
       },
@@ -405,13 +405,26 @@ export default function Automate() {
                       setCurrentOutput={setCurrentOutput}
                     />
                   </Grid>
-                  {/* <div className='w-full text-center p-4 text-white font-semibold text-lg'>
-                    {currentOutput.name}/{currentInput.name} currently up
-                    <span className='rounded-lg  p-2 text-emerald-500 bg-black '>
-                      {' '}
-                      {((1 - priceData[0] / priceData[1]) * 100).toFixed(4)}%
-                    </span>
-                  </div> */}
+
+                  <div className='w-full text-center p-4 text-white font-semibold text-lg'>
+                    {outputIsWETH
+                      ? `Current ${currentInput.symbol} Price:`
+                      : `Current ${currentOutput.symbol} Price:`}
+                    {!priceDataLoading ? (
+                      <span className='rounded-lg p-1 text-emerald-500 bg-black ml-1'>
+                        {(
+                          -1 *
+                          ((1 - priceData[0] / priceData[1]) * 100)
+                        ).toFixed(2)}
+                        %
+                      </span>
+                    ) : (
+                      <span className='rounded-lg p-1 text-emerald-500 bg-black ml-1'>
+                        <m className='animate-pulse'>.... </m>
+                      </span>
+                    )}
+                  </div>
+
                   {isToggled && (
                     <Grid item xs={6}>
                       <InputBatches
@@ -426,7 +439,7 @@ export default function Automate() {
                   )}
 
                   {isToggled && (
-                    <Grid item xs={6} style={{ marginTop: '5px' }}>
+                    <Grid item xs={6}>
                       <TimeSelector
                         onTradeActionChange={handleMessageChange}
                         title='Every'
@@ -436,7 +449,11 @@ export default function Automate() {
 
                   <Grid item xs={6}>
                     <InputPercent
-                      title='When profit increases by'
+                      title={
+                        outputIsWETH
+                          ? `When ${currentInput.symbol} pumps`
+                          : `When ${currentOutput.symbol} dumps`
+                      }
                       value={message.percentChange}
                       onValueChange={handleMessageChange}
                       isUpSelected={toggleSelection !== 'buy'}
@@ -450,29 +467,6 @@ export default function Automate() {
                       setSelectedDate={handleMessageChange}
                     />
                   </Grid>
-
-                  {allInputsFilled && (
-                    <Grid item xs={12}>
-                      <Typography
-                        sx={{
-                          display: 'inline',
-                          color: 'white',
-                          fontWeight: 'medium',
-                        }}
-                      >
-                        {'Estimated Profit: '}
-                      </Typography>
-                      <Typography
-                        sx={{
-                          display: 'inline',
-                          color: '#03C988',
-                          fontWeight: 'bold',
-                        }}
-                      >
-                        {profit + ' ' + currentOutput.name}
-                      </Typography>
-                    </Grid>
-                  )}
 
                   <Grid
                     item
@@ -526,31 +520,6 @@ export default function Automate() {
             </Paper>
           </Box>
 
-          {tokensSelected && isLargeScreen && (
-            <div
-              className={`absolute right-0 pr-5 ${
-                isToggled ? 'top-20' : 'top-32'
-              }`}
-            >
-              {currentInput.name === 'WETH' ? (
-                // Get price on token you're going to buy
-                <AvgPriceDropdown
-                  prices={priceData}
-                  tokenAddy={currentOutput.address}
-                  currentInput={currentInput.name}
-                  currentOutput={currentOutput.name}
-                />
-              ) : (
-                // Get price on token you're going to sell
-                <AvgPriceDropdown
-                  prices={priceData}
-                  tokenAddy={currentInput.address}
-                  currentInput={currentInput.name}
-                  currentOutput={currentOutput.name}
-                />
-              )}
-            </div>
-          )}
           {isLargeScreen && (
             <div
               style={{ position: 'absolute', bottom: '100px', left: '30px' }}

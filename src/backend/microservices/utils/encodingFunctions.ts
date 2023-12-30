@@ -4,7 +4,7 @@ import ExAbi from '../utils/zeroexabi';
 import splurgeAbi from '../utils/splurgeAbi';
 import { viemClient } from './viemclient';
 
-const WETH = '0x82aF49447D8a07e3bd95BD0d56f35241523fBab1'; // production weth: arbitrum currently
+const WETH = '0x82af49447d8a07e3bd95bd0d56f35241523fbab1'; // production weth: arbitrum currently
 
 export type TransformERC20 = [
   string, // First address
@@ -40,7 +40,7 @@ async function fetchQuote(
 ) {
   const url = `${apiUrl}buyToken=${pair.output}&sellToken=${pair.input}&sellAmount=${pair.amount}`;
   const headers = { '0x-api-key': apiKey };
-  const response = await axios.get(url, { headers });
+  let response = await axios.get(url, { headers });
 
   return response.data;
 }
@@ -50,6 +50,7 @@ async function generateZeroExStruct(
   outputTokenAddress: Address,
   swap_tranche: number,
 ) {
+  console.log('quoting swap for', swap_tranche);
   const res = await fetchQuote(
     {
       input: inputTokenAddress,
@@ -97,11 +98,16 @@ export const encodeInput = async (
     swap_tranche -= gasFee;
     swap_tranche = swap_tranche * 0.9985; // take fee
   }
-  const zeroExSwapStruct = await generateZeroExStruct(
-    SwapData.inputTokenAddress,
-    SwapData.outputTokenAddress,
-    swap_tranche,
-  );
+  let zeroExSwapStruct;
+  try {
+    zeroExSwapStruct = await generateZeroExStruct(
+      SwapData.inputTokenAddress,
+      SwapData.outputTokenAddress,
+      swap_tranche,
+    );
+  } catch (e) {
+    return null;
+  }
 
   const data = encodeFunctionData({
     abi: splurgeAbi,
