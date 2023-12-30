@@ -1,7 +1,7 @@
 'use client';
 
 import React, { useState, useEffect } from 'react';
-import { Box, Grid, Paper, Typography, Alert } from '@mui/material';
+import { Box, Grid, Paper } from '@mui/material';
 import Head from 'next/head';
 import { formatEther, getAddress } from 'viem';
 import { useTheme, useMediaQuery } from '@mui/material';
@@ -63,7 +63,6 @@ export default function Automate() {
     salt: generateRandomSalt(),
   });
 
-  const inputIsWETH = message.inputTokenAddress == WETH_ADDRESS;
   const outputIsWETH = message.outputTokenAddress == WETH_ADDRESS;
 
   const [currentInput, setCurrentInput] = useState({

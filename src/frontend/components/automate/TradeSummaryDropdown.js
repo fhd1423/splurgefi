@@ -1,5 +1,4 @@
 import React from 'react';
-import { useState } from 'react';
 import { styled } from '@mui/material/styles';
 import ExpandMoreIcon from '@mui/icons-material/ExpandMore';
 import {
@@ -62,12 +61,6 @@ export default function TradeSummaryDropdown({
   setExpanded,
   tradeType,
 }) {
-  // const [expanded, setExpanded] = useState(true);
-
-  const handleAccordionChange = (event, isExpanded) => {
-    setExpanded(isExpanded);
-  };
-
   return (
     <Box sx={{ height: 285, overflow: 'hidden' }}>
       <CustomAccordion

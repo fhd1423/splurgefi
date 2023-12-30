@@ -9,8 +9,7 @@ import FileCopyIcon from '@mui/icons-material/FileCopy'; // Import the FileCopy 
 import Box from '@mui/material/Box';
 import CloseIcon from '@mui/icons-material/Close';
 import Button from '@mui/material/Button';
-import { Tooltip, Typography } from '@mui/material';
-import { Diversity1TwoTone } from '@mui/icons-material';
+import { Tooltip } from '@mui/material';
 import Alert from '@mui/material/Alert';
 import { ethers } from 'ethers';
 
