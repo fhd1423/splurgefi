@@ -89,6 +89,7 @@ export default function Trades() {
   const handleClose = () => setOpen(false);
 
   const getNameFromPair = async (pair) => {
+    console.log('PAIR', pair);
     const { data: payingETH } = await supabase
       .from('Pairs')
       .select('tokenName')
@@ -206,7 +207,7 @@ export default function Trades() {
       buy: tokenName.split('-')[1],
       batches,
       percentChange: `${
-        pair.split('-')[0] === 'WETH'
+        tokenName.split('-')[0] === 'WETH'
           ? `-${percentChange}`
           : `+${percentChange}`
       }%`,
