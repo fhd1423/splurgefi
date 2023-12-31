@@ -52,6 +52,8 @@ const getCurrentPrice = async (tokenAddress: string) => {
   const ethPrice = prices[`${WETH_ADDRESS.toLowerCase()}`];
   const tokenPrice = prices[`${tokenAddress.toLowerCase()}`];
 
+  console.log('current token price', tokenPrice);
+
   const currentRatio = (0.01 * ethPrice) / tokenPrice;
   return currentRatio;
 };
@@ -74,6 +76,8 @@ async function main(
 
   const ethPoolAddress = await getLargestPoolAddress(wethAddress);
   const ethPrices = await getPrices(ethPoolAddress);
+
+  console.log('token prices', coinPrices);
 
   const ratioPrices = coinPrices.map(
     (_: number, index: number) => (0.01 * ethPrices[index]) / coinPrices[index],

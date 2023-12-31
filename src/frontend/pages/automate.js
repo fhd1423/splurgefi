@@ -412,11 +412,7 @@ export default function Automate() {
                       : `Current ${currentOutput.symbol} Price:`}
                     {!priceDataLoading ? (
                       <span className='rounded-lg p-1 text-emerald-500 bg-black ml-1'>
-                        {(
-                          -1 *
-                          ((1 - priceData[0] / priceData[1]) * 100)
-                        ).toFixed(2)}
-                        %
+                        {((1 - priceData[0] / priceData[1]) * 100).toFixed(2)}%
                       </span>
                     ) : (
                       <span className='rounded-lg p-1 text-emerald-500 bg-black ml-1'>
