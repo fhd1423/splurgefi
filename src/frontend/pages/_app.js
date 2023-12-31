@@ -16,7 +16,8 @@ function MyApp({ Component, pageProps }) {
           accessDeniedMessageSecondary:
             'Unfortunately you are not allowed to proceed.',
           accessDeniedButton: {
-            action: () => window.open('https://www.dynamic.xyz/', '_blank'),
+            action: () =>
+              window.open('https://twitter.com/splurgefinance', '_blank'),
             title: 'Contact us',
           },
           siweStatement:
