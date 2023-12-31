@@ -178,9 +178,7 @@ export default function Automate() {
       }
     };
 
-    if (primaryWallet?.address) {
-      fetchPrice();
-    }
+    fetchPrice();
   }, [message]);
 
   //AUTH - DYNAMIC
