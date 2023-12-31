@@ -74,10 +74,14 @@ const CustomButton = styled(Button)({
 
 const TokenList = styled(List)(({ theme }) => ({
   maxHeight: 'calc(80vh - 40px)',
+  minHeight: 'calc(80vh - 40px)',
   overflowY: 'auto',
   '&::-webkit-scrollbar': {
     width: '8px',
   },
+  display: 'flex',
+  flexDirection: 'column',
+  justifyContent: 'flex-start',
   '&::-webkit-scrollbar-thumb': {
     backgroundColor: 'gray',
     borderRadius: '10px',
