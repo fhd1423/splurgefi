@@ -179,7 +179,7 @@ export default function Automate() {
     };
 
     fetchPrice();
-  }, [message]);
+  }, [message, primaryWallet.address]);
 
   //AUTH - DYNAMIC
   const {
