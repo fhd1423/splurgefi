@@ -94,14 +94,14 @@ export default function Trades() {
       .select('tokenName')
       .eq('path', pair);
 
-    if (payingETH[0]) return `ETH-${payingETH[0].tokenName}`;
+    if (payingETH[0]) return `WETH-${payingETH[0].tokenName}`;
     else {
       const { data: payingToken } = await supabase
         .from('Pairs')
         .select('tokenName')
         .eq('path', `${pair.split('-')[1]}-${pair.split('-')[0]}`);
 
-      if (payingToken[0]) return `${payingToken[0].tokenName}-ETH`;
+      if (payingToken[0]) return `${payingToken[0].tokenName}-WETH`;
       return `Unkown Trade Pair`;
     }
   };
@@ -206,7 +206,9 @@ export default function Trades() {
       buy: tokenName.split('-')[1],
       batches,
       percentChange: `${
-        pair.split('-')[0] === 'ETH' ? `-${percentChange}` : `+${percentChange}`
+        pair.split('-')[0] === 'WETH'
+          ? `-${percentChange}`
+          : `+${percentChange}`
       }%`,
       date: new Date(deadline * 1000).toLocaleString(),
       status: complete
@@ -394,12 +396,8 @@ export default function Trades() {
                         </TableCell>
                         <TableCell component='th' scope='row'>
                           {row.sell}
-                          {/* WETH */}
                         </TableCell>
-                        <TableCell>
-                          {row.buy}
-                          {/* LINK */}
-                        </TableCell>
+                        <TableCell>{row.buy}</TableCell>
                         <TableCell>{row.batches}</TableCell>
                         <TableCell>{row.percentChange}</TableCell>
                         <TableCell>{row.date}</TableCell>
