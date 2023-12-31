@@ -526,8 +526,6 @@ export default function Automate() {
               style={{ position: 'absolute', bottom: '100px', left: '30px' }}
             >
               <CommunityPopUp />
-
-              <p>{accessDeniedMessagePrimary ? 'Not on list' : 'Error'}</p>
             </div>
           )}
         </div>
