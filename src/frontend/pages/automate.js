@@ -178,16 +178,13 @@ export default function Automate() {
       }
     };
 
-    fetchPrice();
-  }, [message, primaryWallet.address]);
+    if (primaryWallet?.address) {
+      fetchPrice();
+    }
+  }, [message]);
 
   //AUTH - DYNAMIC
-  const {
-    setShowAuthFlow,
-    authToken,
-    primaryWallet,
-    accessDeniedMessagePrimary,
-  } = useDynamicContext();
+  const { setShowAuthFlow, authToken, primaryWallet } = useDynamicContext();
   const [isWalletConnected, setIsWalletConnected] = useState(false);
   const handleWalletConnection = () => {
     setShowAuthFlow(true);
