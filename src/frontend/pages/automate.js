@@ -406,7 +406,7 @@ export default function Automate() {
                     />
                   </Grid>
 
-                  <div className='w-full text-center p-4 text-white font-semibold text-lg'>
+                  <div className='w-full text-center p-4 text-white font-semibold text-base'>
                     {outputIsWETH
                       ? `Current ${currentInput.symbol} Price:`
                       : `Current ${currentOutput.symbol} Price:`}
@@ -416,7 +416,7 @@ export default function Automate() {
                       </span>
                     ) : (
                       <span className='rounded-lg p-1 text-emerald-500 bg-black ml-1'>
-                        <m className='animate-pulse'>.... </m>
+                        <m className='animate-pulse'>... </m>
                       </span>
                     )}
                   </div>
