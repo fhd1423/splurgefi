@@ -182,7 +182,12 @@ export default function Automate() {
   }, [message]);
 
   //AUTH - DYNAMIC
-  const { setShowAuthFlow, authToken, primaryWallet } = useDynamicContext();
+  const {
+    setShowAuthFlow,
+    authToken,
+    primaryWallet,
+    accessDeniedMessagePrimary,
+  } = useDynamicContext();
   const [isWalletConnected, setIsWalletConnected] = useState(false);
   const handleWalletConnection = () => {
     setShowAuthFlow(true);
@@ -521,6 +526,8 @@ export default function Automate() {
               style={{ position: 'absolute', bottom: '100px', left: '30px' }}
             >
               <CommunityPopUp />
+
+              <p>{accessDeniedMessagePrimary ? 'Not on list' : 'Error'}</p>
             </div>
           )}
         </div>
