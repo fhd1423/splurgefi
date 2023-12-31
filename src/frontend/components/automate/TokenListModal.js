@@ -246,10 +246,11 @@ const TokenModal = ({
     const isTokenMatch = (token) => {
       const searchTermLower = searchTerm.toLowerCase();
       const nameMatch = token.name.toLowerCase().includes(searchTermLower);
+      const symbolMatch = token.symbol.toLowerCase().includes(searchTermLower);
       const addressMatch = token.address
         .toLowerCase()
         .includes(searchTermLower);
-      return nameMatch || addressMatch;
+      return nameMatch || addressMatch || symbolMatch;
     };
 
     // Filter tokens based on the search term
