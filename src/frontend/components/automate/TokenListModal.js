@@ -246,20 +246,24 @@ const TokenModal = ({
     }
   }
 
-  useEffect(() => {
-    const isTokenMatch = (token) => {
-      const searchTermLower = searchTerm.toLowerCase();
-      const nameMatch = token.name.toLowerCase().includes(searchTermLower);
-      const symbolMatch = token.symbol.toLowerCase().includes(searchTermLower);
+  const handleSearch = (searchTerm) => {
+    const trimmedSearchTerm = searchTerm.trim().toLowerCase();
+    const filtered = tokens.filter((token) => {
+      const nameMatch = token.name.toLowerCase().includes(trimmedSearchTerm);
+      const symbolMatch = token.symbol
+        .toLowerCase()
+        .includes(trimmedSearchTerm);
       const addressMatch = token.address
         .toLowerCase()
-        .includes(searchTermLower);
-      return nameMatch || addressMatch || symbolMatch;
-    };
+        .includes(trimmedSearchTerm);
+      return nameMatch || symbolMatch || addressMatch;
+    });
 
-    // Filter tokens based on the search term
-    const filtered = tokens.filter(isTokenMatch);
     setFilteredTokens(filtered);
+  };
+
+  useEffect(() => {
+    handleSearch(searchTerm);
   }, [searchTerm, tokens]);
 
   useEffect(() => {
