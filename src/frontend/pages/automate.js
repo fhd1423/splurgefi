@@ -155,13 +155,13 @@ export default function Automate() {
             data = await sendCreatePairRequest(
               getAddress(currentOutput.address),
               currentOutput.symbol,
-              false,
+              true,
             );
           } else {
             data = await sendCreatePairRequest(
               getAddress(currentInput.address),
               currentInput.symbol,
-              false,
+              true,
             );
           }
 
@@ -272,19 +272,7 @@ export default function Automate() {
       message,
 
       async onSuccess(data, err) {
-        const req1 = sendCreatePairRequest(
-          getAddress(currentInput.address),
-          currentInput.symbol,
-          true,
-        );
-
-        const req2 = sendCreatePairRequest(
-          getAddress(currentOutput.address),
-          currentOutput.symbol,
-          true,
-        );
-
-        const req3 = sendSupabaseRequest(authToken, {
+        const req3 = await sendSupabaseRequest(authToken, {
           user: primaryWallet.address,
           pair: `${getAddress(message.inputTokenAddress)}-${getAddress(
             message.outputTokenAddress,
@@ -296,8 +284,6 @@ export default function Automate() {
           remainingBatches: message.tranches,
           lastExecuted: 0,
         });
-
-        await Promise.all([req1, req2, req3]);
 
         router.push('/trades');
       },
