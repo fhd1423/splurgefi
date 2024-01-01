@@ -1,6 +1,6 @@
 'use client';
 
-import { useDynamicScopes } from '@dynamic-labs/sdk-react-core';
+import { DynamicWidget, useDynamicScopes } from '@dynamic-labs/sdk-react-core';
 import { Box, Grid, Paper, useMediaQuery, useTheme } from '@mui/material';
 import Head from 'next/head';
 import router from 'next/router';
@@ -301,8 +301,12 @@ export default function Automate() {
     });
 
   const handleStartAutomation = () => {
+    if (!isWalletConnected) {
+      toast.error('Wallet not connected');
+      return;
+    }
     if (!userHasScopes('beta')) {
-      toast.error('Your wallet is whitelisted for beta testing');
+      toast.error('Your wallet is not whitelisted for beta testing');
       return;
     }
     if (!validate('everything')) {
@@ -319,6 +323,13 @@ export default function Automate() {
     <div className='bg-gradient-to-br from-stone-900 to-emerald-900'>
       <LocalizationProvider dateAdapter={AdapterDayjs}>
         <NavBar inTradesPage={false} />
+        <div className='w-full flex justify-end p-5'>
+          <DynamicWidget
+            innerButtonComponent={
+              <button className='h-10'>Connect Wallet</button>
+            }
+          />
+        </div>
 
         <div className='h-screen flex justify-center items-center overflow-hidden relative'>
           <Head>
@@ -480,33 +491,19 @@ export default function Automate() {
                       pt: 4,
                     }}
                   >
-                    {!isWalletConnected ? (
-                      <button
-                        style={{
-                          backgroundColor: '#03C988',
-                          transition:
-                            'transform 0.3s ease, background-color 0.3s ease, box-shadow 0.3s ease',
-                        }}
-                        onClick={handleWalletConnection}
-                        className='text-white text-xl font-semibold rounded-lg shadow-lg hover:bg-green-600 hover:scale-[1.02] hover:shadow-md w-96 h-14 mt-[15px]'
-                      >
-                        Connect Wallet
-                      </button>
-                    ) : (
-                      <button
-                        style={{
-                          backgroundColor: '#03C988',
-                          transition:
-                            'transform 0.3s ease, background-color 0.3s ease, box-shadow 0.3s ease',
-                        }}
-                        onClick={handleStartAutomation}
-                        className='text-white text-xl font-semibold rounded-lg shadow-lg hover:bg-green-600 hover:scale-[1.02] hover:shadow-md w-96 h-14 mt-[15px]'
-                      >
-                        {userHasScopes('beta')
-                          ? 'Start Automation'
-                          : 'Not In Beta'}
-                      </button>
-                    )}
+                    <button
+                      style={{
+                        backgroundColor: '#03C988',
+                        transition:
+                          'transform 0.3s ease, background-color 0.3s ease, box-shadow 0.3s ease',
+                      }}
+                      onClick={handleStartAutomation}
+                      className='text-white text-xl font-semibold rounded-lg shadow-lg hover:bg-green-600 hover:scale-[1.02] hover:shadow-md w-96 h-14 mt-[15px]'
+                    >
+                      {userHasScopes('beta') || !isWalletConnected
+                        ? 'Start Automation'
+                        : 'Not In Beta'}
+                    </button>
                   </Grid>
                 </React.Fragment>
               </Grid>
