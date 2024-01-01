@@ -27,7 +27,7 @@ const Graph = () => {
               fontSize: isMobile ? '2.5rem' : '3rem',
             }}
           >
-            The Pumpinator
+            Automate Intents
           </Typography>
           <Typography
             variant={isMobile ? 'h5' : 'h3'}
@@ -40,7 +40,7 @@ const Graph = () => {
               color: '#9F9F9F',
             }}
           >
-            Never miss a pump
+            Tell us your goal, we'll make it happen.
           </Typography>
 
           <div style={{ marginLeft: isMobile ? '-16px' : '7px' }}>
