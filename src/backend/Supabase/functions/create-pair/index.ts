@@ -89,6 +89,7 @@ async function main(
       ['5min_avg']: { close_prices: ratioPrices },
       updated_at: new Date(),
       tokenName,
+      largestPool: coinPoolAddress,
     };
 
     let { data, error } = await supabase.from('Pairs').upsert([upsertData]);
@@ -107,7 +108,7 @@ Deno.serve(async (req) => {
   let responseData, status;
   try {
     const { tokenAddress, tokenName, insertPair } = await req.json();
-    const currentPrice = await getCurrentPrice(tokenAddress);
+    let currentPrice = await getCurrentPrice(tokenAddress);
     const { data: existingPairs } = await supabase
       .from('Pairs')
       .select()
@@ -116,6 +117,7 @@ Deno.serve(async (req) => {
     if (existingPairs && existingPairs.length > 0) {
       const existingPrices = existingPairs[0]['5min_avg']['close_prices'];
       const existingAvg = getFiveMinAvg(existingPrices);
+      currentPrice = existingPairs[0]['current_price'];
 
       responseData = {
         message: `Pair already exists for ${tokenName}`,
