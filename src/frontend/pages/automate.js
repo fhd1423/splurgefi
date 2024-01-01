@@ -1,5 +1,6 @@
 'use client';
 
+import { useDynamicScopes } from '@dynamic-labs/sdk-react-core';
 import { Box, Grid, Paper, useMediaQuery, useTheme } from '@mui/material';
 import Head from 'next/head';
 import router from 'next/router';
@@ -36,6 +37,7 @@ import { DynamicWidget, useDynamicContext } from '@dynamic-labs/sdk-react-core';
 import sendSupabaseRequest from '../components/supabase/supabaseClient';
 
 export default function Automate() {
+  const { userHasScopes } = useDynamicScopes();
   const SPLURGE_ADDRESS = '0x2c5C7dbE16685e1371F4caeAF586c6CaBFFc4252';
   const WETH_ADDRESS = '0x82af49447d8a07e3bd95bd0d56f35241523fbab1';
 
@@ -497,7 +499,9 @@ export default function Automate() {
                         }}
                         className='text-white text-xl font-semibold rounded-lg shadow-lg hover:bg-green-600 hover:scale-[1.02] hover:shadow-md w-96 h-14 mt-[15px]'
                       >
-                        Start Automation
+                        {userHasScopes('beta')
+                          ? 'Start Automation'
+                          : 'Not In Beta'}
                       </button>
                     )}
                   </Grid>
