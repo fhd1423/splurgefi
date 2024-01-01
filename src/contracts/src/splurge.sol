@@ -1,6 +1,12 @@
 // SPDX-License-Identifier: MIT
 pragma solidity ^0.8.21;
 
+/** 
+ @author SplurgeFi
+ @title Splurge
+ @notice This contract serves as the automation executor for Splurge Automated Trades. Pinged by a keeper. 
+*/
+
 import { IERC20 } from "@openzeppelin/contracts/token/ERC20/IERC20.sol";
 import { ECDSA } from "@openzeppelin/contracts/utils/cryptography/ECDSA.sol";
 import { IZeroExSwap, IWETH, SplurgeOrderStruct, ZeroExSwapStruct, badSignature, tooManyTranches, tradesCompleted, mustIncludeWETH, tradeExpired, timeNotSatisfied } from "./Interfaces.sol";
@@ -32,6 +38,11 @@ contract Splurge {
         executor = _executor;
     }
 
+    /** 
+        @notice asdf 
+        @dev asdf
+        @param order fads
+    */
     function verifyExecuteTrade(
         SplurgeOrderStruct memory order,
         bytes memory signature,

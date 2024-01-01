@@ -1,6 +1,7 @@
 #!/usr/bin/env sh
 . "$(dirname -- "$0")/_/husky.sh"
 
+# npx prettier --write "src/**/*.*"
 npx prettier --write "src/**/*.*"
 npm run solhint
 forge test
