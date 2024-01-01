@@ -30,11 +30,10 @@ import OutputToken from '../components/automate/OutputToken';
 import ToggleSwap from '../components/automate/ToggleSwap';
 
 // SDK & Client Imports
-import { useDynamicContext } from '@dynamic-labs/sdk-react-core';
-import sendSupabaseRequest from '../components/supabase/supabaseClient';
-
 import { ERC20abi } from '@/helpers/ERC20';
 import { generateRandomSalt, parseJwt, uploadUserData } from '@/helpers/utils';
+import { DynamicWidget, useDynamicContext } from '@dynamic-labs/sdk-react-core';
+import sendSupabaseRequest from '../components/supabase/supabaseClient';
 
 export default function Automate() {
   const SPLURGE_ADDRESS = '0x2c5C7dbE16685e1371F4caeAF586c6CaBFFc4252';
@@ -475,7 +474,7 @@ export default function Automate() {
                     }}
                   >
                     {!isWalletConnected ? (
-                      <button
+                      /* <button
                         style={{
                           backgroundColor: '#03C988',
                           transition:
@@ -485,7 +484,12 @@ export default function Automate() {
                         className='text-white text-xl font-semibold rounded-lg shadow-lg hover:bg-green-600 hover:scale-[1.02] hover:shadow-md w-96 h-14 mt-[15px]'
                       >
                         Connect Wallet
-                      </button>
+                      </button> */
+                      <DynamicWidget
+                        innerButtonComponent={
+                          <button className='h-10'>Connect Wallet</button>
+                        }
+                      />
                     ) : (
                       <button
                         style={{
