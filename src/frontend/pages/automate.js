@@ -33,7 +33,7 @@ import ToggleSwap from '../components/automate/ToggleSwap';
 // SDK & Client Imports
 import { ERC20abi } from '@/helpers/ERC20';
 import { generateRandomSalt, parseJwt, uploadUserData } from '@/helpers/utils';
-import { DynamicWidget, useDynamicContext } from '@dynamic-labs/sdk-react-core';
+import { useDynamicContext } from '@dynamic-labs/sdk-react-core';
 import sendSupabaseRequest from '../components/supabase/supabaseClient';
 
 export default function Automate() {
@@ -300,6 +300,21 @@ export default function Automate() {
       },
     });
 
+  const handleStartAutomation = () => {
+    if (!userHasScopes('beta')) {
+      toast.error('Your wallet is whitelisted for beta testing');
+      return;
+    }
+    if (!validate('everything')) {
+      toast.error('Please make sure all inputs are filled.');
+      return;
+    }
+    if (allowance < message.amount) {
+      approveToken?.();
+    }
+    signTypedData();
+  };
+
   return (
     <div className='bg-gradient-to-br from-stone-900 to-emerald-900'>
       <LocalizationProvider dateAdapter={AdapterDayjs}>
@@ -466,7 +481,7 @@ export default function Automate() {
                     }}
                   >
                     {!isWalletConnected ? (
-                      /* <button
+                      <button
                         style={{
                           backgroundColor: '#03C988',
                           transition:
@@ -476,12 +491,7 @@ export default function Automate() {
                         className='text-white text-xl font-semibold rounded-lg shadow-lg hover:bg-green-600 hover:scale-[1.02] hover:shadow-md w-96 h-14 mt-[15px]'
                       >
                         Connect Wallet
-                      </button> */
-                      <DynamicWidget
-                        innerButtonComponent={
-                          <button className='h-10'>Connect Wallet</button>
-                        }
-                      />
+                      </button>
                     ) : (
                       <button
                         style={{
@@ -489,18 +499,7 @@ export default function Automate() {
                           transition:
                             'transform 0.3s ease, background-color 0.3s ease, box-shadow 0.3s ease',
                         }}
-                        onClick={() => {
-                          if (!validate('everything')) {
-                            toast.error(
-                              'Please make sure all inputs are filled.',
-                            );
-                            return;
-                          }
-                          if (allowance < message.amount) {
-                            approveToken?.();
-                          }
-                          signTypedData();
-                        }}
+                        onClick={handleStartAutomation}
                         className='text-white text-xl font-semibold rounded-lg shadow-lg hover:bg-green-600 hover:scale-[1.02] hover:shadow-md w-96 h-14 mt-[15px]'
                       >
                         {userHasScopes('beta')
