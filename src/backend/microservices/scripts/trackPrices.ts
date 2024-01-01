@@ -1,10 +1,10 @@
+import axios from 'axios';
 import { config } from 'dotenv';
-import axios, { AxiosResponse } from 'axios';
 import { supabase } from '../utils/client';
 
 config();
 
-const apiUrl: string = 'https://api.geckoterminal.com/api/v2';
+const apiUrl: string = 'https://api.dexscreener.com';
 const WETH_ADDRESS = '0x82aF49447D8a07e3bd95BD0d56f35241523fBab1';
 
 // Get Requested Pairs & recent PriceQueue from "Pairs" Table
@@ -13,39 +13,72 @@ const getPairs = async () => {
   return Pairs;
 };
 
+function chunkArray(array: string[], chunkSize: number) {
+  const chunks = [];
+
+  for (let i = 0; i < array.length; i += chunkSize) {
+    const chunk = array.slice(i, i + chunkSize);
+    chunks.push(chunk);
+  }
+
+  return chunks;
+}
+
 // Construct PriceQueue
 const updatePriceData = async () => {
   const pairs = await getPairs();
   if (!pairs) return;
 
-  let pairString = [WETH_ADDRESS];
-  const pairList = pairs.map((pair) => [pair.path.split('-')[1]]);
-  pairString.push(pairList.join(','));
+  const pairList = pairs.map((pair) => pair.path.split('-')[1]);
+  const poolAddressList = pairs.map((pair) => pair.largestPool);
+  let chunkedPools = chunkArray(poolAddressList as unknown as string[], 30);
 
   const isInInterval = checkTime();
-  interface PairPrices {
-    [key: string]: number; // Assuming the value is a number. Adjust the type as necessary.
-  }
-  let pairPrices: PairPrices = {};
-  let response;
+  let wethPrice: string;
 
   try {
-    response = await axios.get(
-      `${apiUrl}/simple/networks/arbitrum/token_price/${pairString}`,
+    const wethResponse = await axios.get(
+      `${apiUrl}/latest/dex/tokens/${WETH_ADDRESS}`,
     );
+    wethPrice = wethResponse.data.pairs[0].priceUsd;
   } catch (e) {
-    console.log('Error with geckoterminal');
-    return;
-  }
-  let prices = response.data.data.attributes.token_prices;
-  const ethPrice = prices[`${WETH_ADDRESS.toLowerCase()}`];
-
-  for (let pair of pairList) {
-    pairPrices[`${WETH_ADDRESS}-${pair}`] =
-      (0.01 * Number(ethPrice)) /
-      Number(prices[`${String(pair).toLowerCase()}`]);
+    console.error('error getting weth price');
   }
 
+  let allresponses = [];
+  for (const chunk of chunkedPools) {
+    const poolString = chunk.join(',');
+    allresponses.push(
+      axios.get(`${apiUrl}/latest/dex/pairs/arbitrum/${poolString}`),
+    );
+    //console.log(`${apiUrl}/latest/dex/pairs/arbitrum/${poolString}`);
+  }
+
+  const results = await Promise.all(allresponses);
+
+  let filteredPrices: { [key: string]: number } = {};
+
+  results.forEach((response) => {
+    const priceDatas = response.data.pairs;
+
+    let pairsTracked = new Set();
+
+    priceDatas.forEach((pair: any) => {
+      if (!pairsTracked.has(pair.baseToken.address)) {
+        pairsTracked.add(pair.baseToken.address);
+        filteredPrices[pair.baseToken.address] = pair.priceUsd;
+      }
+    });
+  });
+
+  let pairPrices: { [key: string]: number } = {};
+  pairList.map(
+    (pair) =>
+      (pairPrices[`${WETH_ADDRESS}-${pair}`] =
+        (0.01 * Number(wethPrice)) / Number(filteredPrices[pair])),
+  );
+
+  console.log(pairPrices);
   if (isInInterval) {
     for (let pair of pairs) {
       const current_price = pairPrices[pair.path];
