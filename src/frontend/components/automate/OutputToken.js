@@ -1,7 +1,6 @@
 import KeyboardArrowDownOutlinedIcon from '@mui/icons-material/KeyboardArrowDownOutlined';
 import { styled } from '@mui/system';
 import { useEffect, useState } from 'react';
-import { parseEther } from 'viem';
 import TokenModal from './TokenListModal';
 
 import { FormControl, InputBase, MenuItem, Typography } from '@mui/material';
@@ -110,7 +109,8 @@ export default function OutputToken({
     if (dotCount > 1) return;
 
     setAmount(newValue);
-    onValueChange('amount', String(parseEther(newValue)));
+    const weiValue = 10 ** currentOutput.decimals;
+    onValueChange('amount', String(weiValue * newValue));
   };
 
   const handleCloseTokenModal = () => {

@@ -2,7 +2,6 @@ import KeyboardArrowDownOutlinedIcon from '@mui/icons-material/KeyboardArrowDown
 import { FormControl, InputBase, Typography } from '@mui/material';
 import { styled } from '@mui/system';
 import { useEffect, useState } from 'react';
-import { parseEther } from 'viem';
 import TokenModal from './TokenListModal';
 
 const CustomInputContainer = styled('div')(({ address }) => ({
@@ -97,7 +96,8 @@ export default function InputToken({
     if (dotCount > 1) return;
 
     setAmount(newValue);
-    onValueChange('amount', String(parseEther(newValue)));
+    const weiValue = 10 ** currentInput.decimals;
+    onValueChange('amount', String(weiValue * newValue));
   };
 
   const handleOpenTokenModal = () => {

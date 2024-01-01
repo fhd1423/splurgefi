@@ -72,6 +72,7 @@ export default function Automate() {
     logoURI:
       'https://assets.coingecko.com/coins/images/2518/thumb/weth.png?1696503332',
     symbol: 'WETH',
+    decimals: 18,
   });
 
   const [currentOutput, setCurrentOutput] = useState({
@@ -80,6 +81,7 @@ export default function Automate() {
     logoURI:
       'https://assets.coingecko.com/coins/images/29340/thumb/WINR.png?1696528290',
     symbol: 'WINR',
+    decimals: 18,
   });
 
   const [isToggled, setIsToggled] = useState(false);
@@ -338,14 +340,14 @@ export default function Automate() {
                   className={`w-10 h-6 flex items-center bg-gray-200 rounded-full p-1 cursor-pointer ${
                     isToggled ? 'bg-green-400' : 'bg-gray-700'
                   }`}
-                  style={{position:"relative", zIndex: 1}}
+                  style={{ position: 'relative', zIndex: 1 }}
                   onClick={toggleSwitch}
                 >
                   <div
                     className={`bg-white w-4 h-4 rounded-full shadow-md transform ${
                       isToggled ? 'translate-x-4' : 'translate-x-0'
                     } transition-transform`}
-                    style={{position:"absolute", zIndex: 0}}
+                    style={{ position: 'absolute', zIndex: 0 }}
                   ></div>
                 </div>
               </div>
