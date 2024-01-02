@@ -25,7 +25,7 @@ const getLargestPoolAddress = async (tokenAddress: string) => {
 const getPrices = async (poolAddress: string) => {
   const currentTime = Math.floor(new Date().getTime() / 1000);
   const response = await fetch(
-    `${apiUrl}/networks/arbitrum/pools/${poolAddress}/ohlcv/minute?aggregate=5&before_timestamp=${currentTime}&limit=10`,
+    `${apiUrl}/networks/arbitrum/pools/${poolAddress}/ohlcv/minute?aggregate=15&before_timestamp=${currentTime}&limit=10`,
   );
   const data = await response.json();
   return data.data.attributes.ohlcv_list.map((ohlcv: any) => [ohlcv[4]]);
@@ -86,7 +86,7 @@ async function main(
   if (insertPair) {
     const upsertData = {
       path: `${wethAddress}-${tokenAddress}`,
-      ['5min_avg']: { close_prices: ratioPrices },
+      ['15min_avg']: { close_prices: ratioPrices },
       updated_at: new Date(),
       tokenName,
       largestPool: coinPoolAddress,
@@ -115,7 +115,7 @@ Deno.serve(async (req) => {
       .eq('path', `${WETH_ADDRESS}-${tokenAddress}`);
 
     if (existingPairs && existingPairs.length > 0) {
-      const existingPrices = existingPairs[0]['5min_avg']['close_prices'];
+      const existingPrices = existingPairs[0]['15min_avg']['close_prices'];
       const existingAvg = getFiveMinAvg(existingPrices);
       currentPrice = existingPairs[0]['current_price'];
 
