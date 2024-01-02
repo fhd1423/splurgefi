@@ -1,4 +1,4 @@
-import { verify, Payload } from 'https://deno.land/x/djwt@v3.0.1/mod.ts';
+import { Payload, verify } from 'https://deno.land/x/djwt@v3.0.1/mod.ts';
 import { createClient } from 'https://esm.sh/@supabase/supabase-js@2.39.1';
 import { corsHeaders } from '../_shared/cors.ts';
 
@@ -114,12 +114,18 @@ Deno.serve(async (req) => {
     } else {
       if (userAddress && payload.user === userAddress) {
         try {
-          await supabaseClient.from('Trades').insert([payload]);
-          console.log('Trade inserted successfully!');
+          if (payload.tradeId){
+            await supabaseClient.from('Trades').update({ ['tradeStopped']: true }).eq('id', payload.tradeId);
+            console.log('Trade updated successfully!');
+          }
+          else{
+            await supabaseClient.from('Trades').insert([payload]);
+            console.log('Trade inserted successfully!');
+          }
         } catch (error) {
-          console.error('Error inserting trade:', error);
+          console.error('Error inserting/updating trade:', error);
           return new Response(
-            JSON.stringify({ error: 'Error inserting trade' }),
+            JSON.stringify({ error: 'Error inserting/updating trade' }),
             {
               headers: { ...corsHeaders, 'Content-Type': 'application/json' },
               status: 500,

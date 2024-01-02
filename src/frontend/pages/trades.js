@@ -139,13 +139,15 @@ export default function Trades() {
 
   async function updateTradeStatus(tradeId) {
     try {
-      console.log('TRADE ID:', tradeId);
-      const { data, error } = await supabase
-        .from('Trades')
-        .update({ ['tradeStopped']: true })
-        .eq('id', tradeId);
+      // const { data, error } = await supabase
+      //   .from('Trades')
+      //   .update({ ['tradeStopped']: true })
+      //   .eq('id', tradeId);
 
-      if (error) throw error;
+      // if (error) throw error;
+      const result = await sendSupabaseRequest(authToken, {tradeId})
+
+      console.log("Fuck Delete: ", result)
 
       console.log('Trade updated successfully:', data);
     } catch (error) {
