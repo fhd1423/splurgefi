@@ -4,4 +4,4 @@
 # npx prettier --write "src/**/*.*"
 npx prettier --write "src/**/*.*"
 npm run solhint
-#forge test
+forge test

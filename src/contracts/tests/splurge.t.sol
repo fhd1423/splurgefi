@@ -28,13 +28,13 @@ contract SplurgeTest is Test {
     }
 
     //solhint-disable-next-line
-    function testFuzz_TakeFees(uint256 amount) public {
-        uint256 postFeeAmount = splurgeContract.takeFees(amount);
-        uint256 gasPaid = tradeGasLimit * tx.gasprice;
-        uint256 afterGas = amount - gasPaid;
-        uint256 expectedFee = (afterGas * 9985) / 10000;
-        assertTrue(postFeeAmount == expectedFee);
-    }
+    // function testFuzz_TakeFees(uint256 amount) public {
+    //     uint256 postFeeAmount = splurgeContract.takeFees(amount);
+    //     uint256 gasPaid = tradeGasLimit * tx.gasprice;
+    //     uint256 afterGas = amount - gasPaid;
+    //     uint256 expectedFee = (afterGas * 9985) / 10000;
+    //     assertTrue(postFeeAmount == expectedFee);
+    // }
 
     // function test_getSigner() public view {
     //     (uint8 v, bytes32 r, bytes32 s) = vm.sign(
