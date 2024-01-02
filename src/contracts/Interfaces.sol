@@ -11,6 +11,7 @@ error notEnoughBalanceToWithdraw(uint256, uint256);
 error feeTransferFailed(uint256, uint256);
 error timeNotSatisfied(SplurgeOrderStruct, uint256);
 error tooManyTranches(SplurgeOrderStruct);
+error notEnoughWETH(uint256);
 
 struct SplurgeOrderStruct {
     address inputTokenAddy;

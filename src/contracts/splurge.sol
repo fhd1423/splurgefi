@@ -9,7 +9,7 @@ pragma solidity ^0.8.21;
 
 import { IERC20 } from "@openzeppelin/contracts/token/ERC20/IERC20.sol";
 import { ECDSA } from "@openzeppelin/contracts/utils/cryptography/ECDSA.sol";
-import { IZeroExSwap, IWETH, SplurgeOrderStruct, ZeroExSwapStruct, badSignature, tooManyTranches, tradesCompleted, mustIncludeWETH, tradeExpired, timeNotSatisfied } from "./Interfaces.sol";
+import { IZeroExSwap, IWETH, SplurgeOrderStruct, ZeroExSwapStruct, badSignature, tooManyTranches, tradesCompleted, mustIncludeWETH, tradeExpired, timeNotSatisfied, notEnoughWETH } from "./Interfaces.sol";
 
 contract Splurge {
     address public owner;
@@ -46,7 +46,6 @@ contract Splurge {
         bytes memory signature,
         ZeroExSwapStruct memory swapCallData
     ) public onlyOwner {
-        //@AUDIT-medium Need to verify the message from signature == order
         if (getSigner(order, signature) != order.recipient)
             revert badSignature(order, signature);
 
@@ -87,7 +86,6 @@ contract Splurge {
         }
 
         // approve infinite only if needed
-        // ? Infinite allowance for inputToken always occurs
         if (input.allowance(address(this), address(swapRouter)) < order.amount)
             input.approve(address(swapRouter), type(uint256).max);
 
@@ -109,13 +107,13 @@ contract Splurge {
         return outputAmount;
     }
 
-    //@AUDIT-High arithmetic overflow/underflow posed by fuzz test
     /** 
-        @notice calculates the WETH amount after fee - 0.15%
+        @notice calculates the WETH amount after 0.15% fee
         @param amount the trade amount determined by order.amount / order.tranches
     */
     function takeFees(uint256 amount) public view returns (uint256) {
         uint256 gasPaid = tradeGasLimit * tx.gasprice;
+        if (amount < gasPaid) revert notEnoughWETH(amount);
         uint256 afterGas = amount - gasPaid;
         uint256 afterFee = (afterGas * 9985) / 10000;
         return afterFee;
@@ -133,19 +131,16 @@ contract Splurge {
         SplurgeOrderStruct memory order,
         bytes memory _signature
     ) private view returns (address) {
-        // EIP721 domain type
         string memory name = "Splurge Finance";
         string memory version = "1";
         uint256 chainId = 42161;
         address verifyingContract = address(this);
 
-        // stringified types
         string
             memory domainType = "EIP712Domain(string name,string version,uint256 chainId,address verifyingContract)";
         string
             memory messageType = "conditionalOrder(address inputTokenAddress,address outputTokenAddress,address recipient,uint256 amount,uint256 tranches,uint256 percentChange,uint256 priceAvg,uint256 deadline,uint256 timeBwTrade,bytes32 salt)";
 
-        // hash to prevent signature collision
         bytes32 domainSeperator = keccak256(
             abi.encode(
                 keccak256(abi.encodePacked(domainType)),
@@ -156,10 +151,9 @@ contract Splurge {
             )
         );
 
-        // hash typed data
         bytes32 hash = keccak256(
             abi.encodePacked(
-                "\x19\x01", // backslash is needed to escape the character
+                "\x19\x01",
                 domainSeperator,
                 keccak256(
                     abi.encode(keccak256(abi.encodePacked(messageType)), order)
