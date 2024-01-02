@@ -8,21 +8,21 @@ const NavBar = ({ inLandingPage }) => {
         <Link href='/' passHref>
           <button
             style={{ color: '#03C988' }}
-            className='font-bold text-lg shadow-lg hover:shadow-xl hover:scale-105 transition duration-200'
+            className='font-bold text-xl hover:scale-105 transition duration-200'
           >
             SplurgeFi
           </button>
         </Link>
         {!inLandingPage && (
           <Link href='/trades' passHref>
-            <button className='text-white font-medium text-base shadow-md hover:shadow-lg hover:scale-105 transition duration-200'>
+            <button className='text-white hover:decoration-solid hover:scale-105 transition duration-200'>
               My Trades
             </button>
           </Link>
         )}
         {!inLandingPage && (
           <Link href='/automate' passHref>
-            <button className='text-white font-medium text-base shadow-md hover:shadow-lg hover:scale-105 transition duration-200'>
+            <button className='text-white font-medium hover:scale-105 transition duration-200'>
               New Trade
             </button>
           </Link>
