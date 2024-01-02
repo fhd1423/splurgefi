@@ -134,6 +134,8 @@ export default function Trades() {
 
   const tradeStoppedPressed = async () => {
     await Promise.all(selected.map((id) => updateTradeStatus(id)));
+    setSelected([]);
+    fetchTrades();
     return;
   };
 
@@ -147,7 +149,7 @@ export default function Trades() {
       // if (error) throw error;
       const result = await sendSupabaseRequest(authToken, {
         user: primaryWallet.address,
-        tradeId: tradeId 
+        tradeId: tradeId,
       });
 
       console.log('Fuck Delete: ', result);
@@ -158,39 +160,37 @@ export default function Trades() {
     }
   }
 
+  const fetchTrades = async () => {
+    if (primaryWallet?.address) {
+      const data = await sendSupabaseRequest(authToken, {});
+      console.log(data);
+
+      const tradesPromises = data.map(async (trade) => ({
+        id: trade.id,
+        details: [
+          await getNameFromPair(trade.pair),
+          trade.pair,
+          trade.complete,
+          trade.order.tranches,
+          trade.order.percentChange,
+          trade.order.deadline,
+          trade.remainingBatches,
+          trade.tradeStopped,
+          trade.failedSimulation,
+          trade.amountRecieved,
+        ],
+      }));
+
+      const tradesResults = await Promise.all(tradesPromises);
+      let newTrades = new Map(
+        tradesResults.map((item) => [item.id, item.details]),
+      );
+
+      setUserTrades(newTrades);
+    }
+  };
+
   useEffect(() => {
-    const fetchTrades = async () => {
-      if (primaryWallet?.address) {
-        const data = await sendSupabaseRequest(authToken, {});
-        console.log(data);
-
-        const tradesPromises = data.map(async (trade) => ({
-          id: trade.id,
-          details: [
-            await getNameFromPair(trade.pair),
-            trade.pair,
-            trade.complete,
-            trade.order.tranches,
-            trade.order.percentChange,
-            trade.order.deadline,
-            trade.remainingBatches,
-            trade.tradeStopped,
-            trade.failedSimulation,
-            trade.amountRecieved,
-          ],
-        }));
-
-        const tradesResults = await Promise.all(tradesPromises);
-        let newTrades = new Map(
-          tradesResults.map((item) => [item.id, item.details]),
-        );
-
-        setUserTrades(newTrades);
-      }
-    };
-
-    // Check remaining balances from smart contract
-
     // Update remaining balances
     fetchTrades();
   }, [primaryWallet?.address]);
