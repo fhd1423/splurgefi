@@ -1,34 +1,12 @@
 'use client';
-import { useDynamicContext } from '@dynamic-labs/sdk-react-core';
 import Head from 'next/head';
 import Link from 'next/link';
 import { useRouter } from 'next/navigation';
-import { useEffect, useState } from 'react';
 import NavBar from '../NavBar';
 import GradientText from './GradientText';
 
 const LandingPage = () => {
   const router = useRouter();
-
-  // Local state to track if the wallet is connected
-  const [isWalletConnected, setIsWalletConnected] = useState(false);
-
-  // Access setShowAuthFlow and primaryWallet from useDynamicContext
-  const { setShowAuthFlow, primaryWallet } = useDynamicContext();
-
-  // Function to handle the authentication flow
-  const handleAuthFlow = () => {
-    setShowAuthFlow(true);
-  };
-
-  // Use useEffect to listen for changes in primaryWallet and redirect on successful connection
-  useEffect(() => {
-    if (primaryWallet?.address) {
-      setIsWalletConnected(true);
-      localStorage.setItem('walletAddress', primaryWallet.address); // Store wallet address
-      router.push('/trades'); // Redirect to the trades page
-    }
-  }, [primaryWallet?.address, router]);
 
   return (
     <div className='h-screen bg-black flex flex-col'>
@@ -61,6 +39,7 @@ const LandingPage = () => {
                   'transform 0.3s ease, background-color 0.3s ease, box-shadow 0.3s ease',
               }}
               className='text-white text-xl font-semibold rounded-lg shadow-lg hover:bg-green-700 hover:scale-105 hover:shadow-xl w-64 h-14'
+              onClick={() => router.push('/trades')}
             >
               Get Started
             </button>
