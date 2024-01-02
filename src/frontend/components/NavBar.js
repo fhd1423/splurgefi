@@ -15,14 +15,14 @@ const NavBar = ({ inLandingPage }) => {
         </Link>
         {!inLandingPage && (
           <Link href='/trades' passHref>
-            <button className='text-white hover:decoration-solid hover:scale-105 transition duration-200'>
+            <button className='text-white hover:decoration-solid hover:scale-105 transition duration-200 hover:text-gray-500'>
               My Trades
             </button>
           </Link>
         )}
         {!inLandingPage && (
           <Link href='/automate' passHref>
-            <button className='text-white font-medium hover:scale-105 transition duration-200'>
+            <button className='text-white font-medium hover:scale-105 transition duration-200 hover:text-gray-500'>
               New Trade
             </button>
           </Link>
