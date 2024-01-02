@@ -410,12 +410,29 @@ export default function Trades() {
                         <TableCell>{row.batches}</TableCell>
                         <TableCell>{row.percentChange}</TableCell>
                         <TableCell>{row.date}</TableCell>
-                        <TableCell>
+                        {/* <TableCell>
                           {row.tradeStopped
                             ? 'Cancelled'
                             : row.failedSimulation
                             ? 'Failed Simulation'
                             : row.status}
+                        </TableCell> */}
+                        <TableCell>
+                          {row.tradeStopped ? (
+                            'Cancelled'
+                          ) : row.failedSimulation ? (
+                            'Failed Simulation'
+                          ) : row.status === 'Complete' ? (
+                            <a
+                              href={`https://arbiscan.io/advanced-filter?fadd=0x2c5c7dbe16685e1371f4caeaf586c6cabffc4252&txntype=2&tadd=${primaryWallet?.address}`}
+                              target='_blank'
+                              rel='noopener noreferrer'
+                            >
+                              Complete
+                            </a>
+                          ) : (
+                            row.status
+                          )}
                         </TableCell>
                         <TableCell>
                           {row.amountRecieved
@@ -489,3 +506,5 @@ export default function Trades() {
     </div>
   );
 }
+
+// https://arbiscan.io/advanced-filter?fadd=0x2c5c7dbe16685e1371f4caeaf586c6cabffc4252&txntype=2&tadd=0xBb6AeaBdf61Ca96e80Aa239bA8cC7e436862E596

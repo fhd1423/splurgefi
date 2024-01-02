@@ -32,7 +32,15 @@ const NavBar = ({ inLandingPage }) => {
       {!inLandingPage && (
         <DynamicWidget
           innerButtonComponent={
-            <button className='h-10'>Connect Wallet</button>
+            <button
+              className='h-5'
+              style={{
+                padding: '0px 0px',
+                margin: '-10px',
+              }}
+            >
+              Connect Wallet
+            </button>
           }
         />
       )}

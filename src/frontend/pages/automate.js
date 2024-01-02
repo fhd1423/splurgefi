@@ -413,7 +413,7 @@ export default function Automate() {
                     />
                   </Grid>
 
-                  <div className='w-full text-center p-4 text-white font-semibold text-base'>
+                  <div className='w-full text-center pt-3 mb-0 text-white font-semibold text-base'>
                     {outputIsWETH
                       ? `Current ${currentInput.symbol} Price:`
                       : `Current ${currentOutput.symbol} Price:`}
