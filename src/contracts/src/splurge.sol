@@ -12,14 +12,14 @@ import { ECDSA } from "@openzeppelin/contracts/utils/cryptography/ECDSA.sol";
 import { IZeroExSwap, IWETH, SplurgeOrderStruct, ZeroExSwapStruct, badSignature, tooManyTranches, tradesCompleted, mustIncludeWETH, tradeExpired, timeNotSatisfied } from "./Interfaces.sol";
 
 contract Splurge {
+    event TradeEvent(bytes signature, uint256 amountReceieved);
+
     IZeroExSwap public swapRouter;
     IWETH internal wETH;
     mapping(bytes => uint256) public lastCompletedTrade;
     mapping(bytes => uint256) public tranchesCompleted;
     address public deployer;
     address public executor;
-    event TradeEvent(bytes signature, uint256 amountReceieved);
-
     uint256 public tradeGasLimit = 4000000;
 
     modifier onlyExecutorOrDeployer() {
@@ -31,6 +31,7 @@ contract Splurge {
         _;
     }
 
+    //? What is the value of _executor on init
     constructor(address _swapRouter, address _wethAddress, address _executor) {
         swapRouter = IZeroExSwap(_swapRouter);
         wETH = IWETH(_wethAddress);
@@ -42,12 +43,14 @@ contract Splurge {
         @notice asdf 
         @dev asdf
         @param order fads
+        //? Do we want Deployer to be able to call verifyExecuteTrade
     */
     function verifyExecuteTrade(
         SplurgeOrderStruct memory order,
         bytes memory signature,
         ZeroExSwapStruct memory swapCallData
     ) public onlyExecutorOrDeployer {
+        //! Need to verify the message from signature == order
         if (getSigner(order, signature) != order.recipient)
             revert badSignature(order, signature);
 
@@ -80,7 +83,7 @@ contract Splurge {
         IERC20 input = IERC20(order.inputTokenAddy);
         IERC20 output = IERC20(order.outputTokenAddy);
 
-        uint256 tranche = order.amount / order.tranches;
+        uint256 tranche = order.amount / order.tranches; //? Precision errors
         input.transferFrom(order.recipient, address(this), tranche);
 
         if (order.inputTokenAddy == address(wETH)) {
@@ -88,6 +91,7 @@ contract Splurge {
         }
 
         // approve infinite only if needed
+        // ? Infinite allowance for inputToken always occurs
         if (input.allowance(address(this), address(swapRouter)) < order.amount)
             input.approve(address(swapRouter), type(uint256).max);
 
@@ -112,10 +116,11 @@ contract Splurge {
     function takeFees(uint256 amount) public view returns (uint256) {
         uint256 gasPaid = tradeGasLimit * tx.gasprice;
         uint256 afterGas = amount - gasPaid;
-        uint256 afterFee = (afterGas * 9985) / 10000;
+        uint256 afterFee = (afterGas * 9985) / 10000; //? Precision
         return afterFee;
     }
 
+    //! Modify to only allow deployer to claim fees
     function claimFees() public onlyExecutorOrDeployer {
         wETH.withdraw(wETH.balanceOf(address(this)));
         payable(deployer).transfer(address(this).balance);
@@ -124,7 +129,7 @@ contract Splurge {
     function getSigner(
         SplurgeOrderStruct memory order,
         bytes memory _signature
-    ) public view returns (address) {
+    ) private view returns (address) {
         // EIP721 domain type
         string memory name = "Splurge Finance";
         string memory version = "1";
