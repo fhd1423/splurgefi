@@ -12,20 +12,16 @@ import { ECDSA } from "@openzeppelin/contracts/utils/cryptography/ECDSA.sol";
 import { IZeroExSwap, IWETH, SplurgeOrderStruct, ZeroExSwapStruct, badSignature, tooManyTranches, tradesCompleted, mustIncludeWETH, tradeExpired, timeNotSatisfied } from "./Interfaces.sol";
 
 contract Splurge {
-    event TradeEvent(bytes signature, uint256 amountReceieved);
-
-    //solhint-disable-next-line
-    IWETH public constant wETH =
-        IWETH(0x82aF49447D8a07e3bd95BD0d56f35241523fBab1);
-
-    //solhint-disable-next-line
-    IZeroExSwap public constant swapRouter =
-        IZeroExSwap(0xDef1C0ded9bec7F1a1670819833240f027b25EfF);
+    address public owner;
+    IZeroExSwap public swapRouter;
+    IWETH internal wETH;
 
     mapping(bytes => uint256) public lastCompletedTrade;
     mapping(bytes => uint256) public tranchesCompleted;
-    address public owner;
-    uint256 public tradeGasLimit = 4000000;
+
+    event TradeEvent(bytes signature, uint256 amountReceieved);
+
+    uint256 public constant tradeGasLimit = 4000000;
 
     modifier onlyOwner() {
         //solhint-disable-next-line
@@ -33,8 +29,10 @@ contract Splurge {
         _;
     }
 
-    constructor() {
+    constructor(address _swapRouter, address _wethAddress) {
         owner = msg.sender;
+        swapRouter = IZeroExSwap(_swapRouter);
+        wETH = IWETH(_wethAddress);
     }
 
     /** 
