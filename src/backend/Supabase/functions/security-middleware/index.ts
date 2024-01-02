@@ -114,11 +114,13 @@ Deno.serve(async (req) => {
     } else {
       if (userAddress && payload.user === userAddress) {
         try {
-          if (payload.tradeId){
-            await supabaseClient.from('Trades').update({ ['tradeStopped']: true }).eq('id', payload.tradeId);
+          if (payload.tradeId) {
+            await supabaseClient
+              .from('Trades')
+              .update({ ['tradeStopped']: true })
+              .eq('id', payload.tradeId);
             console.log('Trade updated successfully!');
-          }
-          else{
+          } else {
             await supabaseClient.from('Trades').insert([payload]);
             console.log('Trade inserted successfully!');
           }

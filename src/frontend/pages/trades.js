@@ -145,9 +145,9 @@ export default function Trades() {
       //   .eq('id', tradeId);
 
       // if (error) throw error;
-      const result = await sendSupabaseRequest(authToken, {tradeId})
+      const result = await sendSupabaseRequest(authToken, { tradeId });
 
-      console.log("Fuck Delete: ", result)
+      console.log('Fuck Delete: ', result);
 
       console.log('Trade updated successfully:', data);
     } catch (error) {
