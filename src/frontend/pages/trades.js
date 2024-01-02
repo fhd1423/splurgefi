@@ -26,6 +26,8 @@ import NavBar from '../components/NavBar';
 import { supabase } from '../components/supabase/client';
 import sendSupabaseRequest from '../components/supabase/supabaseClient';
 
+//Should add arbiscan links for completed batches
+
 const EnhancedTableToolbar = ({ numSelected, onDeleteSelected }) => (
   <Toolbar
     sx={{
@@ -151,8 +153,6 @@ export default function Trades() {
         user: primaryWallet.address,
         tradeId: tradeId,
       });
-
-      console.log('Fuck Delete: ', result);
 
       console.log('Trade updated successfully:', data);
     } catch (error) {
@@ -341,7 +341,7 @@ export default function Trades() {
                           fontWeight: 'bold',
                         }}
                       >
-                        Date
+                        Deadline
                       </TableCell>
                       <TableCell
                         sx={{
