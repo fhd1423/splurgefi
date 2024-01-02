@@ -1,15 +1,15 @@
 import axios from 'axios';
 import * as dotenv from 'dotenv';
 import { Address, decodeFunctionData, encodeFunctionData } from 'viem';
-import { account } from '../utils/config';
-import { generateRandomSalt } from '../../src/frontend/helpers/utils';
-import { viemClient } from '../../src/backend/microservices/utils/viemclient';
 import {
-  TransformERC20,
   SwapDataStruct,
+  TransformERC20,
 } from '../../src/backend/microservices/utils/encodingFunctions';
 import splurgeAbi from '../../src/backend/microservices/utils/splurgeAbi';
+import { viemClient } from '../../src/backend/microservices/utils/viemclient';
 import ExAbi from '../../src/backend/microservices/utils/zeroexabi';
+import { generateRandomSalt } from '../../src/frontend/helpers/utils';
+import { account } from '../utils/config';
 
 dotenv.config();
 
@@ -230,3 +230,5 @@ async function main(splurgeContract: Address) {
 
 const splurgeContract = process.argv[2];
 main(splurgeContract as Address);
+
+//test
