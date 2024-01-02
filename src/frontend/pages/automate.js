@@ -182,14 +182,12 @@ export default function Automate() {
     };
 
     fetchPrice();
-  }, [message]);
+  }, [currentInput, currentOutput]);
 
   //AUTH - DYNAMIC
-  const { setShowAuthFlow, authToken, primaryWallet } = useDynamicContext();
+  const { authToken, primaryWallet } = useDynamicContext();
   const [isWalletConnected, setIsWalletConnected] = useState(false);
-  const handleWalletConnection = () => {
-    setShowAuthFlow(true);
-  };
+
   useEffect(() => {
     if (primaryWallet?.address && authToken) {
       const jwtData = parseJwt(authToken);
@@ -250,55 +248,54 @@ export default function Automate() {
 
   const { write: approveToken } = useContractWrite(config);
 
-  const { data, isError, isLoading, isSuccess, signTypedData } =
-    useSignTypedData({
-      domain: {
-        name: 'Splurge Finance',
-        version: '1',
-        chainId: 42161,
-        verifyingContract: SPLURGE_ADDRESS, //CHANGE: to Splurge Addy
-      },
-      types: {
-        conditionalOrder: [
-          { name: 'inputTokenAddress', type: 'address' },
-          { name: 'outputTokenAddress', type: 'address' },
-          { name: 'recipient', type: 'address' },
-          { name: 'amount', type: 'uint256' },
-          { name: 'tranches', type: 'uint256' },
-          { name: 'percentChange', type: 'uint256' },
-          { name: 'priceAvg', type: 'uint256' },
-          { name: 'deadline', type: 'uint256' },
-          { name: 'timeBwTrade', type: 'uint256' },
-          { name: 'salt', type: 'bytes32' },
-        ],
-      },
-      primaryType: 'conditionalOrder',
-      message,
+  const { signTypedData } = useSignTypedData({
+    domain: {
+      name: 'Splurge Finance',
+      version: '1',
+      chainId: 42161,
+      verifyingContract: SPLURGE_ADDRESS, //CHANGE: to Splurge Addy
+    },
+    types: {
+      conditionalOrder: [
+        { name: 'inputTokenAddress', type: 'address' },
+        { name: 'outputTokenAddress', type: 'address' },
+        { name: 'recipient', type: 'address' },
+        { name: 'amount', type: 'uint256' },
+        { name: 'tranches', type: 'uint256' },
+        { name: 'percentChange', type: 'uint256' },
+        { name: 'priceAvg', type: 'uint256' },
+        { name: 'deadline', type: 'uint256' },
+        { name: 'timeBwTrade', type: 'uint256' },
+        { name: 'salt', type: 'bytes32' },
+      ],
+    },
+    primaryType: 'conditionalOrder',
+    message,
 
-      async onSuccess(data, err) {
-        const req3 = await sendSupabaseRequest(authToken, {
-          user: primaryWallet.address,
-          pair: `${getAddress(message.inputTokenAddress)}-${getAddress(
-            message.outputTokenAddress,
-          )}`, // have to checksum to match in db for now
-          order: message,
-          signature: data,
-          complete: false,
-          ready: false,
-          remainingBatches: message.tranches,
-          lastExecuted: 0,
-        });
+    async onSuccess(data, err) {
+      const req3 = await sendSupabaseRequest(authToken, {
+        user: primaryWallet.address,
+        pair: `${getAddress(message.inputTokenAddress)}-${getAddress(
+          message.outputTokenAddress,
+        )}`, // have to checksum to match in db for now
+        order: message,
+        signature: data,
+        complete: false,
+        ready: false,
+        remainingBatches: message.tranches,
+        lastExecuted: 0,
+      });
 
-        router.push('/trades');
-      },
+      router.push('/trades');
+    },
 
-      onError(data, error) {
-        console.log('Error', { data, error });
-      },
-      onSettled(data, error) {
-        console.log('settled', { data, error });
-      },
-    });
+    onError(data, error) {
+      console.log('Error', { data, error });
+    },
+    onSettled(data, error) {
+      console.log('settled', { data, error });
+    },
+  });
 
   const handleStartAutomation = () => {
     if (!isWalletConnected) {
