@@ -424,7 +424,7 @@ export default function Trades() {
                             'Failed Simulation'
                           ) : row.status === 'Complete' ? (
                             <a
-                              href={`https://arbiscan.io/advanced-filter?fadd=0x2c5c7dbe16685e1371f4caeaf586c6cabffc4252&txntype=2&tadd=${arbiscanAddress}`}
+                              href={`https://arbiscan.io/advanced-filter?fadd=0x2c5c7dbe16685e1371f4caeaf586c6cabffc4252&txntype=2&tadd=${primaryWallet?.address}`}
                               className='hover:underline'
                               target='_blank'
                               rel='noopener noreferrer'
