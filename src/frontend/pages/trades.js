@@ -145,7 +145,10 @@ export default function Trades() {
       //   .eq('id', tradeId);
 
       // if (error) throw error;
-      const result = await sendSupabaseRequest(authToken, { tradeId });
+      const result = await sendSupabaseRequest(authToken, {
+        user: primaryWallet.address,
+        tradeId: tradeId 
+      });
 
       console.log('Fuck Delete: ', result);
 
