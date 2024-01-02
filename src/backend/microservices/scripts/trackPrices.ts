@@ -84,7 +84,7 @@ const updatePriceData = async () => {
       const current_price = pairPrices[pair.path];
       let priceArr = [];
       try {
-        priceArr = pair['5min_avg']['close_prices'];
+        priceArr = pair['15min_avg']['close_prices'];
       } catch (e) {
         // first time inserting
       }
@@ -94,7 +94,7 @@ const updatePriceData = async () => {
       const upsertData = {
         path: pair.path,
         ['current_price']: current_price,
-        ['5min_avg']: { close_prices: priceArr },
+        ['15min_avg']: { close_prices: priceArr },
         updated_at: new Date(),
       };
 
@@ -125,9 +125,9 @@ function checkTime() {
     Math.abs(seconds - targetSeconds) <= 5;
 
   const withinPeriod = isWithinGracePeriod(0);
-  const is5Minutes = minutes % 5 === 0 && withinPeriod;
+  const is15Minutes = minutes % 15 === 0 && withinPeriod;
 
-  if (is5Minutes) return true;
+  if (is15Minutes) return true;
 }
 
 // must be called at a 10 second interval in order to fit the grace period of 5 seconds
