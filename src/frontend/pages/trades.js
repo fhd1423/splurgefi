@@ -419,9 +419,11 @@ export default function Trades() {
                         </TableCell> */}
                         <TableCell>
                           {row.tradeStopped ? (
-                            <span style={{color: red}}>Cancelled</span>
+                            <span style={{ color: red }}>Cancelled</span>
                           ) : row.failedSimulation ? (
-                            <span style={{color: red}}>Failed Simulation</span>
+                            <span style={{ color: red }}>
+                              Failed Simulation
+                            </span>
                           ) : row.status === 'Complete' ? (
                             <a
                               href={`https://arbiscan.io/advanced-filter?fadd=0x2c5c7dbe16685e1371f4caeaf586c6cabffc4252&txntype=2&tadd=${primaryWallet?.address}`}
@@ -429,10 +431,10 @@ export default function Trades() {
                               target='_blank'
                               rel='noopener noreferrer'
                             >
-                              <span style={{color: green}}>Complete</span>
+                              <span style={{ color: green }}>Complete</span>
                             </a>
                           ) : (
-                            <span style={{color: yellow}}>row.status</span>
+                            <span style={{ color: yellow }}>row.status</span>
                           )}
                         </TableCell>
                         <TableCell>
