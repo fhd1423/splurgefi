@@ -1,8 +1,11 @@
+//SPDX-License-Identifier: UNLICENSED
+
 pragma solidity ^0.8.13;
 
 /*
 
 
+/*
 import { Test } from "forge-std/Test.sol";
 import { Splurge } from "../src/splurge.sol";
 import { MockToken } from "./mocks/MockToken.sol";
@@ -10,7 +13,7 @@ import { MockToken } from "./mocks/MockToken.sol";
 
 // import { Strings } from "@openzeppelin/contracts/utils/Strings.sol";
 // import { Transformation } from "../src/Interfaces.sol";
-
+/*
 contract SplurgeTest is Test {
     Splurge public splurgeContract;
     MockToken public token;
