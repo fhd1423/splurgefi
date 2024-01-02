@@ -419,9 +419,9 @@ export default function Trades() {
                         </TableCell> */}
                         <TableCell>
                           {row.tradeStopped ? (
-                            <span style={{ color: red }}>Cancelled</span>
+                            <span style={{ color: "red" }}>Cancelled</span>
                           ) : row.failedSimulation ? (
-                            <span style={{ color: red }}>
+                            <span style={{ color: "red" }}>
                               Failed Simulation
                             </span>
                           ) : row.status === 'Complete' ? (
@@ -431,10 +431,10 @@ export default function Trades() {
                               target='_blank'
                               rel='noopener noreferrer'
                             >
-                              <span style={{ color: green }}>Complete</span>
+                              <span style={{ color: "green" }}>Complete</span>
                             </a>
                           ) : (
-                            <span style={{ color: yellow }}>row.status</span>
+                            <span style={{ color: "yellow" }}>row.status</span>
                           )}
                         </TableCell>
                         <TableCell>
