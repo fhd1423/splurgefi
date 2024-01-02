@@ -434,7 +434,9 @@ export default function Trades() {
                               <span style={{ color: 'green' }}>Complete</span>
                             </a>
                           ) : (
-                            <span style={{ color: 'yellow' }}>{row.status}</span>
+                            <span style={{ color: 'yellow' }}>
+                              {row.status}
+                            </span>
                           )}
                         </TableCell>
                         <TableCell>
