@@ -1,6 +1,6 @@
 'use client';
 
-import { DynamicWidget, useDynamicScopes } from '@dynamic-labs/sdk-react-core';
+import { useDynamicScopes } from '@dynamic-labs/sdk-react-core';
 import { Box, Grid, Paper, useMediaQuery, useTheme } from '@mui/material';
 import Head from 'next/head';
 import router from 'next/router';
@@ -322,14 +322,7 @@ export default function Automate() {
   return (
     <div className='bg-gradient-to-br from-stone-900 to-emerald-900'>
       <LocalizationProvider dateAdapter={AdapterDayjs}>
-        <NavBar inTradesPage={false} />
-        <div className='w-full flex justify-end p-5'>
-          <DynamicWidget
-            innerButtonComponent={
-              <button className='h-10'>Connect Wallet</button>
-            }
-          />
-        </div>
+        <NavBar />
 
         <div className='h-screen flex justify-center items-center overflow-hidden relative'>
           <Head>

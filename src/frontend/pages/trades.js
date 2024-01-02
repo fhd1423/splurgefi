@@ -1,7 +1,6 @@
 import { EthereumWalletConnectors } from '@dynamic-labs/ethereum';
 import {
   DynamicContextProvider,
-  DynamicWidget,
   useDynamicContext,
 } from '@dynamic-labs/sdk-react-core';
 import CloseIcon from '@mui/icons-material/Close';
@@ -240,11 +239,6 @@ export default function Trades() {
 
           <div className='w-full flex justify-between items-center p-4'>
             <h1 className='text-4xl text-white font-semibold'>Trades</h1>
-            <DynamicWidget
-              innerButtonComponent={
-                <button className='h-10'>Connect Wallet</button>
-              }
-            />
           </div>
 
           {userTrades.size > 0 ? (

@@ -32,7 +32,7 @@ const LandingPage = () => {
 
   return (
     <div className='h-screen bg-black flex flex-col'>
-      <NavBar inTradesPage={false} />
+      <NavBar inLandingPage={true} />
       <div className='flex flex-col h-screen bg-black font-sans px-4 sm:px-6 lg:px-8'>
         <Head>
           <title>SplurgeFi</title>
