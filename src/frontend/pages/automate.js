@@ -58,7 +58,7 @@ export default function Automate() {
     amount: null, // Input token scaled(18 decimal places)
     tranches: 1,
     percentChange: null,
-    priceAvg: 5,
+    priceAvg: 15,
     deadline: null,
     timeBwTrade: 100,
     salt: generateRandomSalt(),
