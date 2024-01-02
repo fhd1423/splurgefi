@@ -6,8 +6,8 @@ import { Test } from "forge-std/Test.sol";
 import { Splurge } from "../src/splurge.sol";
 import { MockToken } from "./mocks/MockToken.sol";
 
-import { Strings } from "@openzeppelin/contracts/utils/Strings.sol";
-import { Transformation } from "../src/Interfaces.sol";
+// import { Strings } from "@openzeppelin/contracts/utils/Strings.sol";
+// import { Transformation } from "../src/Interfaces.sol";
 
 contract SplurgeTest is Test {
     Splurge public splurgeContract;
@@ -16,7 +16,7 @@ contract SplurgeTest is Test {
     uint256 private ownerPrivateKey;
     uint256 private spenderPrivateKey;
     uint256 private realPrivateKey;
-    uint256 tradeGasLimit;
+    uint256 private tradeGasLimit;
 
     function setUp() public {
         splurgeContract = new Splurge();
@@ -27,6 +27,7 @@ contract SplurgeTest is Test {
         // realPrivateKey = 0xd9ed762bc42f7913160dffd48b19c3d55bb3c76e2fadabda232e386fb43fd0f6;
     }
 
+    //solhint-disable-next-line
     function testFuzz_TakeFees(uint256 amount) public {
         uint256 postFeeAmount = splurgeContract.takeFees(amount);
         uint256 gasPaid = tradeGasLimit * tx.gasprice;

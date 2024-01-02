@@ -59,7 +59,7 @@ export default function Home() {
 
               {/* Docs link here */}
               <a
-                href='https://splurge.gitbook.io/splurge-docs/'
+                href='https://splurge-1.gitbook.io/splurge/'
                 className='text-gray-500 hover:text-blue-500 transition'
                 target='_blank'
                 rel='noopener noreferrer'

@@ -14,8 +14,12 @@ import { IZeroExSwap, IWETH, SplurgeOrderStruct, ZeroExSwapStruct, badSignature,
 contract Splurge {
     event TradeEvent(bytes signature, uint256 amountReceieved);
 
-    IWETH constant wETH = IWETH(0x82aF49447D8a07e3bd95BD0d56f35241523fBab1);
-    IZeroExSwap constant swapRouter =
+    //solhint-disable-next-line
+    IWETH public constant wETH =
+        IWETH(0x82aF49447D8a07e3bd95BD0d56f35241523fBab1);
+
+    //solhint-disable-next-line
+    IZeroExSwap public constant swapRouter =
         IZeroExSwap(0xDef1C0ded9bec7F1a1670819833240f027b25EfF);
 
     mapping(bytes => uint256) public lastCompletedTrade;
@@ -44,7 +48,7 @@ contract Splurge {
         bytes memory signature,
         ZeroExSwapStruct memory swapCallData
     ) public onlyOwner {
-        //@AUDIT Need to verify the message from signature == order
+        //@AUDIT-medium Need to verify the message from signature == order
         if (getSigner(order, signature) != order.recipient)
             revert badSignature(order, signature);
 
@@ -107,7 +111,7 @@ contract Splurge {
         return outputAmount;
     }
 
-    //@AUDIT arithmetic overflow/underflow posed by fuzz test
+    //@AUDIT-High arithmetic overflow/underflow posed by fuzz test
     /** 
         @notice calculates the WETH amount after fee - 0.15%
         @param amount the trade amount determined by order.amount / order.tranches
