@@ -113,7 +113,7 @@ export default function Trades() {
 
     if (selectedIndex === -1) {
       newSelected = newSelected.concat(selected, id);
-      updateTradeStatus(id); // Call updateTradeStatus for the selected trade
+      // updateTradeStatus(id); // Call updateTradeStatus for the selected trade
     } else {
       newSelected = newSelected.concat(
         selected.slice(0, selectedIndex),
@@ -127,14 +127,19 @@ export default function Trades() {
     if (event.target.checked) {
       const newSelected = tradeRows.map((n) => n.id);
       setSelected(newSelected);
-      await Promise.all(newSelected.map((id) => updateTradeStatus(id)));
       return;
     }
     setSelected([]);
   };
 
+  const tradeStoppedPressed = async () => {
+    await Promise.all(selected.map((id) => updateTradeStatus(id)));
+    return;
+  };
+
   async function updateTradeStatus(tradeId) {
     try {
+      console.log('TRADE ID:', tradeId);
       const { data, error } = await supabase
         .from('Trades')
         .update({ ['tradeStopped']: true })
@@ -463,7 +468,7 @@ export default function Trades() {
                   color='error'
                   sx={{ mt: 2 }}
                   onClick={async () => {
-                    await handleSelectAllClick(); // Wait for handleSelectAllClick to complete
+                    await tradeStoppedPressed(); // Wait for tradeStopped to complete
                     handleClose();
                   }}
                 >
