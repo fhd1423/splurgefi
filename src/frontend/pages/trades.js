@@ -27,6 +27,8 @@ import { supabase } from '../components/supabase/client';
 import sendSupabaseRequest from '../components/supabase/supabaseClient';
 
 //Should add arbiscan links for completed batches
+//UI color response in NavBar for when a tab is selected
+//Feedback widget on every page(just a textbox that says send)
 
 const EnhancedTableToolbar = ({ numSelected, onDeleteSelected }) => (
   <Toolbar

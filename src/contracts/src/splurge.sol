@@ -4,7 +4,7 @@ pragma solidity ^0.8.21;
 /** 
  @author SplurgeFi
  @title Splurge
- @notice This contract serves as the automation executor for Splurge Automated Trades. Pinged by a keeper. 
+ @notice This contract serves as the settlement executor for Splurge Automated Trades(https://www.splurgefi.xyz/). Executions are triggered by keeper bot. 
 */
 
 import { IERC20 } from "@openzeppelin/contracts/token/ERC20/IERC20.sol";
@@ -14,43 +14,37 @@ import { IZeroExSwap, IWETH, SplurgeOrderStruct, ZeroExSwapStruct, badSignature,
 contract Splurge {
     event TradeEvent(bytes signature, uint256 amountReceieved);
 
-    IZeroExSwap public swapRouter;
-    IWETH internal wETH;
+    IWETH constant wETH = IWETH(0x82aF49447D8a07e3bd95BD0d56f35241523fBab1);
+    IZeroExSwap constant swapRouter =
+        IZeroExSwap(0xDef1C0ded9bec7F1a1670819833240f027b25EfF);
+
     mapping(bytes => uint256) public lastCompletedTrade;
     mapping(bytes => uint256) public tranchesCompleted;
-    address public deployer;
-    address public executor;
+    address public owner;
     uint256 public tradeGasLimit = 4000000;
 
-    modifier onlyExecutorOrDeployer() {
+    modifier onlyOwner() {
         //solhint-disable-next-line
-        require(
-            msg.sender == executor || msg.sender == deployer,
-            "Not executor or deployer"
-        );
+        require(msg.sender == owner, "Not deployer");
         _;
     }
 
-    //? What is the value of _executor on init
-    constructor(address _swapRouter, address _wethAddress, address _executor) {
-        swapRouter = IZeroExSwap(_swapRouter);
-        wETH = IWETH(_wethAddress);
-        deployer = msg.sender;
-        executor = _executor;
+    constructor() {
+        owner = msg.sender;
     }
 
     /** 
-        @notice asdf 
-        @dev asdf
-        @param order fads
-        //? Do we want Deployer to be able to call verifyExecuteTrade
+        @notice verifies if 'order' is authenticated by trader and authorized to trade as per conditions
+        @param order automation conditions of trade
+        @param signature trader signature of 'order'
+        @param swapCallData call data to execute with ZeroEx(0x) Protocol contract for trade
     */
     function verifyExecuteTrade(
         SplurgeOrderStruct memory order,
         bytes memory signature,
         ZeroExSwapStruct memory swapCallData
-    ) public onlyExecutorOrDeployer {
-        //! Need to verify the message from signature == order
+    ) public onlyOwner {
+        //@AUDIT Need to verify the message from signature == order
         if (getSigner(order, signature) != order.recipient)
             revert badSignature(order, signature);
 
@@ -113,17 +107,24 @@ contract Splurge {
         return outputAmount;
     }
 
+    //@AUDIT arithmetic overflow/underflow posed by fuzz test
+    /** 
+        @notice calculates the WETH amount after fee - 0.15%
+        @param amount the trade amount determined by order.amount / order.tranches
+    */
     function takeFees(uint256 amount) public view returns (uint256) {
         uint256 gasPaid = tradeGasLimit * tx.gasprice;
         uint256 afterGas = amount - gasPaid;
-        uint256 afterFee = (afterGas * 9985) / 10000; //? Precision
+        uint256 afterFee = (afterGas * 9985) / 10000;
         return afterFee;
     }
 
-    //! Modify to only allow deployer to claim fees
-    function claimFees() public onlyExecutorOrDeployer {
+    /** 
+        @notice withdraws contracts WETH balance to contract owner. Only callable by owner.
+    */
+    function claimFees() public onlyOwner {
         wETH.withdraw(wETH.balanceOf(address(this)));
-        payable(deployer).transfer(address(this).balance);
+        payable(owner).transfer(address(this).balance);
     }
 
     function getSigner(
