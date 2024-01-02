@@ -366,7 +366,9 @@ export default function Trades() {
                                 ? 'transparent'
                                 : '#5D5D5D',
                             borderBottom:
-                              tradeRows.length === 1 ? 'none' : '1px solid',
+                              tradeRows.length === 1
+                                ? 'none'
+                                : '1px solid #5D5D5D',
                             color: 'white',
                           },
                         }}
