@@ -1,3 +1,4 @@
+import sendCreatePairRequest from '@/components/supabase/sendCreatePairRequest';
 import { EthereumWalletConnectors } from '@dynamic-labs/ethereum';
 import {
   DynamicContextProvider,
@@ -25,7 +26,6 @@ import React, { useEffect, useState } from 'react';
 import NavBar from '../components/NavBar';
 import { supabase } from '../components/supabase/client';
 import sendSupabaseRequest from '../components/supabase/supabaseClient';
-
 //Should add arbiscan links for completed batches
 //UI color response in NavBar for when a tab is selected
 //Feedback widget on every page(just a textbox that says send)
@@ -162,26 +162,112 @@ export default function Trades() {
     }
   }
 
+  const fetchPrice = async (inputName, outputName, inputAddy, outputAddy) => {
+    try {
+      let data;
+      if (inputName === 'WETH') {
+        data = await sendCreatePairRequest(
+          getAddress(outputAddy),
+          outputName,
+          true,
+        );
+      } else {
+        data = await sendCreatePairRequest(
+          getAddress(inputAddy),
+          inputName,
+          true,
+        );
+      }
+
+      if (data && data.avgPrice && data.currentPrice) {
+        return { currentPrice: data.currentPrice, avgPrice: data.avgPrice };
+      } else {
+        console.error('Price data not found');
+      }
+    } catch (error) {
+      console.error('Error fetching average price:', error);
+    }
+  };
+
+  // const fetchTrades = async () => {
+  //   if (primaryWallet?.address) {
+  //     const data = await sendSupabaseRequest(authToken, {});
+  //     console.log(data);
+
+  //     const tradesPromises = data.map(async (trade) => ({
+  //       id: trade.id,
+  //       details: [
+  //         await getNameFromPair(trade.pair),
+  //         trade.pair,
+  //         trade.complete,
+  //         trade.order.tranches,
+  //         trade.order.percentChange,
+  //         trade.order.deadline,
+  //         trade.remainingBatches,
+  //         trade.tradeStopped,
+  //         trade.failedSimulation,
+  //         trade.amountRecieved,
+  //       ],
+  //     }));
+
+  //     const tradesResults = await Promise.all(tradesPromises);
+  //     let newTrades = new Map(
+  //       tradesResults.map((item) => [item.id, item.details]),
+  //     );
+
+  //     setUserTrades(newTrades);
+  //   }
+  // };
+
   const fetchTrades = async () => {
     if (primaryWallet?.address) {
       const data = await sendSupabaseRequest(authToken, {});
       console.log(data);
 
-      const tradesPromises = data.map(async (trade) => ({
-        id: trade.id,
-        details: [
-          await getNameFromPair(trade.pair),
-          trade.pair,
-          trade.complete,
-          trade.order.tranches,
-          trade.order.percentChange,
-          trade.order.deadline,
-          trade.remainingBatches,
-          trade.tradeStopped,
-          trade.failedSimulation,
-          trade.amountRecieved,
-        ],
-      }));
+      const tradesPromises = data.map(async (trade) => {
+        // Extract necessary data for fetchPrice
+        const tokenName = await getNameFromPair(trade.pair);
+        const inputName = tokenName.split('-')[0];
+        const outputName = tokenName.split('-')[1];
+
+        const inputAddy = trade.pair.split('-')[0];
+        const outputAddy = trade.pair.split('-')[1];
+
+        // Call fetchPrice and wait for the result
+        let currentPrice, avgPrice, priceDifference;
+        try {
+          const priceData = await fetchPrice(
+            inputName,
+            outputName,
+            inputAddy,
+            outputAddy,
+          );
+          currentPrice = priceData.currentPrice;
+          avgPrice = priceData.avgPrice;
+          priceDifference = ((1 - currentPrice / avgPrice) * 100).toFixed(2);
+        } catch (error) {
+          console.error('Error fetching price data:', error);
+          currentPrice = 'N/A';
+          avgPrice = 'N/A';
+        }
+
+        return {
+          id: trade.id,
+          details: [
+            tokenName,
+            trade.pair,
+            trade.complete,
+            trade.order.tranches,
+            trade.order.percentChange,
+            priceDifference,
+            trade.order.deadline,
+            trade.remainingBatches,
+            trade.tradeStopped,
+            trade.failedSimulation,
+            trade.amountRecieved,
+          ],
+        };
+      });
 
       const tradesResults = await Promise.all(tradesPromises);
       let newTrades = new Map(
@@ -206,6 +292,7 @@ export default function Trades() {
         complete,
         batches,
         percentChange,
+        priceDifference,
         deadline,
         remainingBatches,
         tradeStopped,
@@ -222,6 +309,7 @@ export default function Trades() {
           ? `-${percentChange}`
           : `+${percentChange}`
       }%`,
+      priceDifference: priceDifference + '%',
       date: new Date(deadline * 1000).toLocaleString(),
       status: complete
         ? 'Complete'
@@ -343,6 +431,15 @@ export default function Trades() {
                           fontWeight: 'bold',
                         }}
                       >
+                        Current Price
+                      </TableCell>
+                      <TableCell
+                        sx={{
+                          color: 'white',
+                          borderBottom: 'none',
+                          fontWeight: 'bold',
+                        }}
+                      >
                         Deadline
                       </TableCell>
                       <TableCell
@@ -409,14 +506,8 @@ export default function Trades() {
                         <TableCell>{row.buy}</TableCell>
                         <TableCell>{row.batches}</TableCell>
                         <TableCell>{row.percentChange}</TableCell>
+                        <TableCell>{row.priceDifference}</TableCell>
                         <TableCell>{row.date}</TableCell>
-                        {/* <TableCell>
-                          {row.tradeStopped
-                            ? 'Cancelled'
-                            : row.failedSimulation
-                            ? 'Failed Simulation'
-                            : row.status}
-                        </TableCell> */}
                         <TableCell>
                           {row.tradeStopped ? (
                             <span style={{ color: 'red' }}>Cancelled</span>
