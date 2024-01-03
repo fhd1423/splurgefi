@@ -609,8 +609,8 @@ export default function Trades() {
                           </Paper>
                         </TableCell>
                         <TableCell>
-                          {row.amountRecieved
-                            ? (row.amountRecieved / 1e18).toFixed(4)
+                          {row.amountReceived
+                            ? (row.amountReceived / 1e18).toFixed(4)
                             : 'N/A'}
                         </TableCell>
                       </TableRow>
