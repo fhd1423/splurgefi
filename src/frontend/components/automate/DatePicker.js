@@ -21,8 +21,9 @@ const DatePicker = ({ selectedDate, setSelectedDate, limitOrder, title }) => {
             input: {
               color: '#ffffff',
               height: '35px',
-              width: '170px',
-              padding: '10px 14px 10px 0',
+              width: '100%',
+              maxWidth: '170px',
+              padding: '10px 14px',
               fontSize: '1rem',
             },
             '& .MuiInputLabel-root': {
@@ -37,7 +38,7 @@ const DatePicker = ({ selectedDate, setSelectedDate, limitOrder, title }) => {
               backgroundColor: '#1B1B1B',
               borderRadius: '10px',
               '& fieldset': {
-                borderColor: 'transparent', // Set the border color to transparent
+                borderColor: 'transparent',
               },
               '&.Mui-focused fieldset': {
                 borderColor: 'transparent', // Remove outline

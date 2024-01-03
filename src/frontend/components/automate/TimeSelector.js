@@ -12,7 +12,8 @@ import { useState } from 'react';
 const CustomFormControl = styled(FormControl)({
   backgroundColor: '#1B1B1B',
   borderRadius: '10px',
-  width: '220px',
+  width: '100%',
+  maxWidth: '220px',
   height: '55px',
   display: 'flex',
   flexDirection: 'row',
