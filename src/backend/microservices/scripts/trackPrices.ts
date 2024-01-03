@@ -78,7 +78,7 @@ const updatePriceData = async () => {
         (0.01 * Number(wethPrice)) / Number(filteredPrices[pair])),
   );
 
-  console.log(pairPrices);
+  //console.log(pairPrices);
   if (isInInterval) {
     for (let pair of pairs) {
       const current_price = pairPrices[pair.path];

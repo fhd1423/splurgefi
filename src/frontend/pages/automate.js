@@ -38,7 +38,7 @@ import sendSupabaseRequest from '../components/supabase/supabaseClient';
 
 export default function Automate() {
   const { userHasScopes } = useDynamicScopes();
-  const SPLURGE_ADDRESS = '0x2c5C7dbE16685e1371F4caeAF586c6CaBFFc4252';
+  const SPLURGE_ADDRESS = '0xc6f9745EDE9faeD41ff8189Bb2FF7f5864d6366E';
   const WETH_ADDRESS = '0x82af49447d8a07e3bd95bd0d56f35241523fbab1';
 
   // FRONT END RESPONSIVENESS

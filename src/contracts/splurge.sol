@@ -21,7 +21,7 @@ contract Splurge {
 
     event TradeEvent(bytes signature, uint256 amountReceieved);
 
-    uint256 public constant tradeGasLimit = 4000000;
+    uint256 public constant TRADE_GAS_LIMIT = 4000000;
 
     modifier onlyOwner() {
         //solhint-disable-next-line
@@ -112,7 +112,7 @@ contract Splurge {
         @param amount the trade amount determined by order.amount / order.tranches
     */
     function takeFees(uint256 amount) public view returns (uint256) {
-        uint256 gasPaid = tradeGasLimit * tx.gasprice;
+        uint256 gasPaid = TRADE_GAS_LIMIT * tx.gasprice;
         if (amount < gasPaid) revert notEnoughWETH(amount);
         uint256 afterGas = amount - gasPaid;
         uint256 afterFee = (afterGas * 9985) / 10000;
