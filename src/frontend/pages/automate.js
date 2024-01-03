@@ -416,8 +416,8 @@ export default function Automate() {
 
                   <div className='w-full text-center pt-3 mb-0 text-white font-semibold text-base'>
                     {outputIsWETH
-                      ? `Current ${currentInput.symbol} Price:`
-                      : `Current ${currentOutput.symbol} Price:`}
+                      ? `Current ${currentInput.symbol} Price Delta:`
+                      : `Current ${currentOutput.symbol} Price Delta:`}
                     {!priceDataLoading ? (
                       <span className='rounded-lg p-1 text-emerald-500 bg-black ml-1'>
                         {((1 - priceData[0] / priceData[1]) * 100).toFixed(2)}%
