@@ -457,7 +457,7 @@ export default function Trades() {
                           fontWeight: 'bold',
                         }}
                       >
-                        Current Price
+                        Current Price Delta
                       </TableCell>
                       <TableCell
                         sx={{
