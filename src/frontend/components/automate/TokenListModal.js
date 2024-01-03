@@ -256,10 +256,10 @@ const TokenModal = ({
       const addressMatch = token.address
         .toLowerCase()
         .includes(trimmedSearchTerm);
-      
-      const excludeRunblox = !token.name.toLowerCase().includes("runblox");
+
+      const excludeRunblox = !token.name.toLowerCase().includes('runblox');
       return (nameMatch || symbolMatch || addressMatch) && excludeRunblox;
-  });
+    });
 
     setFilteredTokens(filtered);
   };
