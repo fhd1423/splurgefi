@@ -448,7 +448,7 @@ export default function Trades() {
                           fontWeight: 'bold',
                         }}
                       >
-                        Percent Change
+                        Target Percent Change
                       </TableCell>
                       <TableCell
                         sx={{

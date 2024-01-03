@@ -32,7 +32,7 @@ import ToggleSwap from '../components/automate/ToggleSwap';
 
 // SDK & Client Imports
 import { ERC20abi } from '@/helpers/ERC20';
-import { generateRandomSalt, parseJwt, uploadUserData } from '@/helpers/utils';
+import { generateRandomSalt, parseJwt } from '@/helpers/utils';
 import { useDynamicContext } from '@dynamic-labs/sdk-react-core';
 import sendSupabaseRequest from '../components/supabase/supabaseClient';
 
@@ -191,8 +191,8 @@ export default function Automate() {
   useEffect(() => {
     if (primaryWallet?.address && authToken) {
       const jwtData = parseJwt(authToken);
+      // uploadUserData(primaryWallet?.address, jwtData);
 
-      uploadUserData(primaryWallet?.address, jwtData);
       handleMessageChange('recipient', primaryWallet?.address);
     }
     if (primaryWallet?.address) {
