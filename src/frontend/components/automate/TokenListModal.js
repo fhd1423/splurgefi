@@ -256,7 +256,9 @@ const TokenModal = ({
       const addressMatch = token.address
         .toLowerCase()
         .includes(trimmedSearchTerm);
-      return nameMatch || symbolMatch || addressMatch;
+
+      const excludeRunblox = !token.name.toLowerCase().includes('runblox');
+      return (nameMatch || symbolMatch || addressMatch) && excludeRunblox;
     });
 
     setFilteredTokens(filtered);
