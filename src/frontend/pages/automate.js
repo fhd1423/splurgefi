@@ -223,7 +223,7 @@ export default function Automate() {
     onSuccess(data) {
       let formattedBalance = 0;
       try {
-        formattedBalance = balance / 10 ** currentInput.decimals;
+        formattedBalance = Number(balance) / 10 ** currentInput.decimals;
       } catch (e) {}
 
       const roundedBalance =
