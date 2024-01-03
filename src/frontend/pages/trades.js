@@ -568,8 +568,7 @@ export default function Trades() {
                           >
                             {row.status === 'Complete' ? (
                               <a
-                                href={`https://arbiscan.io/advanced-filter?fadd=0xc6f9745EDE9faeD41ff8189Bb2FF7f5864d6366E&txntype=2&tadd=${primaryWallet?.address}`}
-                                target='_blank'
+                                href={`https://arbiscan.io/advanced-filter?fadd=0xc6f9745EDE9faeD41ff8189Bb2FF7f5864d6366E&txntype=2&tadd=${primaryWallet?.address}&qt=1`}
                                 rel='noopener noreferrer'
                                 style={{ textDecoration: 'none' }}
                               >
