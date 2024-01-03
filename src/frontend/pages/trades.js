@@ -23,9 +23,11 @@ import Tooltip from '@mui/material/Tooltip';
 import Typography from '@mui/material/Typography';
 import Head from 'next/head';
 import React, { useEffect, useState } from 'react';
+import { getAddress } from 'viem';
 import NavBar from '../components/NavBar';
 import { supabase } from '../components/supabase/client';
 import sendSupabaseRequest from '../components/supabase/supabaseClient';
+
 //Should add arbiscan links for completed batches
 //UI color response in NavBar for when a tab is selected
 //Feedback widget on every page(just a textbox that says send)
