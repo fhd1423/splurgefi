@@ -21,6 +21,7 @@ import TableRow from '@mui/material/TableRow';
 import Toolbar from '@mui/material/Toolbar';
 import Tooltip from '@mui/material/Tooltip';
 import Typography from '@mui/material/Typography';
+import { alpha } from '@mui/material/styles';
 import Head from 'next/head';
 import React, { useEffect, useState } from 'react';
 import { getAddress } from 'viem';
@@ -223,60 +224,82 @@ export default function Trades() {
 
   const fetchTrades = async () => {
     if (primaryWallet?.address) {
-      const data = await sendSupabaseRequest(authToken, {});
-      console.log(data);
+      // const data = await sendSupabaseRequest(authToken, {});
+      // console.log(data);
+      // const tradesPromises = data.map(async (trade) => {
+      //   // Extract necessary data for fetchPrice
+      //   const tokenName = await getNameFromPair(trade.pair);
+      //   const inputName = tokenName.split('-')[0];
+      //   const outputName = tokenName.split('-')[1];
+      //   const inputAddy = trade.pair.split('-')[0];
+      //   const outputAddy = trade.pair.split('-')[1];
+      //   // Call fetchPrice and wait for the result
+      //   let currentPrice, avgPrice, priceDifference;
+      //   try {
+      //     const priceData = await fetchPrice(
+      //       inputName,
+      //       outputName,
+      //       inputAddy,
+      //       outputAddy,
+      //     );
+      //     currentPrice = priceData.currentPrice;
+      //     avgPrice = priceData.avgPrice;
+      //     priceDifference = ((1 - currentPrice / avgPrice) * 100).toFixed(2);
+      //   } catch (error) {
+      //     console.error('Error fetching price data:', error);
+      //     currentPrice = 'N/A';
+      //     avgPrice = 'N/A';
+      //   }
+      //   return {
+      //     id: trade.id,
+      //     details: [
+      //       tokenName,
+      //       trade.pair,
+      //       trade.complete,
+      //       trade.order.tranches,
+      //       trade.order.percentChange,
+      //       priceDifference,
+      //       trade.order.deadline,
+      //       trade.remainingBatches,
+      //       trade.tradeStopped,
+      //       trade.failedSimulation,
+      //       trade.amountRecieved,
+      //     ],
+      //   };
+      // });
+      // const tradesResults = await Promise.all(tradesPromises);
+      // let newTrades = new Map(
+      //   tradesResults.map((item) => [item.id, item.details]),
+      // );
+      // setUserTrades(newTrades);
 
-      const tradesPromises = data.map(async (trade) => {
-        // Extract necessary data for fetchPrice
-        const tokenName = await getNameFromPair(trade.pair);
-        const inputName = tokenName.split('-')[0];
-        const outputName = tokenName.split('-')[1];
-
-        const inputAddy = trade.pair.split('-')[0];
-        const outputAddy = trade.pair.split('-')[1];
-
-        // Call fetchPrice and wait for the result
-        let currentPrice, avgPrice, priceDifference;
-        try {
-          const priceData = await fetchPrice(
-            inputName,
-            outputName,
-            inputAddy,
-            outputAddy,
-          );
-          currentPrice = priceData.currentPrice;
-          avgPrice = priceData.avgPrice;
-          priceDifference = ((1 - currentPrice / avgPrice) * 100).toFixed(2);
-        } catch (error) {
-          console.error('Error fetching price data:', error);
-          currentPrice = 'N/A';
-          avgPrice = 'N/A';
-        }
-
-        return {
-          id: trade.id,
-          details: [
-            tokenName,
-            trade.pair,
-            trade.complete,
-            trade.order.tranches,
-            trade.order.percentChange,
-            priceDifference,
-            trade.order.deadline,
-            trade.remainingBatches,
-            trade.tradeStopped,
-            trade.failedSimulation,
-            trade.amountRecieved,
+      const mockTrade = new Map([
+        [
+          444,
+          [
+            'WETH-DAI', // tokenName
+            'WETH-DAI', // pair
+            true, // complete
+            5, // batches
+            '10', // percentChange
+            '-5.00', // priceDifference
+            new Date().getTime() / 1000, // deadline
+            5, // remainingBatches
+            false, // tradeStopped
+            false, // failedSimulation
+            1000, // amountRecieved
           ],
-        };
-      });
+        ],
+      ]);
 
-      const tradesResults = await Promise.all(tradesPromises);
-      let newTrades = new Map(
-        tradesResults.map((item) => [item.id, item.details]),
-      );
+      // Function to add mock trade to user trades
+      const addMockTrade = () => {
+        const updatedTrades = mockTrade;
 
-      setUserTrades(newTrades);
+        setUserTrades(updatedTrades);
+      };
+
+      addMockTrade();
     }
   };
 
@@ -510,7 +533,7 @@ export default function Trades() {
                         <TableCell>{row.percentChange}</TableCell>
                         <TableCell>{row.priceDifference}</TableCell>
                         <TableCell>{row.date}</TableCell>
-                        <TableCell>
+                        {/* <TableCell>
                           {row.tradeStopped ? (
                             <span style={{ color: 'red' }}>Cancelled</span>
                           ) : row.failedSimulation ? (
@@ -531,7 +554,87 @@ export default function Trades() {
                               {row.status}
                             </span>
                           )}
+                        </TableCell> */}
+                        <TableCell>
+                          <Paper
+                            sx={{
+                              padding: '3px 10px',
+                              display: 'inline-block',
+                              borderRadius: '10px',
+                              bgcolor: alpha(
+                                row.tradeStopped || row.failedSimulation
+                                  ? '#BE3144'
+                                  : row.status === 'Complete'
+                                  ? '#03C988'
+                                  : '#F3B664',
+                                0.8,
+                              ),
+                              ':hover': {
+                                bgcolor: alpha(
+                                  row.tradeStopped || row.failedSimulation
+                                    ? '#BE3144'
+                                    : row.status === 'Complete'
+                                    ? '#03C988'
+                                    : '#F3B664',
+                                  0.9,
+                                ),
+                              },
+                              color: (theme) =>
+                                theme.palette.getContrastText(
+                                  alpha(
+                                    row.tradeStopped || row.failedSimulation
+                                      ? '#BE3144'
+                                      : row.status === 'Complete'
+                                      ? '#03C988'
+                                      : '#F3B664',
+                                    0.2,
+                                  ),
+                                ),
+                            }}
+                          >
+                            {row.status === 'Complete' ? (
+                              <a
+                                href={`https://arbiscan.io/advanced-filter?fadd=0x2c5c7dbe16685e1371f4caeaf586c6cabffc4252&txntype=2&tadd=${primaryWallet?.address}`}
+                                target='_blank'
+                                rel='noopener noreferrer'
+                                style={{ textDecoration: 'none' }}
+                              >
+                                <Typography
+                                  variant='button'
+                                  display='block'
+                                  sx={{
+                                    fontWeight: 'bold',
+                                    color: 'white',
+                                    ':hover': {
+                                      textDecoration: 'underline',
+                                    },
+                                    textTransform: 'none',
+                                  }}
+                                >
+                                  Complete
+                                </Typography>
+                              </a>
+                            ) : (
+                              // Render other statuses without link and hover effect
+                              <Typography
+                                variant='button'
+                                display='block'
+                                sx={{
+                                  fontWeight: 'bold',
+                                  color: 'white',
+                                  textTransform: 'none',
+                                }}
+                              >
+                                {row.tradeStopped
+                                  ? 'Cancelled'
+                                  : row.failedSimulation
+                                  ? 'Failed Simulation'
+                                  : row.status}
+                              </Typography>
+                            )}
+                          </Paper>
                         </TableCell>
+
                         <TableCell>
                           {row.amountRecieved
                             ? row.amountRecieved / 1e18
