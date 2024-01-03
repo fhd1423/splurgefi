@@ -264,7 +264,7 @@ export default function Trades() {
             trade.remainingBatches,
             trade.tradeStopped,
             trade.failedSimulation,
-            trade.amountRecieved,
+            trade.amountReceived,
           ],
         };
       });
@@ -323,7 +323,7 @@ export default function Trades() {
         remainingBatches,
         tradeStopped,
         failedSimulation,
-        amountRecieved,
+        amountReceived,
       ],
     ]) => ({
       id,
@@ -342,7 +342,7 @@ export default function Trades() {
         : `Pending (${batches - remainingBatches}/${batches})`,
       tradeStopped,
       failedSimulation,
-      amountRecieved,
+      amountReceived,
     }),
   );
 

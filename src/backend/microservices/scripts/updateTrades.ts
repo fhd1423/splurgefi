@@ -1,12 +1,12 @@
+import { Address, parseAbiItem } from 'viem';
 import { supabase } from '../utils/client';
 import { viemClient } from '../utils/viemclient';
-import { Address, parseAbiItem } from 'viem';
 
 const updateTrade = async (
   id: number,
   remainingBatches: number,
   lastExecuted: number,
-  amountReceieved: number,
+  amountReceived: number,
 ) => {
   const { data, error } = await supabase
     .from('Trades')
@@ -15,7 +15,7 @@ const updateTrade = async (
       lastExecuted,
       ready: false,
       complete: remainingBatches == 0,
-      amountReceieved,
+      amountReceived,
     })
     .match({ id });
 
@@ -30,7 +30,7 @@ const updateTrade = async (
 
 const updateTradeBatchTimings = async (
   signature: string,
-  amountReceieved: number,
+  amountReceived: number,
 ) => {
   let { data: trades, error } = await supabase
     .from('Trades')
@@ -43,13 +43,13 @@ const updateTradeBatchTimings = async (
   }
   const trade = trades[0];
   const justExecuted = parseInt((new Date().getTime() / 1000).toFixed(0));
-  const currentReceieved = trade.amountReceieved;
+  const currentReceived = trade.amountReceived;
 
   updateTrade(
     trade.id,
     trade.remainingBatches - 1,
     justExecuted,
-    currentReceieved + amountReceieved,
+    currentReceived + amountReceived,
   );
 };
 
