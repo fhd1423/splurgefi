@@ -7,7 +7,8 @@ const CustomInputContainer = styled('div')({
   alignItems: 'center',
   backgroundColor: '#1B1B1B',
   borderRadius: '10px',
-  width: '215px',
+  width: '100%',
+  maxWidth: '215px',
   height: '55px',
   padding: '0 15px',
 });

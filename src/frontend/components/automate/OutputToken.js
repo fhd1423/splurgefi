@@ -12,9 +12,8 @@ const CustomInputContainer = styled('div')({
   backgroundColor: '#1B1B1B',
   borderRadius: '10px',
   padding: '0 10px',
-  margin: 0,
-  paddingTop: 0,
-  width: '455px',
+  width: '100%',
+  maxWidth: '455px',
   height: '90px',
   justifyContent: 'space-between',
 });

@@ -44,6 +44,7 @@ export default function Automate() {
   // FRONT END RESPONSIVENESS
   const theme = useTheme();
   const isLargeScreen = useMediaQuery(theme.breakpoints.up('md'));
+  const isMobile = useMediaQuery(theme.breakpoints.down('sm'));
 
   //STATE
   const [toggleSelection, setToggleSelection] = useState('buy');
@@ -332,7 +333,7 @@ export default function Automate() {
             sx={{
               width: { xs: '85%', md: '500px' },
               mx: 'auto',
-              mt: '-60px',
+              mt: isToggled && isMobile ? '20px' : '-60px',
               display: 'flex',
               flexDirection: 'column',
               alignItems: 'center',

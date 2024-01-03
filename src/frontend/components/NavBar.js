@@ -1,6 +1,11 @@
 import { DynamicWidget } from '@dynamic-labs/sdk-react-core';
+import { useMediaQuery, useTheme } from '@mui/material';
 import Link from 'next/link';
+
 const NavBar = ({ inLandingPage }) => {
+  const theme = useTheme();
+  const isMobile = useMediaQuery(theme.breakpoints.down('sm'));
+
   return (
     <nav className='flex justify-between items-center px-8 pt-5'>
       {/* Left-aligned links */}
@@ -13,14 +18,14 @@ const NavBar = ({ inLandingPage }) => {
             SplurgeFi
           </button>
         </Link>
-        {!inLandingPage && (
+        {!inLandingPage && !isMobile && (
           <Link href='/trades' passHref>
             <button className='text-white hover:decoration-solid hover:scale-105 transition duration-200 hover:text-gray-500'>
               My Trades
             </button>
           </Link>
         )}
-        {!inLandingPage && (
+        {!inLandingPage && !isMobile && (
           <Link href='/automate' passHref>
             <button className='text-white font-medium hover:scale-105 transition duration-200 hover:text-gray-500'>
               New Trade

@@ -6,15 +6,16 @@ import TokenModal from './TokenListModal';
 
 const CustomInputContainer = styled('div')(({ address }) => ({
   display: 'flex',
-  flexDirection: 'column', // Stack children vertically
-  justifyContent: 'space-between', // Distribute space between items
-  alignItems: 'flex-start', // Align items to the start of the container
+  flexDirection: 'column',
+  justifyContent: 'space-between',
+  alignItems: 'flex-start',
   backgroundColor: '#1B1B1B',
   borderRadius: '10px',
   padding: '10px',
-  width: '455px',
+  width: '100%',
+  maxWidth: '455px',
   height: '90px',
-  position: 'relative', // Set to relative
+  position: 'relative',
 }));
 
 const InputRow = styled('div')({

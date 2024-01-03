@@ -8,7 +8,8 @@ const CustomInputContainer = styled('div')(({ limitOrder }) => ({
   alignItems: 'center',
   backgroundColor: '#1B1B1B',
   borderRadius: '10px',
-  width: '215px',
+  width: '100%',
+  maxWidth: '215px',
   height: '55px',
   position: 'relative',
 }));
@@ -20,7 +21,7 @@ const CustomInput = styled(InputBase)({
   '& .MuiInputBase-input': {
     textAlign: 'left',
     padding: '0 10px',
-    width: 'calc(100% - 50px)', // Reduced width to make room for percent symbol
+    width: 'calc(100% - 50px)',
     height: '100%',
   },
 });
