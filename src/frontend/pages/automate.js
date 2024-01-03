@@ -6,7 +6,7 @@ import Head from 'next/head';
 import router from 'next/router';
 import React, { useEffect, useState } from 'react';
 import { Toaster, toast } from 'sonner';
-import { formatEther, getAddress } from 'viem';
+import { getAddress } from 'viem';
 
 // MUI Date Picker Imports
 import { AdapterDayjs } from '@mui/x-date-pickers/AdapterDayjs';
@@ -223,10 +223,11 @@ export default function Automate() {
     onSuccess(data) {
       let formattedBalance = 0;
       try {
-        formattedBalance = formatEther(balance);
+        formattedBalance = balance / 10 ** currentInput.decimals;
       } catch (e) {}
 
-      const roundedBalance = Number(formattedBalance).toFixed(5);
+      const roundedBalance =
+        Math.floor(Number(formattedBalance) * 100000) / 100000;
       setTokenBalance(roundedBalance);
     },
   });
