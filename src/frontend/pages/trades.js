@@ -250,6 +250,7 @@ export default function Trades() {
           currentPrice = 'N/A';
           avgPrice = 'N/A';
         }
+
         return {
           id: trade.id,
           details: [
@@ -609,7 +610,7 @@ export default function Trades() {
                         </TableCell>
                         <TableCell>
                           {row.amountRecieved
-                            ? row.amountRecieved / 1e18
+                            ? (row.amountRecieved / 1e18).toFixed(4)
                             : 'N/A'}
                         </TableCell>
                       </TableRow>
