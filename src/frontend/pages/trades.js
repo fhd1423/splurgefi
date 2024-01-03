@@ -109,7 +109,7 @@ export default function Trades() {
         .eq('path', `${pair.split('-')[1]}-${pair.split('-')[0]}`);
 
       if (payingToken[0]) return `${payingToken[0].tokenName}-WETH`;
-      return `Unkown Trade Pair`;
+      return `Unknown Trade Pair`;
     }
   };
 
