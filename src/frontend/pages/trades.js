@@ -547,16 +547,12 @@ export default function Trades() {
                                   : '#F3B664',
                                 0.8,
                               ),
-                              ':hover': {
-                                bgcolor: alpha(
-                                  row.tradeStopped || row.failedSimulation
-                                    ? '#BE3144'
-                                    : row.status === 'Complete'
-                                    ? '#03C988'
-                                    : '#F3B664',
-                                  0.9,
-                                ),
-                              },
+                              ':hover':
+                                row.status === 'Complete'
+                                  ? {
+                                      bgcolor: alpha('#03C988', 0.9),
+                                    }
+                                  : {},
                               color: (theme) =>
                                 theme.palette.getContrastText(
                                   alpha(
