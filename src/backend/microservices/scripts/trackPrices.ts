@@ -137,7 +137,7 @@ function getNextIntervalTime() {
   const milliseconds = now.getMilliseconds();
 
   // Calculate how many milliseconds to next 10-second mark
-  const secondsToNextInterval = 5 - (seconds % 5);
+  const secondsToNextInterval = 10 - (seconds % 10);
   const millisecondsToWait = secondsToNextInterval * 1000 - milliseconds;
 
   return millisecondsToWait;
