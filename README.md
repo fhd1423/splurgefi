@@ -1,66 +1,13 @@
-## Foundry
+Automated trading with EIP-712 Signatures based on price deviations, settled through the 0x Protocol. 
 
-**Foundry is a blazing fast, portable and modular toolkit for Ethereum application development written in Rust.**
+## Database:
+Supabase stores price data and pending orders.
 
-Foundry consists of:
+## Price Feeds: 
+Docker containers running in GCP to capture prices from DexScreener and CoinGeckoTerminal.
 
--   **Forge**: Ethereum testing framework (like Truffle, Hardhat and DappTools).
--   **Cast**: Swiss army knife for interacting with EVM smart contracts, sending transactions and getting chain data.
--   **Anvil**: Local Ethereum node, akin to Ganache, Hardhat Network.
--   **Chisel**: Fast, utilitarian, and verbose solidity REPL.
+## Trade Execution:
+Tenderly for transaction simulation before each trade in order to not waste gas, and Tenderly Web3Actions hosts the actual execution logic.
 
-## Documentation
-
-https://book.getfoundry.sh/
-
-## Usage
-
-### Build
-
-```shell
-$ forge build
-```
-
-### Test
-
-```shell
-$ forge test
-```
-
-### Format
-
-```shell
-$ forge fmt
-```
-
-### Gas Snapshots
-
-```shell
-$ forge snapshot
-```
-
-### Anvil
-
-```shell
-$ anvil
-```
-
-### Deploy
-
-```shell
-$ forge script script/Counter.s.sol:CounterScript --rpc-url <your_rpc_url> --private-key <your_private_key>
-```
-
-### Cast
-
-```shell
-$ cast <subcommand>
-```
-
-### Help
-
-```shell
-$ forge --help
-$ anvil --help
-$ cast --help
-```
+## CI/CD:
+Github Actions automatically deploy a new contract to polygon testnet, approve tokens for trade through the contract and then a test signature and corresponding transaction is simulated.
