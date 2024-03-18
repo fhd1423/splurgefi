@@ -1,4 +1,4 @@
-Automated trading with EIP-712 Signatures based on price deviations, settled through the 0x Protocol. 
+Automated batch trading with EIP-712 Signatures based on price deviations, settled through the 0x Protocol. 
 
 ## Database:
 Supabase stores price data and pending orders.
